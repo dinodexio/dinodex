@@ -31,7 +31,7 @@ describe("balances", () => {
     const balances = appChain.runtime.resolve("Balances");
 
     const tx1 = await appChain.transaction(alice, async () => {
-      await balances.addBalance(tokenId, alice, UInt64.from(1000));
+      await balances.mintAndIncrementSupply(tokenId, alice, UInt64.from(1000));
     });
 
     await tx1.sign();

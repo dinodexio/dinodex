@@ -50,10 +50,12 @@ export const useBalancesStore = create<
     },
     async faucet(client: Client, address: string) {
       const balances = client.runtime.resolve("Balances");
+      const faucetRuntime = client.runtime.resolve('Faucet');
       const sender = PublicKey.fromBase58(address);
 
       const tx = await client.transaction(sender, async () => {
-        await balances.addBalance(tokenId, sender, Balance.from(1000));
+        // await balances.mintAndIncrementSupply(tokenId, sender, Balance.from(1000));
+        await faucetRuntime.dripSigned(tokenId, Balance.from(199));
       });
 
       await tx.sign();
