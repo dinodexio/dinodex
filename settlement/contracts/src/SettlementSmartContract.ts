@@ -21,7 +21,7 @@ import {
     TokenId,
     UInt32,
     UInt64,
-    TokenContract,
+    TokenContractV2,
     AccountUpdateForest,
   } from "o1js";
   
@@ -84,7 +84,7 @@ import {
   export const BATCH_SIGNATURE_PREFIX = prefixToField("pk-batchSignature");
   
   export class SettlementSmartContract
-    extends TokenContract
+    extends TokenContractV2
     implements SettlementContractType
   {
     // This pattern of injecting args into a smartcontract is currently the only

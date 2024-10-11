@@ -108,25 +108,28 @@ import {
     }
   
     @method
-    public async deposit(amount: UInt64) {
+    public async deposit(amount: UInt64, id: Field) {
       // Save this, since otherwise it would be a second witness later,
       // which could be a different values than the first
-      const sender = this.sender.getUnconstrained();
+      const sender = this.sender.getAndRequireSignatureV2();
   
       const settlementContract = this.settlementContract.getAndRequireEquals();
   
       // Credit the amount to the settlement contract
-      const balanceAU = AccountUpdate.create(settlementContract);
+      var balanceAU = AccountUpdate.create(settlementContract);
+      if(id != Field(0)){
+        balanceAU = AccountUpdate.create(settlementContract, id);
+      }
       balanceAU.balance.addInPlace(amount);
       this.self.approve(balanceAU);
   
       const action = new Deposit({
         address: sender,
         amount,
+        id
       });
   
-      const { methodIdMappings, incomingMessagesPaths } =
-        DispatchSmartContract.args;
+      const { methodIdMappings, incomingMessagesPaths } = DispatchSmartContract.args;
   
       const methodId = Field(
         methodIdMappings[incomingMessagesPaths.deposit].methodId

@@ -1,5 +1,10 @@
 import { AuroSigner, ClientAppChain } from "@proto-kit/sdk";
 import runtime from "../runtime";
+import { LPTokenId } from "../runtime/modules/dex/lp-token-id";
+import { TokenPair } from "../runtime/modules/dex/token-pair";
+import { PoolKey } from "../runtime/modules/dex/pool-key";
+import { prepareGraph, dijkstra } from "../runtime/modules/dex/router";
+import { TokenIdPath } from "../runtime/modules/dex/xyk";
 
 const appChain = ClientAppChain.fromRuntime(runtime.modules, AuroSigner);
 
@@ -14,3 +19,4 @@ appChain.configurePartial({
 });
 
 export const client = appChain;
+export { LPTokenId, TokenPair, PoolKey, prepareGraph, dijkstra, TokenIdPath };
