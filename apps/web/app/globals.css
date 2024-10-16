@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* import fonts */
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/SFProDisplay/SF-Pro-Display-Bold.otf") format("opentype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/SFProDisplay/SF-Pro-Display-BoldItalic.otf") format("opentype");
+  font-weight: 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/SFProDisplay/SF-Pro-Display-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: regular;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/SFProDisplay/SF-Pro-Display-RegularItalic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+}
+ 
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/SFProDisplay/SF-Pro-Display-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: regular;
+}
+
+@font-face {
+  font-family: 'PPMondwest';
+  src: url('/fonts/PPMondwest/PPMondwest-Regular.otf') format('opentype');
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -24,9 +65,8 @@
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
     --radius: 0.5rem;
-  }
 
-  .dark {
+    /* dark */
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
@@ -46,6 +86,33 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
+
+    --secondary-color: #6c757d;
+    --background-color: #fff;
+    --text-color: #333;
+    --border-color: #ccc;
+    --header-background-color: #f8f9fa;
+    --footer-background-color: #343a40;
+    --hero-background-color: #e9ecef;
+    --header-button-color: radial-gradient(1465.72% 50% at 60.91% 50%, #FF603B 0%, #F83B28 100%);
+    --black-text-color: #000;
+    --white-text-color: #FFF;
+    --red-text-color: #F83B28;
+    --green-text-color: #45B272;
+    --bg-button-active-color: #FF603B;
+    --bg-button-color: #FFCABD;
+    --button-connect-wallet-color: #C5B4E3;
+    --button-connect-wallet-hover-color: linear-gradient(180deg, #9FE4C9 0%, #C5B4E3 100%);
+    --button-header-hover-color: linear-gradient(90deg, #FF603B 0%, #6A16FF 100%);
+    --button-connected-wallet-color: #9FE4C9;
+    --bg-overlay-color: rgba(217, 217, 217, 0.48);
+    --bg-overlay-black-color: rgba(0, 0, 0, 0.5);
+    --border-black-color: rgba(0, 0, 0, 0.3);
+    --shadow-popup-color: rgba(0, 0, 0, 0.25);
+    --bg-pool-color: rgba(255, 255, 255, 0.50);
+    --bg-switch-range-color: #EBEBEB;
+    --bg-fixed-color: #FCCDC2;
+    --bg-chart-color: #6A16FF
   }
 }
 
@@ -53,7 +120,95 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"] {
+    -webkit-appearance: none;
+    margin: 0;
+    -moz-appearance: textfield !important;
+  }
+}
+
+div[role="menubar"] {
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+}
+
+body {
+  font-family: 'SF Pro Display', sans-serif;
+  color: #000;
+  line-height: normal;
+  /* Use a fallback font */
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* loading */
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 20px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  margin-left: 12px;
+  border: 4px solid #514b82;
+  animation:
+    l20-1 0.8s infinite linear alternate,
+    l20-2 1.6s infinite linear;
+}
+
+@keyframes l20-1 {
+  0% {
+    clip-path: polygon(50% 50%, 0 0, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%)
+  }
+
+  12.5% {
+    clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 0%, 100% 0%, 100% 0%)
+  }
+
+  25% {
+    clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 100%, 100% 100%, 100% 100%)
+  }
+
+  50% {
+    clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%)
+  }
+
+  62.5% {
+    clip-path: polygon(50% 50%, 100% 0, 100% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%)
+  }
+
+  75% {
+    clip-path: polygon(50% 50%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 50% 100%, 0% 100%)
+  }
+
+  100% {
+    clip-path: polygon(50% 50%, 50% 100%, 50% 100%, 50% 100%, 50% 100%, 50% 100%, 0% 100%)
+  }
+}
+
+@keyframes l20-2 {
+  0% {
+    transform: scaleY(1) rotate(0deg)
+  }
+
+  49.99% {
+    transform: scaleY(1) rotate(135deg)
+  }
+
+  50% {
+    transform: scaleY(-1) rotate(0deg)
+  }
+
+  100% {
+    transform: scaleY(-1) rotate(-135deg)
   }
 }

@@ -31,16 +31,17 @@ const nextConfig = {
       child_process: false,
     };
 
-    config.plugins.push(
-      new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
-        resource.request = resource.request.replace(/^node:/, "");
-      }),
-    );
+    // config.plugins.push(
+    //   new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
+    //     resource.request = resource.request.replace(/^node:/, "");
+    //   }),
+    // );
 
     return config;
   },
   compress: false,
-  output: "standalone"
+  output: "standalone",
+  transpilePackages: ["geist"]
 };
 
 module.exports = nextConfig;

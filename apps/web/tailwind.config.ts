@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-import { fontFamily } from "tailwindcss/defaultTheme";
 
 module.exports = {
   darkMode: ["class"],
@@ -9,6 +8,7 @@ module.exports = {
     "./containers/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
+    ".storybook/preview.tsx",
   ],
   theme: {
     container: {
@@ -53,6 +53,26 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        textBlack:{
+          DEFAULT: "var(--black-text-color)",
+        foreground: "hsl(var(--secondary-foreground))",
+        },
+        borderOrColor: {
+          DEFAULT: "var(--bg-button-active-color)",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        bgButtonFixed: {
+          DEFAULT: "var(--bg-fixed-color)",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        bgWhiteColor: {
+          DEFAULT: "var(--white-text-color)",
+          foreground: "hsl(var(--card-foreground))",
+        }
+      },
+      overlayPreview: {
+        DEFAULT: "var(--bg-overlay-black-color)",
+        foreground: "hsl(var(--secondary-foreground))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -74,7 +94,10 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
+        sans: ['SF Pro Display', 'sans-serif'],
+      },
+      letterSpacing: {
+        "balance-separator": "-0.1rem",
       },
     },
   },

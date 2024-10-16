@@ -21,7 +21,8 @@ export const useClientStore = create<ClientState, [["zustand/immer", never]]>(
 
       set((state) => {
         state.loading = false;
-        state.client = client as any;
+        // @ts-expect-error
+        state.client = client;
       });
     },
   })),

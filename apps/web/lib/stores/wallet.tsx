@@ -13,10 +13,11 @@ import { Bool, Field, PublicKey, Signature, UInt64 } from "o1js";
 
 export interface WalletState {
   wallet?: string;
+  isWalletOpen: boolean;
+  setIsWalletOpen: (isWalletOpen: boolean) => void;
   initializeWallet: () => Promise<void>;
   connectWallet: () => Promise<void>;
   observeWalletChange: () => void;
-
   pendingTransactions: PendingTransaction[];
   addPendingTransaction: (pendingTransaction: PendingTransaction) => void;
   removePendingTransaction: (pendingTransaction: PendingTransaction) => void;
@@ -46,6 +47,15 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
         state.wallet = wallet;
       });
     },
+
+    isWalletOpen: false,
+
+    setIsWalletOpen(isWalletOpen) {
+      set((state) => {
+        state.isWalletOpen = isWalletOpen;
+      });
+    },
+
     observeWalletChange() {
       if (typeof mina === "undefined") {
         throw new Error("Auro wallet not installed");

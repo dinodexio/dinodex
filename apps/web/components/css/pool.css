@@ -1,0 +1,801 @@
+.popup-container {
+    transition: all 0.3s ease;
+    opacity: 0;
+    z-index: -1;
+    box-shadow: 0 7px 8.1px 0 var(--shadow-popup-color);
+}
+
+.button-open-popup:hover+.popup-container,
+.popup-container:hover {
+    opacity: 1;
+    visibility: visible;
+    z-index: 100;
+}
+
+.item-status-closed {
+    opacity: 0.3;
+}
+
+.status-in-range {
+    background-color: var(--button-connected-wallet-color);
+}
+
+.status-closed {
+    background-color: var(--bg-button-active-color);
+}
+
+.active-pool-info::-webkit-scrollbar {
+    display: none;
+}
+
+.btn-edit-fee-tier {
+    display: flex;
+    padding: 6px 18px;
+    align-items: center;
+    border-radius: 18.118px;
+    border: .953px solid var(--black-text-color);
+    background: var(--bg-button-active-color);
+    cursor: pointer;
+    color: var(--white-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.fee-tier-desc {
+    display: flex;
+    padding: 4px 8px;
+    justify-content: center;
+    align-items: center;
+    height: 27px;
+    border-radius: 6px;
+    border: 1px solid var(--black-text-color);
+    color: var(--black-text-color);
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.content-left-header {
+    color: var(--black-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.content-deposit-amounts {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px
+}
+
+.deposit-amounts-item {
+    height: 115px;
+    display: flex;
+    padding: 21px 10px 21px 20px;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    border-radius: 21px;
+    border: 1px solid var(--black-text-color);
+    background: var(--white-text-color);
+}
+
+.deposit-amounts-item-left,
+.deposit-amounts-item-right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.deposit-amounts-item-left {
+    flex: 1;
+}
+
+.deposit-amounts-item-right {
+    align-items: flex-end;
+}
+
+.value-price-deposit-amount {
+    color: var(--black-text-color);
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.value-price-desc {
+    color: var(--black-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.token-select-deposit-amount {
+    display: flex;
+    width: max-content;
+    padding: 6px 18px;
+    align-items: center;
+    gap: 5px;
+    border-radius: 18.118px;
+    border: 0.953px solid var(--black-text-color);
+}
+
+.token-symbol-deposit-amount {
+    color: var(--black-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+}
+
+.deposit-amount-balance {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.balance-deposit-amount {
+    color: var(--black-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.btn-max-deposit-amount {
+    display: flex;
+    padding: 4px 8px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    border: 1px solid var(--black-text-color);
+    cursor: pointer;
+}
+
+.deposit-amounts-item:first-child .token-select-deposit-amount {
+    background-color: var(--button-connect-wallet-color);
+}
+
+.deposit-amounts-item:last-child .token-select-deposit-amount {
+    background-color: var(--button-connected-wallet-color);
+}
+
+.input-price-deposit-amount {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    color: var(--black-text-color);
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.btn-max-deposit-amount {
+    display: flex;
+    padding: 4px 8px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    border: 1px solid var(--black-text-color);
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--black-text-color);
+}
+
+.choose-fee-tier-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: -20px;
+    height: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.choose-fee-tier-content-show {
+    height: 148px;
+    opacity: 1;
+    visibility: visible;
+    margin-top: -5px;
+}
+
+.choose-fee-tier-item {
+    display: flex;
+    padding: 12px 10px;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: 21px;
+    border: 1px solid var(--black-text-color);
+    background: var(--white-text-color);
+    width: 124px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.choose-fee-tier-item-text {
+    color: var(--black-text-color);
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.choose-fee-tier-item-desc {
+    color: var(--black-text-color);
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.choose-fee-tier-active {
+    background: var(--bg-button-active-color);
+}
+
+.choose-fee-tier-active .choose-fee-tier-item-text,
+.choose-fee-tier-active .choose-fee-tier-item-desc,
+.choose-fee-tier-active .fee-tier-desc {
+    color: var(--white-text-color);
+    border-color: var(--white-text-color);
+}
+
+.content-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 520px;
+}
+
+.header-content-right {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.btn-header-content-right {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-header-content-right-item {
+    padding: 6px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--black-text-color);
+    cursor: pointer;
+}
+
+.container-chart-join-pool {
+    margin-top: 5px;
+    min-height: 325px;
+}
+
+.content-min-price-join-pool {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.min-price-join-pool-item {
+    display: flex;
+    width: 250px;
+    padding: 12px 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 21px;
+    border: 1px solid var(--black-text-color);
+}
+
+.min-price-join-pool-item-text,
+.min-price-join-pool-item-title {
+    color: var(--black-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.min-price-join-pool-item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    height: 29px;
+}
+
+.btn-min-price-join-pool-item {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.btn-prview {
+    padding: 12px 10px;
+    color: var(--white-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.join-create-text {
+    display: flex;
+    padding: 15px var(--20125-rem, 20px);
+    align-items: center;
+    gap: var(--100625-rem, 10px);
+    align-self: stretch;
+    border-radius: 21px;
+    border: 1px solid var(--black-text-color);
+    background: var(--white-text-color);
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.input-value-current {
+    display: flex;
+    padding: 12px 10px 12px 20px;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    border-radius: 21px;
+    border: 1px solid var(--black-text-color);
+    background: var(--white-text-color);
+    color: var(--black-text-color);
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    width: 100%;
+}
+
+.content-current-price {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    display: flex;
+    padding: 15px 10px 15px 20px;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    border-radius: 21px;
+    border: 1px solid var(--black-text-color);
+    background: var(--white-text-color);
+}
+
+.content-current-price-text {
+    color: var(--black-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.container-join-create {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    margin-top: -2px;
+}
+
+.input-min-join-pool-item {
+    text-align: center;
+    height: 24px;
+    width: 100%;
+    border: 0;
+    outline: none;
+    background-color: transparent;
+    color: var(--black-text-color);
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    flex: 1;
+}
+
+.btn-approve {
+    display: flex;
+    padding: 12px 10px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    border: 1px solid var(--black-text-color);
+    color: var(--black-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-approve:hover {
+    background-color: var(--bg-switch-range-color);
+}
+
+.content-pool-hide {
+    opacity: 0.09;
+}
+
+.btn-approve-active,
+.btn-approve-active:hover {
+    background: var(--button-connected-wallet-color);
+    cursor: no-drop;
+}
+
+.popup-hide {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    width: 520px;
+    padding: var(--20125-rem, 20px) var(--100625-rem, 10px) 35px var(--20125-rem, 20px);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border-radius: 21px;
+    border: 1px solid var(--black-text-color);
+    background: var(--bg-pool-color);
+}
+
+.content-left-select-token-item-have-token:first-child,
+.content-left-select-token-item-have-token:first-child:hover {
+    background-color: var(--button-connect-wallet-color) !important;
+}
+
+.content-left-select-token-item-have-token:last-child,
+.content-left-select-token-item-have-token:last-child:hover {
+    background-color: var(--button-connected-wallet-color);
+}
+
+.btn-pool {
+    padding: 10px 18px;
+    background-color: var(--white-text-color);
+    font-size: 16px;
+    font-weight: 500;
+    color: #FF603B;
+    cursor: pointer;
+    height: 39px;
+    letter-spacing: 0.6px;
+}
+
+.btn-pool-active {
+    padding: 10px 18px;
+    font-size: 16px;
+    font-weight: 500;
+    height: auto;
+    color: var(--white-text-color);
+    cursor: pointer;
+    width: max-content;
+    border: 1px solid var(--black-text-color);
+    border-radius: 12px;
+    letter-spacing: 0.8px;
+}
+
+.pool-item {
+    padding: 15px 20px;
+    background: transparent;
+    border: 1px solid var(--black-text-color);
+    border-radius: 12px;
+    gap: 10px;
+    cursor: pointer;
+    margin-bottom: 12px;
+    height: 55px;
+    transition: height 0.3s ease;
+}
+
+.pool-item-active {
+    height: 297px;
+}
+
+.content-pool-item {
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.content-pool-item-show {
+    margin-top: 15px;
+    opacity: 1;
+    visibility: visible;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.info-item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.info-content-title,
+.info-content-value {
+    color: var(--black-text-color);
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.text-or {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #FF603B;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+}
+
+.content-item-button {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+}
+
+.btn-pool-info {
+    display: flex;
+    width: 180px;
+    height: 64px;
+    padding: 20px 18px;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--black-text-color);
+    color: var(--white-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: 0.5px;
+}
+
+.btn-approve-new {
+    font-size: 26px;
+    font-weight: 600;
+    border: 1px solid var(--black-text-color);
+    border-radius: 20px;
+}
+
+.btn-approve-new.button-swap::after {
+    border-radius: 20px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    background: #FF603B;
+    outline: none;
+    border-radius: 999px;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 31px;
+    height: 31px;
+    background: #FF603B;
+    border-radius: 31px;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #04AA6D;
+    cursor: pointer;
+}
+
+.btn-supply-remove {
+    border: 1px solid var(--black-text-color);
+    border-radius: 20px;
+    width: 281px;
+    height: 71px;
+    padding: 20px 10px;
+    font-size: 26px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.btn-supply-remove::after {
+    border-radius: 20px;
+}
+
+.btn-disable{
+    border: 1px solid var(--black-text-color);
+    border-radius: 20px;
+    width: 281px;
+    height: 71px;
+    padding: 20px 10px;
+    font-size: 26px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    transition: all 0.3s ease;
+    background-color: var(--white-text-color);
+    cursor: no-drop;
+}
+
+.btn-disable > span{
+    opacity: 0.3;
+}
+
+.modal-pool{
+    border-radius: 27px;
+}
+
+.modal-pool:has(.modal-waiting){
+    max-width: 550px;
+}
+
+.loading-waiting{
+    animation: spin 1s linear infinite;
+}
+
+@media (max-width: 600px) {
+    .content-left-header {
+        font-size: 18px;
+    }
+
+    .content-deposit-amounts {
+        gap: 12px;
+    }
+
+    .content-deposit-amounts {
+        margin-top: 12px;
+    }
+
+    .deposit-amounts-item-left {
+        flex: 1;
+    }
+
+    .token-select-deposit-amount>img {
+        width: 18px;
+        height: 18px;
+    }
+
+    .content-deposit-amounts,
+    .content-right {
+        gap: 12px;
+    }
+
+    .content-deposit-amounts {
+        margin-top: 12px;
+    }
+
+    .choose-fee-tier-content {
+        gap: 3.33px;
+    }
+
+    .choose-fee-tier-item {
+        padding: 12px 8px;
+    }
+
+    .choose-fee-tier-item-text {
+        font-size: 20px;
+    }
+
+    .fee-tier-desc {
+        font-size: 12px;
+        padding: 4px;
+    }
+
+    .join-create-text,
+    .input-value-current {
+        font-size: 16px;
+    }
+
+    .content-current-price-text {
+        font-size: 14px;
+    }
+
+    .choose-fee-tier-item-desc {
+        font-size: 14px;
+    }
+
+    .popup-hide {
+        width: 90%;
+    }
+
+    .info-content-title,
+    .info-content-value {
+        font-size: 14px;
+    }
+
+    .pool-item {
+        height: 51px;
+    }
+
+    .content-pool-item-show {
+        gap: 10px;
+    }
+
+    .pool-item-active {
+        height: 245px;
+    }
+
+    .text-or {
+        margin-top: 2px;
+        font-size: 14px;
+    }
+
+    .btn-pool-info {
+        width: 110px;
+        height: 39px;
+        padding: 10px 8px;
+        font-size: 16px;
+    }
+
+    .btn-approve-new {
+        font-size: 20px;
+        padding: 12px 10px;
+        height: 48px;
+    }
+
+    .btn-supply-remove,.btn-disable {
+        width: 190px;
+        height: 56px;
+        font-size: 20px;
+        border-radius: 12px;
+    }
+
+    .btn-supply-remove::after {
+        border-radius: 12px;
+    }
+
+    .modal-pool{
+        border-radius: 12px;
+    }
+}
+
+@media (max-width:500px) {
+
+    .btn-pool-active,
+    .btn-pool {
+        padding: 10px 12px;
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
