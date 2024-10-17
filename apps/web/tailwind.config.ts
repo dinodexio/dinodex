@@ -74,6 +74,10 @@ module.exports = {
         DEFAULT: "var(--bg-overlay-black-color)",
         foreground: "hsl(var(--secondary-foreground))",
       },
+      overlayListToken: {
+        DEFAULT: "var(--bg-overlay-color)",
+        foreground: "hsl(var(--secondary-foreground))",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

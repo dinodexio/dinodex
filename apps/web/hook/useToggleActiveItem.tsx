@@ -1,5 +1,5 @@
 import { useObserveBalance } from '@/lib/stores/balances';
-import { getTokenID } from '@/lib/utils';
+import { getTokenID } from '@/tokens';
 import { TokenId } from '@proto-kit/library';
 import { PoolKey, TokenPair } from 'chain';
 import { useState, useEffect, useMemo } from 'react';

@@ -1,6 +1,6 @@
 .swap-container {
     width: min(90%, 605px);
-    margin: 90px auto 59px auto;
+    margin: calc(80vh / 10) auto 0 auto;
     z-index: 99;
     position: relative;
 }
@@ -87,6 +87,10 @@
     margin-bottom: 12.35px;
 }
 
+.bg-overlay{
+    background: var(--bg-overlay-color);
+}
+
 .value-price {
     color: var(--black-text-color);
     font-size: 20px;
@@ -121,6 +125,11 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+    transition: all 0.3s ease;
+}
+
+.swap-item-select:hover{
+    background-color: #EEEEEE;
 }
 
 .swap-item-select-have-token {
@@ -497,5 +506,18 @@
     .token-swap-container .slippage-container {
         gap: unset;
         justify-content: space-between;
+    }
+
+    .bg-overlay{
+        background: rgba(0, 0, 0, 0.60);
+    }
+
+    .modal-container{
+        top: unset;
+        bottom: 0;
+        left: 0;
+        transform: translateY(0);
+        border-radius: 12px;
+        height: 621px;
     }
 }

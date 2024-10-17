@@ -86,7 +86,7 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
         state.loading = true;
       });
 
-      const response = await fetch("http://localhost:8080/graphql", {
+      const response = await fetch("https://graphql.dinodex.io/graphql", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

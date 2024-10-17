@@ -258,7 +258,7 @@ export function PoolPanel({ balances, valueSearch }: PoolPanelProps) {
   const poolBalances = Object.entries(balances ?? {}).map(
     ([tokenId, balance], index) => {
       const token = tokens[tokenId];
-      if (!token || (BigInt(tokenId) > 3n && balance == "0")) return null;
+      if (!token || (BigInt(tokenId) > BigInt(3) && balance == "0")) return null;
       if (token?.name === "LP Token")
         return {
           id: index,

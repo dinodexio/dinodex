@@ -47,11 +47,11 @@ export interface XYKState {
   loadPool: (client: Client, key: string) => Promise<void>;
   pools: {
     [key: string]:
-      | {
-          loading: boolean;
-          exists: boolean;
-        }
-      | undefined;
+    | {
+      loading: boolean;
+      exists: boolean;
+    }
+    | undefined;
   };
 }
 
@@ -91,8 +91,8 @@ export const useXYKStore = create<XYKState, [["zustand/immer", never]]>(
       const xyk = client.runtime.resolve("XYK");
       const senderPublicKey = PublicKey.fromBase58(sender);
 
-      const tx = await client.transaction(senderPublicKey, () => {
-        xyk.createPoolSigned(
+      const tx = await client.transaction(senderPublicKey, async () => {
+        await xyk.createPoolSigned(
           TokenId.from(tokenAId),
           TokenId.from(tokenBId),
           Balance.from(tokenAAmount),
@@ -118,8 +118,8 @@ export const useXYKStore = create<XYKState, [["zustand/immer", never]]>(
       const xyk = client.runtime.resolve("XYK");
       const senderPublicKey = PublicKey.fromBase58(sender);
 
-      const tx = await client.transaction(senderPublicKey, () => {
-        xyk.addLiquiditySigned(
+      const tx = await client.transaction(senderPublicKey, async () => {
+        await xyk.addLiquiditySigned(
           TokenId.from(tokenAId),
           TokenId.from(tokenBId),
           Balance.from(tokenAAmount),
@@ -145,8 +145,8 @@ export const useXYKStore = create<XYKState, [["zustand/immer", never]]>(
       const xyk = client.runtime.resolve("XYK");
       const senderPublicKey = PublicKey.fromBase58(sender);
 
-      const tx = await client.transaction(senderPublicKey, () => {
-        xyk.removeLiquiditySigned(
+      const tx = await client.transaction(senderPublicKey, async () => {
+        await xyk.removeLiquiditySigned(
           TokenId.from(tokenAId),
           TokenId.from(tokenBId),
           Balance.from(lpTokenAmount),
@@ -177,8 +177,8 @@ export const useXYKStore = create<XYKState, [["zustand/immer", never]]>(
       );
       Provable.log("PATH", basePath, tokenIdPath);
 
-      const tx = await client.transaction(senderPublicKey, () => {
-        xyk.sellPathSigned(
+      const tx = await client.transaction(senderPublicKey, async () => {
+        await xyk.sellPathSigned(
           tokenIdPath,
           Balance.from(amountIn),
           Balance.from(amountOutMinLimit),

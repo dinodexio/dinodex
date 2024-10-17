@@ -4,42 +4,68 @@ import { LayoutConfirm } from "./layoutModal/layoutConfirm";
 import { LayoutWaitingAndSuccess } from "./layoutModal/layoutWaitingAndSuccess";
 
 export interface ModalRemovePoolProps {
-
+  onConfirm: () => void;
+  valueTokenPool?: any;
+  tokenParams?: any;
+  valuePer?: any;
+  loading?: boolean;
+  onCloseRemovePool?: () => void;
 }
 
-export function ModalRemovePool({ }: ModalRemovePoolProps) {
+export function ModalRemovePool({
+  loading,
+  onConfirm,
+  valuePer,
+  tokenParams,
+  valueTokenPool,
+  onCloseRemovePool,
+}: ModalRemovePoolProps) {
+  const [layoutModalRemovePool, setLayoutModalRemovePool] = React.useState({
+    confirm: true,
+    waiting: false,
+    success: false,
+  });
 
-    const [layoutModalRemovePool, setLayoutModalRemovePool] = React.useState({
-        confirm:true,
-        waiting:false,
-        success:false
-    })
+  const clickConfirm = () => {
+    setLayoutModalRemovePool({
+      ...layoutModalRemovePool,
+      confirm: false,
+      waiting: true,
+    });
+    onConfirm();
+  };
 
-    const clickConfirm = () => {
-        setLayoutModalRemovePool({
-            ...layoutModalRemovePool,
-            confirm:false,
-            waiting:true
-        })
+  const handleCloseRmovePool = () => {
+    onCloseRemovePool && onCloseRemovePool();
+  };
+
+  useEffect(() => {
+    if (layoutModalRemovePool.waiting) {
+      setLayoutModalRemovePool({
+        ...layoutModalRemovePool,
+        waiting: loading ? true : false,
+        success: loading ? false : true,
+      });
     }
+  }, [loading]);
 
-    useEffect(() => {
-        if(layoutModalRemovePool.waiting) {
-            setTimeout(() => {
-                setLayoutModalRemovePool({
-                    ...layoutModalRemovePool,
-                    waiting:false,
-                    success:true
-                })
-            }, 5000)
-        }
-    },[layoutModalRemovePool])
-
-    return (
-        <>
-            {layoutModalRemovePool.confirm ? <LayoutConfirm onClickConFirm={clickConfirm}/> : (
-                <LayoutWaitingAndSuccess statusLayout={layoutModalRemovePool}/>
-            )}
-        </>
-    );
+  return (
+    <>
+      {layoutModalRemovePool.confirm ? (
+        <LayoutConfirm
+          onClickConFirm={clickConfirm}
+          valuePer={valuePer}
+          tokenParams={tokenParams}
+          valueTokenPool={valueTokenPool}
+        />
+      ) : (
+        <LayoutWaitingAndSuccess
+          statusLayout={layoutModalRemovePool}
+          tokenParams={tokenParams}
+          valueTokenPool={valueTokenPool}
+          handleCloseRmovePool={handleCloseRmovePool}
+        />
+      )}
+    </>
+  );
 }

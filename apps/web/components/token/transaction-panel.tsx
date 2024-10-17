@@ -208,9 +208,9 @@ export function TransactionPanel({
 
     return transactions
       .filter(
-        (item: ComputedTransactionJSON) => item?.methodName !== DRIPBUNDLE,
+        (item) => item?.methodName !== DRIPBUNDLE,
       )
-      .map((item: ComputedTransactionJSON) => {
+      .map((item) => {
         if (!client) return;
 
         const methodIdResolver = client?.resolveOrFail(
@@ -244,7 +244,7 @@ export function TransactionPanel({
             token: tmpData || {},
             address: truncateAddress(item?.sender),
             type: convertMethodname(methodName),
-            price: null,
+            price: '',
             timeStamp: new Date().toLocaleString(),
           };
         }
@@ -255,7 +255,7 @@ export function TransactionPanel({
     if (!valueSearch) return processedTransactions;
 
     const lowerValueSearch = valueSearch.toLowerCase();
-    return processedTransactions.filter((item: ComputedTransactionJSON) => {
+    return processedTransactions.filter((item) => {
       const tokenFirstSymbol = item?.token?.first?.symbol?.toLowerCase();
       const tokenSecondSymbol = item?.token?.second?.symbol?.toLowerCase();
       return (
@@ -271,7 +271,7 @@ export function TransactionPanel({
         loading={loading}
         data={
           filteredTransactions?.filter?.(
-            (item: ComputedTransactionJSON) => item?.methodName !== DRIPBUNDLE,
+            (item) => item?.methodName !== DRIPBUNDLE,
           ) || []
         }
         column={columTableTransaction}

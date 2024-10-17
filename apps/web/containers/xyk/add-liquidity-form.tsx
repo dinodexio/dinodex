@@ -135,7 +135,7 @@ export function AddLiquidityForm() {
       .div(tokenAReserve)
       .toString();
 
-    console.log("calculated lp tokens", removePrecision(lpTokensToMint));
+    // console.log("calculated lp tokens", removePrecision(lpTokensToMint));
     form.setValue("tokenLP_amount", removePrecision(lpTokensToMint));
   }, [pool, tokenAReserve, fields.tokenA_token, lpTotalSupply]);
 

@@ -162,20 +162,6 @@ export function SwapForm() {
     let amountOut = "0";
 
     console.log("fields.route", fields.route);
-    try {
-      const methodIdResolver = client.client.resolveOrFail(
-        "MethodIdResolver",
-        MethodIdResolver,
-      );
-      console.log(
-        "====> Method",
-        methodIdResolver.getMethodNameFromId(
-          BigInt(
-            "14611692223427430559526007140581096422970105604128196339131458122687359281956",
-          ),
-        ),
-      );
-    } catch (error) {}
 
     fields.route.forEach((token, index) => {
       const tokenIn = token;

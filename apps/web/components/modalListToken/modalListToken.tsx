@@ -44,7 +44,7 @@ export function ModalListToken({ tokenSelected, onClickToken }: modalListTokenPr
                             >
                                 <div className="list-token-item-content">
                                     <div className="list-token-item-logo">
-                                        <Image src={tokens[token.value]?.logo} alt="token-1" width={40} height={40} />
+                                        <Image src={tokens[token.value]?.logo || ""} alt="token-1" width={40} height={40} />
                                     </div>
                                     <div className="list-token-item-text">
                                         <span className="list-token-item-name">{token.label}</span>

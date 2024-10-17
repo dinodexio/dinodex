@@ -39,6 +39,15 @@
 }
 
 @font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/SFProDisplay/SF-Pro-Display-Thin.otf") format("opentype");
+  font-weight: 300;
+  letter-spacing: 1px;
+  font-style: regular;
+}
+
+
+@font-face {
   font-family: 'PPMondwest';
   src: url('/fonts/PPMondwest/PPMondwest-Regular.otf') format('opentype');
 }

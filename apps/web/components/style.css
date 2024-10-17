@@ -7,3 +7,19 @@
 @import './css/pool.css';
 @import './css/modalListToken.css';
 @import './css/modalPreviewPool.css';
+
+.list-token-wallet::-webkit-scrollbar {
+    display: none;
+}
+
+.button-wallet {
+    height: 48px;
+    display: flex;
+    padding: 12px var(--100625-rem, 10px);
+    color: var(white-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    border-radius: 12px;
+}

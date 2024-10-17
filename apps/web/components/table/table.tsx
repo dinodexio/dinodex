@@ -7,7 +7,7 @@ export interface TokenProps {
   column: Array<any>;
   onClickTr: (data: any) => void;
   classTable?: string;
-  loading: boolean;
+  loading?: boolean;
 }
 
 export function Table({

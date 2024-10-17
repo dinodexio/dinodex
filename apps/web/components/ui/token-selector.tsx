@@ -69,7 +69,6 @@ export function TokenSelector({ disabled, name }: TokenSelectorProps) {
           <PopoverContent className="w-[200px] p-0">
             <Command
               filter={(value, search) => {
-                console.log("filter", { value, search });
                 if (
                   tokenOptions
                     .find((option) => option.value === value)

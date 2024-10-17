@@ -1,26 +1,13 @@
-import { memo, useMemo, useState } from "react";
+import { useState } from "react";
 import "../../style.css";
 import Image from "next/image";
 import Link from "next/link";
-import { EMPTY_DATA, LIST_STATUS } from "@/constants";
-import { tokens } from "@/tokens";
+import { EMPTY_DATA } from "@/constants";
+import { getTokenByTicker, tokens } from "@/tokens";
 import { Balance } from "../../ui/balance";
-import { USDBalance } from "../../ui/usd-balance";
 import { Card, CardHeader } from "@/components/ui/card";
-import { getTokenByTicker, getTokenID } from "@/lib/utils";
 import { Loader } from "@/components/ui/Loader";
-import { client, LPTokenId, PoolKey, TokenPair } from "chain";
-import { TokenId } from "@proto-kit/library";
-import {
-  useBalance,
-  useObserveBalance,
-  useObservePooled,
-  useObservePoolOfShare,
-  useObserveTotalSupply,
-} from "@/lib/stores/balances";
-import { usePoolKey } from "@/lib/xyk/usePoolKey";
-import { usePooledValue } from "@/hook/usePooledValue";
-import { useToggleActiveItem } from "@/hook/useToggleActiveItem";
+import { useObservePooled } from "@/lib/stores/balances";
 import { useRouter } from "next/navigation";
 
 export interface Balances {
@@ -36,81 +23,12 @@ type PoolBalance = {
   [key: string]: any; // Define the structure of your pool balance if known
 };
 
-// let dataFakeListPool = [
-//   {
-//     tokenSelectedPool: {
-//       first: {
-//         name: "Ethereum",
-//         logo: "images/swap/logo-token-default.svg",
-//         symbol: "ETH",
-//       },
-//       second: {
-//         name: "Wrapped Bitcoin",
-//         logo: "images/swap/logo-token-dummy.svg",
-//         symbol: "WBTC",
-//       },
-//     },
-//     feeTierValue: 1,
-//     valueMinPrice: {
-//       first: 0.01,
-//       second: 0,
-//     },
-//     status_pool: 1,
-//   },
-//   {
-//     tokenSelectedPool: {
-//       first: {
-//         name: "Toncoin",
-//         logo: "images/swap/logo-token-default.svg",
-//         symbol: "TON",
-//       },
-//       second: {
-//         name: "Wrapped Bitcoin",
-//         logo: "images/swap/logo-token-dummy.svg",
-//         symbol: "WBTC",
-//       },
-//     },
-//     feeTierValue: 1,
-//     valueMinPrice: {
-//       first: 0.01,
-//       second: 0,
-//     },
-//     status_pool: 1,
-//   },
-//   {
-//     tokenSelectedPool: {
-//       first: {
-//         name: "Solana",
-//         logo: "images/swap/logo-token-default.svg",
-//         symbol: "SOL",
-//       },
-//       second: {
-//         name: "Tether",
-//         logo: "images/swap/logo-token-dummy.svg",
-//         symbol: "USDT",
-//       },
-//     },
-//     feeTierValue: 0.05,
-//     valueMinPrice: {
-//       first: 0.0001,
-//       second: 0.015,
-//     },
-//     status_pool: 1,
-//   },
-// ];
-
 export function ListPool({ balances, loading, wallet }: ListPoolProps) {
   const router = useRouter();
   const [activeItems, setActiveItems] = useState<any>([]);
   const [valueTicker, setValueTicker] = useState<any>(null);
 
   const toggleActiveItem = (item: any) => {
-    console.log("item", item);
-    // setActiveItems((prev: any) =>
-    //   prev.includes(item?.id)
-    //     ? prev.filter((itemId: any) => itemId !== item?.id)
-    //     : [...prev, item?.id],
-    // );
     setActiveItems([item?.id]);
     setValueTicker({
       first: item?.tokenSelectedPool?.first?.symbol,
@@ -120,7 +38,11 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
   };
 
   const handleActionPool = (type: string) => {
-    router.push(`/${type}`);
+    if (!valueTicker?.first || !valueTicker?.second) {
+      router.push(`/${type}`);
+      return;
+    }
+    router.push(`/${type}/${valueTicker?.first}/${valueTicker?.second}`);
   };
 
   const dataPooled = useObservePooled(
@@ -133,7 +55,8 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
   const poolBalances = Object.entries(balances ?? {}).map(
     ([tokenId, balance]) => {
       const token = tokens[tokenId];
-      if (!token || (BigInt(tokenId) > 3n && balance === "0")) return null;
+      if (!token || (BigInt(tokenId) > BigInt(3) && balance === "0"))
+        return null;
 
       if (token?.name === "LP Token") {
         // Split the ticker to get the symbols of the tokens in the pool
@@ -186,21 +109,6 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
           }))
       : [];
 
-  // const {  tokenPair } = usePoolKey(
-  //   dataPoolCreate.deposit_amount.first_token,
-  //   dataPoolCreate.deposit_amount.second_token,
-  // );
-
-  // const lpTotalSupply = useObserveTotalSupply(
-  //   LPTokenId.fromTokenPair(tokenPair).toString(),
-  // );
-
-  // const poolOfShare = useObservePoolOfShare(
-  //   dataPoolCreate.deposit_amount.first_token,
-  //   dataPoolCreate.deposit_amount.second_token,
-  // );
-  // const poolOfShare = useObservePoolOfShare(wallet,)
-
   return (
     <>
       <Card className="border-transparent bg-transparent">
@@ -249,7 +157,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
           </span>
           <div className="flex items-center gap-2">
             <div
-              className="btn-pool flex items-center justify-center rounded-[12px] border border-textBlack"
+              className="btn-pool flex items-center justify-center rounded-[12px] border border-textBlack hover:bg-[#EBEBEB]"
               onClick={() => handleActionPool("add")}
             >
               <span>Create a Pair</span>

@@ -42,7 +42,6 @@ export default function Swap() {
   }, []);
 
   const ownBalances = wallet ? balances[wallet] : {};
-  console.log("ownBalances", ownBalances);
 
   const loading =
     balancesLoading && !!(wallet && balances[wallet]?.["0"] === undefined);

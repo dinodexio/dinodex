@@ -10,8 +10,7 @@ import {
 import { useChainStore, usePollBlockHeight } from "@/lib/stores/chain";
 import { useClientStore } from "@/lib/stores/client";
 import { useNotifyTransactions, useWalletStore } from "@/lib/stores/wallet";
-import { findTokenByParams } from "@/lib/utils";
-import { tokens } from "@/tokens";
+import { tokens, findTokenByParams } from "@/tokens";
 import { useEffect, useMemo } from "react";
 
 export default function RemovePool({ params }: { params?: any }) {
@@ -51,14 +50,11 @@ export default function RemovePool({ params }: { params?: any }) {
   }, []);
 
   const ownBalances = wallet ? balances[wallet] : {};
-  console.log("ownBalances", ownBalances);
-
   const loading =
     balancesLoading && !!(wallet && balances[wallet]?.["0"] === undefined);
 
   const faucet = useFaucet();
 
-  console.log("params in Pool component:", params);
   const tokenParams = useMemo(
     () => ({
       tokenA,
@@ -71,6 +67,7 @@ export default function RemovePool({ params }: { params?: any }) {
     <>
       <PoolRemoveComponent
         tokenParams={tokenParams}
+        balances={ownBalances}
         walletElement={
           <Wallet
             loading={loading}

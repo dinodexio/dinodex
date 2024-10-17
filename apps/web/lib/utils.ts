@@ -6,7 +6,7 @@ import {
   EMPTY_DATA,
   SELLPATH,
 } from "@/constants";
-import { Token, tokens, Tokens } from "@/tokens";
+import { Token, Tokens } from "@/tokens";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -127,35 +127,3 @@ export const passDataTokenByFields = (
     second: secondToken,
   };
 };
-
-export const getTokenByTicker = (tickerSymbol: string) => {
-  return Object.values(tokens).find((token) => token?.ticker === tickerSymbol);
-};
-
-export const getTokenID = (
-  key: keyof (typeof tokens)[string] | string,
-  value: string,
-): string | undefined => {
-  for (const [id, token] of Object.entries(tokens)) {
-    if (token && token[key] === value) {
-      return id;
-    }
-  }
-  return undefined; // Return undefined if no match found
-};
-
-// Hàm tìm token dựa vào params
-export function findTokenByParams(paramsToken: string) {
-  // Lặp qua tất cả các token trong object tokens
-  if (!paramsToken) return undefined;
-  for (const tokenId in tokens) {
-    const tokenInfo = tokens[tokenId];
-    if (tokenInfo && tokenInfo?.ticker?.toLowerCase() === paramsToken.toLowerCase()) {
-      return {
-        label: tokenInfo.ticker, // Label là ticker của token (ví dụ: "MINA", "DAI", "BTC", ...)
-        value: tokenId, // Value là mã token (ví dụ: "0", "1", "2")
-      };
-    }
-  }
-  return undefined; // Nếu không tìm thấy
-}

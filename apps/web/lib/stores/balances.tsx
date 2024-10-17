@@ -7,7 +7,7 @@ import { PublicKey } from "o1js";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useChainStore } from "./chain";
 import { useWalletStore } from "./wallet";
-import { getTokenID } from "../utils";
+import { getTokenID } from '@/tokens';
 import { usePoolKey } from "../xyk/usePoolKey";
 import { LPTokenId, TokenPair } from "chain";
 
@@ -16,11 +16,11 @@ export interface BalancesState {
   balances: {
     // address
     [key: string]:
-      | {
-          // tokenId
-          [key: string]: string | undefined;
-        }
-      | undefined;
+    | {
+      // tokenId
+      [key: string]: string | undefined;
+    }
+    | undefined;
   };
   totalSupply: {
     [key: string]: string | undefined;
@@ -97,7 +97,6 @@ export const useBalancesStore = create<
       );
 
       const balance = await client.query.runtime.Balances.balances.get(key);
-
       set((state) => {
         state.loading = false;
         state.balances = {
@@ -113,8 +112,8 @@ export const useBalancesStore = create<
       const faucet = client.runtime.resolve("Faucet");
       const sender = PublicKey.fromBase58(address);
 
-      const tx = await client.transaction(sender, () => {
-        faucet.dripBundle();
+      const tx = await client.transaction(sender, async () => {
+        await faucet.dripBundle();
       });
 
       await tx.sign();
@@ -133,8 +132,8 @@ export const useBalancesStore = create<
       const balances = client.runtime.resolve("Balances");
       const sender = PublicKey.fromBase58(address);
 
-      const tx = await client.transaction(sender, () => {
-        balances.transferSigned(
+      const tx = await client.transaction(sender, async () => {
+        await balances.transferSigned(
           TokenId.from(tokenId),
           sender,
           PublicKey.fromBase58(recipient),

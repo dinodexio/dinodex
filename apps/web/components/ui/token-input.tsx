@@ -9,7 +9,7 @@ import { useFormContext } from "react-hook-form";
 
 export interface TokenInputProps {
   label: string;
-  name: string;
+  name?: string;
   tokenInputDisabled?: boolean;
   amountInputDisabled?: boolean;
   tokenInputHidden?: boolean;
@@ -17,8 +17,8 @@ export interface TokenInputProps {
 }
 
 export function TokenInput({
-  label,
-  name,
+  label = '',
+  name = '',
   tokenInputDisabled,
   amountInputDisabled,
   tokenInputHidden,
