@@ -19,6 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import useClickOutside from "@/hook/useClickOutside";
 import Image from "next/image";
 import '../style.css'
+import styles from '../css/swap.module.css'
 import Link from "next/link";
 
 export interface Balances {
@@ -195,14 +196,14 @@ export function Wallet({
             </div>
           </div>
           <div className="flex items-center justify-center gap-[17px] mb-[25px]">
-              <Link href="https://twitter.com/dinodex" target="_blank"><Image src={"/images/social/git.svg"} alt="logo" width={35} height={35} /></Link>
-              <Link href="https://t.me/dinodex" target="_blank"><Image src={"/images/social/x.svg"} alt="logo" width={35} height={35} /></Link>
-              <Link href="https://discord.com/invite/9nXbJX5" target="_blank"><Image src={"/images/social/discord.svg"} alt="logo" width={35} height={35} /></Link>
+              <Image src={"/images/social/git.svg"} alt="logo" width={35} height={35} />
+              <Image src={"/images/social/x.svg"} alt="logo" width={35} height={35} />
+              <Image src={"/images/social/discord.svg"} alt="logo" width={35} height={35} />
           </div>
           <div className="flex flex-col gap-[15px]">
             <Button
               size="sm"
-              className="button-swap button-wallet *:w-full"
+              className={`${styles['button-swap']} ${styles['button-wallet']} *:w-full`}
               variant={"outline"}
               onClick={onFaucetDrip}
             >

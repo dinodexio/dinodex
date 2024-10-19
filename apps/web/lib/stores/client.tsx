@@ -18,9 +18,9 @@ export const useClientStore = create<ClientState, [["zustand/immer", never]]>(
       });
       client.configurePartial({
         GraphqlClient: {
-          url: "https://graphql.dinodex.io/graphql"
+          url: "https://graphql.dinodex.io/graphql",
         },
-      })
+      });
       await client.start();
 
       set((state) => {

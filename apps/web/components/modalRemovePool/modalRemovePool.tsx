@@ -60,10 +60,11 @@ export function ModalRemovePool({
         />
       ) : (
         <LayoutWaitingAndSuccess
+          type="remove"
           statusLayout={layoutModalRemovePool}
           tokenParams={tokenParams}
           valueTokenPool={valueTokenPool}
-          handleCloseRmovePool={handleCloseRmovePool}
+          handleClosePool={handleCloseRmovePool}
         />
       )}
     </>

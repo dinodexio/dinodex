@@ -25,7 +25,7 @@ export interface ComputedTransactionJSON {
       symbol: string;
       amount: string;
     };
-  },
+  };
   address?: string;
   price?: number | string;
   nonce: string;
@@ -85,7 +85,7 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
       set((state) => {
         state.loading = true;
       });
-
+      // https://graphql.dinodex.io/graphql
       const response = await fetch("https://graphql.dinodex.io/graphql", {
         method: "POST",
         headers: {
@@ -147,9 +147,7 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
         },
       });
 
-   
-
-      const  data  = (await response.json()) as TransactionQueryResponse
+      const data = (await response.json()) as TransactionQueryResponse;
 
       set((state) => {
         state.loading = false;

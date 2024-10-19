@@ -192,6 +192,9 @@ export const useObservePooled = (
 
   // Memoize the pool key and token pair to avoid recalculating when tokenA or tokenB change
   const { tokenPair, poolKey } = usePoolKey(tokenA, tokenB);
+  // const {
+  //   wallet,
+  // } = useWalletStore();
 
   // Observe balances for both tokens and the total supply of the liquidity pool token
   const first = useObserveBalance(tokenA, poolKey);

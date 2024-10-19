@@ -62,7 +62,7 @@ export function Home({
                   </TabsTrigger>
                   <TabsTrigger
                     value="pools"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e : any) => e.stopPropagation()}
                     className="p-0 data-[state=active]:bg-muted"
                   >
                     <Menubar>

@@ -4,6 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "../style.css";
+import styles from '../css/swap.module.css'
+import stylesPool from '../css/pool.module.css'
 import {
   Dialog,
   DialogContent,
@@ -21,6 +23,7 @@ import {
 import { usePoolKey } from "@/lib/xyk/usePoolKey";
 import {
   useObserveBalance,
+  useObservePooled,
   useObserveTotalSupply,
 } from "@/lib/stores/balances";
 import { useWalletStore } from "@/lib/stores/wallet";
@@ -94,6 +97,14 @@ export function PoolAdd({
     active: true,
     loading: false,
   });
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpenChange = (open: boolean) => {
+    // Only allow closing the dialog if triggered programmatically
+    if (!open) return;
+    setIsOpen(open);
+  };
   const { poolKey, tokenPair } = usePoolKey(
     dataPoolCreate.deposit_amount.first_token,
     dataPoolCreate.deposit_amount.second_token,
@@ -177,10 +188,6 @@ export function PoolAdd({
     });
   };
 
-  const resetDataPoolCreate = () => {
-    setDataPoolCreate({ ...initDataPoolCreate });
-  };
-
   const validatePoolCreation = useMemo(() => {
     let text = null;
     let isRequired = true;
@@ -260,24 +267,36 @@ export function PoolAdd({
     } finally {
       setLoading(false);
     }
-    resetDataPoolCreate();
-    router.push("/pool");
+    // resetDataPoolCreate();
+    // router.push("/pool");
   };
 
-  // const ClickApprove = () => {
-  //   if (approve.loading || approve.active) return;
-  //   setApprove({
-  //     ...approve,
-  //     loading: true,
-  //   });
-  //   setTimeout(() => {
-  //     setApprove({
-  //       ...approve,
-  //       active: true,
-  //       loading: false,
-  //     });
-  //   }, 1000);
-  // };
+  const handleClosePool = () => {
+    const newDataPoolCreate = {
+      ...dataPoolCreate,
+      deposit_amount: {
+        ...dataPoolCreate.deposit_amount,
+        first: null,
+        second: null,
+      },
+    };
+    setDataPoolCreate(newDataPoolCreate);
+  };
+
+  const ClickApprove = () => {
+    if (approve.loading || approve.active) return;
+    setApprove({
+      ...approve,
+      loading: true,
+    });
+    setTimeout(() => {
+      setApprove({
+        ...approve,
+        active: true,
+        loading: false,
+      });
+    }, 1000);
+  };
 
   const poolExists = pool?.exists ?? true;
 
@@ -299,7 +318,7 @@ export function PoolAdd({
   );
 
   const spotPrice = useSpotPrice(tokenAReserve, tokenBReserve);
-
+  
   useEffect(() => {
     if (!userTokenABalance || !userTokenBBalance) return;
     balanceARef.current = userTokenABalance;
@@ -444,7 +463,7 @@ export function PoolAdd({
                         <input
                           className="w-[50%] border-none bg-transparent text-[32px] font-[400] text-textBlack outline-none placeholder:opacity-[0.4]"
                           data-type-deposit="first"
-                          value={dataPoolCreate.deposit_amount.first}
+                          value={dataPoolCreate.deposit_amount.first || ""}
                           onChange={(e) =>
                             handleChangeDepositAmount("first", e)
                           }
@@ -519,7 +538,7 @@ export function PoolAdd({
                         <input
                           className="w-[50%] border-none bg-transparent text-[32px] font-[400] text-textBlack outline-none placeholder:opacity-[0.4]"
                           data-type-deposit="second"
-                          value={dataPoolCreate.deposit_amount.second}
+                          value={dataPoolCreate.deposit_amount.second || ""}
                           disabled={poolExists}
                           onChange={(e) =>
                             handleChangeDepositAmount("second", e)
@@ -529,7 +548,7 @@ export function PoolAdd({
                         <DialogTrigger
                           className={`flex items-center gap-[4px] rounded-[18px] border border-textBlack px-[18px] py-[6px] hover:bg-[#EBEBEB] ${
                             dataPoolCreate.tokenPool.second
-                              ? "bg-[#C5B4E3] hover:bg-[#C5B4E3]"
+                              ? "bg-[#9FE4C9] hover:bg-[#9FE4C9]"
                               : ""
                           }`}
                           style={{ transition: "all 0.3s ease" }}
@@ -615,7 +634,7 @@ export function PoolAdd({
                             </div>
                             <div className="flex w-[30%] max-w-[150px] flex-col items-center gap-[10px]">
                               <span className="text-[15px] font-[500] text-textBlack sm:text-[15px] lg:text-[18px] xl:text-[18px]">
-                                0%
+                                ~ %
                               </span>
                               <span className="text-[15px] font-[600] text-textBlack opacity-[0.6] sm:text-[15px] lg:text-[18px] xl:text-[18px]">
                                 Share of pool
@@ -634,31 +653,35 @@ export function PoolAdd({
                   </DialogContent>
                 </Dialog>
                 {approve.active ? (
-                  <Dialog>
-                    <DialogTrigger>
+                  <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+                    <DialogTrigger disabled={validatePoolCreation.isRequired} onClick={() => setIsOpen(true)}>
                       <Button
                         loading={loading}
                         type={"submit"}
                         disabled={validatePoolCreation.isRequired}
-                        className={
-                          dataPoolCreate.deposit_amount.first === null ||
-                          dataPoolCreate.deposit_amount.second === null
-                            ? "flex h-max cursor-no-drop items-center justify-center rounded-[20px] border border-textBlack bg-white px-[10px] py-5 text-[20px] font-[600] sm:text-[20px] lg:text-[26px] xl:text-[26px]"
-                            : "button-swap btn-prview btn-approve-new"
-                        }
+                        className={`${styles['button-swap']} ${stylesPool['btn-prview']} ${stylesPool['btn-approve-new']}`}
                       >
                         <span>
-                          {poolExists ? "Add Liquidity" : "Create Pool"}
+                          {validatePoolCreation.text ??
+                            (poolExists ? "Add Liquidity" : "Create Pool")}
                         </span>
                       </Button>
                     </DialogTrigger>
-                    <DialogOverlay className="bg-[rgba(0,0,0,0.5)]" />
+                    <DialogOverlay
+                      className="bg-[rgba(0,0,0,0.5)]"
+                      onClick={(e) => e.stopPropagation()}
+                    />
                     <DialogContent className="modal-container modal-pool w-[99%] max-w-[625px] border-none bg-white px-[20px] pb-[20px] pt-[27px] sm:px-[20px] sm:pt-[27px] lg:px-[30px] lg:pt-[35px] xl:px-[30px] xl:pt-[35px]">
                       <ModalSupplyComfirm
+                        tokenParams={tokenParams}
                         dataPool={dataPoolCreate}
                         valuePer={valuePer}
                         onClickAddPool={handleCreatePool}
                         loading={loading}
+                        onClosePool={() => {
+                          handleClosePool();
+                          setIsOpen(false); // Close programmatically
+                        }}
                       />
                     </DialogContent>
                   </Dialog>

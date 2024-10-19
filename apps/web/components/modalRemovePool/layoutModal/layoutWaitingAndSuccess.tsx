@@ -8,15 +8,26 @@ export interface layoutWaitingAndSuccessProps {
   statusLayout: any;
   tokenParams?: any;
   valueTokenPool?: any;
-  handleCloseRmovePool?: () => void;
+  handleClosePool?: () => void;
+  type: string;
 }
 
 export function LayoutWaitingAndSuccess({
   statusLayout,
   tokenParams,
   valueTokenPool,
-  handleCloseRmovePool,
+  handleClosePool,
+  type,
 }: layoutWaitingAndSuccessProps) {
+  const tokenA_amount =
+    type === "remove"
+      ? Number(valueTokenPool?.tokenA_amount) / 100
+      : valueTokenPool?.tokenA_amount;
+  const tokenB_amount =
+    type === "remove"
+      ? Number(valueTokenPool?.tokenB_amount) / 100
+      : valueTokenPool?.tokenB_amount;
+  const textType = type === "remove" ? "Removing" : "Deposited";
   return (
     <div className="modal-waiting h-max w-full">
       <div className="relative mb-[15px] flex flex-col items-center justify-center gap-[50px]">
@@ -71,10 +82,8 @@ export function LayoutWaitingAndSuccess({
               Waiting for confirmation
             </span>
             <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-              Removing {Number(valueTokenPool?.tokenA_amount) / 100}{" "}
-              {tokenParams?.tokenA?.label} and{" "}
-              {Number(valueTokenPool?.tokenB_amount) / 100}{" "}
-              {tokenParams?.tokenB?.label}
+              {textType} {tokenA_amount} {tokenParams?.tokenA?.label} and{" "}
+              {tokenB_amount} {tokenParams?.tokenB?.label}
             </span>
             <span className="text-[14px] font-[400] text-textBlack opacity-50 sm:text-[14px] lg:text-[15px] xl:text-[15px]">
               Confirm this transaction in your wallet
@@ -95,7 +104,7 @@ export function LayoutWaitingAndSuccess({
                 type={"submit"}
                 className={`button-swap btn-supply-remove`}
                 style={{ width: "100%" }}
-                onClick={() => handleCloseRmovePool && handleCloseRmovePool()}
+                onClick={() => handleClosePool && handleClosePool()}
               >
                 <span>Close</span>
               </Button>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "../../style.css";
+import styles from '../../css/pool.module.css'
 import Image from "next/image";
 import Link from "next/link";
 import { EMPTY_DATA } from "@/constants";
@@ -218,7 +219,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
               const poolSecondSymbol = item?.tokenSelectedPool?.second?.symbol;
               return (
                 <Card
-                  className={`pool-item ${isActive ? "pool-item-active" : ""}`}
+                  className={`${styles['pool-item']} ${isActive ? styles["pool-item-active"] : ""}`}
                   key={index}
                 >
                   <CardHeader

@@ -488,6 +488,7 @@ export const DATA_TRANSACTIONS = [
 ]
 
 export const SLIPPAGE = [
+    { value: 0, label: 'Off' },
     { value: 0.1, label: '0.1%' },
     { value: 0.2, label: '0.2%' },
     { value: 0.5, label: '0.5%' },

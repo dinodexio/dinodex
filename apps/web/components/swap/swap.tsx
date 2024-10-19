@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "../style.css";
+import styles from '../css/swap.module.css'
 import { SLIPPAGE } from "@/constants";
 import Image from "next/image";
 import {
@@ -22,10 +23,7 @@ import { dijkstra, PoolKey, prepareGraph, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
 import { useObservePool, useSellPath } from "@/lib/stores/xyk";
 import { Balance } from "../ui/balance";
-import {
-  Collapsible,
-  CollapsibleContent,
-} from "../ui/collapsible";
+import { Collapsible, CollapsibleContent } from "../ui/collapsible";
 import { USDBalance } from "../ui/usd-balance";
 
 export interface SwapProps {
@@ -33,7 +31,7 @@ export interface SwapProps {
   type: string;
 }
 
-const INIT_SLIPPPAGE = 0.5
+const INIT_SLIPPPAGE = 0.5;
 
 export function Swap({ token, type }: SwapProps) {
   const [loading, setLoading] = useState(false);
@@ -124,14 +122,12 @@ export function Swap({ token, type }: SwapProps) {
     wallet.wallet,
   );
   const handleChangeSlippage = (valueSlippage: number) => {
-    setSlippage(valueSlippage)
-
-
-  }
+    setSlippage(valueSlippage);
+  };
 
   const handleChangeInput = (type: string, event: any) => {
     const value = event.target.value;
-    if (/^\d*\.?\d*$/.test(value) || value === '') {
+    if (/^\d*\.?\d*$/.test(value) || value === "") {
       setValueInputSwap({
         ...valueInputSwap,
         [type]: value,
@@ -274,7 +270,9 @@ export function Swap({ token, type }: SwapProps) {
     });
     setValueInputSwap({
       ...valueInputSwap,
-      tokenOut: removePrecision(`${Number(amountOut) * (100 - slippage) / 100}`),
+      tokenOut: removePrecision(
+        `${(Number(amountOut) * (100 - slippage)) / 100}`,
+      ),
     });
   }, [
     tokenSwap.route,
@@ -323,8 +321,6 @@ export function Swap({ token, type }: SwapProps) {
     }
   };
 
-
-
   const changeSwap = () => {
     // setTokenSwap({
     //   tokenIn: tokenSwap.tokenOut,
@@ -334,17 +330,20 @@ export function Swap({ token, type }: SwapProps) {
   return (
     <Dialog>
       <div
-        className={`swap-container ${type === "tokenDetail" ? "token-swap-container pc-swap-token" : ""
-          }`}
+        className={`swap-container ${
+          type === "tokenDetail" ? "token-swap-container pc-swap-token" : ""
+        }`}
       >
         <span className="swap-text">Swap</span>
         <div
-          className={`swap-content ${type === "tokenDetail" ? "token-swap-content" : ""
-            }`}
+          className={`swap-content ${
+            type === "tokenDetail" ? "token-swap-content" : ""
+          }`}
         >
           <div
-            className={`swap-container-form ${type === "tokenDetail" ? "token-swap-form" : ""
-              }`}
+            className={`swap-container-form ${
+              type === "tokenDetail" ? "token-swap-form" : ""
+            }`}
           >
             <div className="swap-content-item swap-item-first">
               <span className="swap-item-header">You pay</span>
@@ -413,12 +412,13 @@ export function Swap({ token, type }: SwapProps) {
                   id="input-second"
                   value={valueInputSwap.tokenOut}
                   disabled
-                //   onChange={(e) => handleChangeInput("tokenOut", e)}
+                  //   onChange={(e) => handleChangeInput("tokenOut", e)}
                 />
                 <DialogTrigger>
                   <div
-                    className={`swap-item-select ${tokenSwap?.tokenOut?.name && "swap-item-select-have-token"
-                      }`}
+                    className={`swap-item-select ${
+                      tokenSwap?.tokenOut?.name && "swap-item-select-have-token"
+                    }`}
                     onClick={() => setTypeOpenModal("tokenOut")}
                   >
                     {tokenSwap.tokenOut.name ? (
@@ -457,21 +457,21 @@ export function Swap({ token, type }: SwapProps) {
           <Button
             loading={loading}
             disabled={renderButtonSwap.isDisabled}
-            className="button-swap"
+            className={styles["button-swap"]}
             style={{ marginTop: "-12px" }}
             onClick={() => handleSwap()}
           >
             <span>{renderButtonSwap.text}</span>
           </Button>
-
         </div>
 
         <div className="slippage-container">
           <div className="slippage-head">Slippage</div>
           {SLIPPAGE?.map((item, index) => (
             <div
-              className={`slippage-item ${item?.value === slippage ? "slippage-item-active" : ""
-                }`}
+              className={`slippage-item ${
+                item?.value === slippage ? "slippage-item-active" : ""
+              }`}
               onClick={() => handleChangeSlippage(item?.value)}
               data-slippage={item?.value}
               key={index}
@@ -481,7 +481,7 @@ export function Swap({ token, type }: SwapProps) {
           ))}
         </div>
         <Collapsible onOpenChange={setDetailsOpen}>
-            {/* <div className="mt-4 flex justify-between">
+          {/* <div className="mt-4 flex justify-between">
               <div className="flex items-center">
                 <p className={cn("mr-1.5 text-lg text-textBlack")}>
                   {unitPriceWrapped ? (
@@ -507,8 +507,8 @@ export function Swap({ token, type }: SwapProps) {
                 </div>
               </CollapsibleTrigger>
             </div> */}
-            <CollapsibleContent className="mt-3 grid gap-2">
-              {/* <div className="flex justify-between text-sm">
+          <CollapsibleContent className="mt-3 grid gap-2">
+            {/* <div className="flex justify-between text-sm">
                 <p className="text-textBlack">Route</p>
                 <div>
                   {tokenSwap.route && tokenSwap.route.length ? (
@@ -531,7 +531,7 @@ export function Swap({ token, type }: SwapProps) {
                   )}
                 </div>
               </div> */}
-              {/* <div className="flex justify-between text-sm">
+            {/* <div className="flex justify-between text-sm">
             <p className="text-muted-foreground">Spot price</p>
             <div className="flex">
               <p className={cn(GeistMono.className)}>1 MINA = 0.8 DAI</p>
@@ -549,7 +549,6 @@ export function Swap({ token, type }: SwapProps) {
             <div>🎉 Free</div>
           </div> */}
           </CollapsibleContent>
-          
         </Collapsible>
         <DialogOverlay className="bg-overlay" />
         <DialogContent className="modal-container bg-white px-[19.83px] pb-[33.88px] pt-[21.49px]">
