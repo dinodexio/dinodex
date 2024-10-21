@@ -15,7 +15,6 @@ export class Balances extends BaseBalances<BalancesConfig> {
     Balance
   );
 
-  // @runtimeMethod()
   public async getCirculatingSupply(tokenId: TokenId) {
     return Balance.from((await this.circulatingSupply.get(tokenId)).value);
   }
@@ -44,5 +43,22 @@ export class Balances extends BaseBalances<BalancesConfig> {
     const newtotalSupply = Balance.from(circulatingSupply.value).sub(amount);
     await this.circulatingSupply.set(tokenId, newtotalSupply);
     await this.burn(tokenId, address, amount);
+  }
+  @runtimeMethod()
+  public async addBalance(
+    tokenId: TokenId,
+    address: PublicKey,
+    amount: Balance
+  ): Promise<void> {
+    const circulatingSupply = await this.circulatingSupply.get(tokenId);
+    const newCirculatingSupply = Balance.from(circulatingSupply.value).add(
+      amount
+    );
+    assert(
+      newCirculatingSupply.lessThanOrEqual(this.config.totalSupply),
+      "Circulating supply would be higher than total supply"
+    );
+    await this.circulatingSupply.set(tokenId, newCirculatingSupply);
+    await this.mint(tokenId, address, amount);
   }
 }
