@@ -30,11 +30,39 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
         throw new Error("Auro wallet not installed");
       }
 
-      const [wallet] = await mina.getAccounts();
+      try {
+        // Get the list of accounts
+        const accounts = await mina.getAccounts();
+        console.log("accountInfo", accounts);
 
-      set((state) => {
-        state.wallet = wallet;
-      });
+        if (accounts.length > 0) {
+          const [wallet] = accounts;
+
+          // Update the state with the retrieved wallet
+          set((state) => {
+            state.wallet = wallet;
+            state.isWalletOpen = true; // Mark wallet as open
+          });
+
+          // Optionally, add an event listener for account changes
+          mina.on("accountsChanged", (newAccounts) => {
+            console.log("accountsChanged", newAccounts);
+            if (newAccounts.length > 0) {
+              set((state) => {
+                state.wallet = newAccounts[0];
+              });
+            } else {
+              set((state) => {
+                state.wallet = "";
+                state.isWalletOpen = false;
+              });
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error initializing wallet:", error);
+        throw new Error("Failed to retrieve accounts from Auro wallet");
+      }
     },
     async connectWallet() {
       if (typeof mina === "undefined") {

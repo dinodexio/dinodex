@@ -6,17 +6,16 @@ import {
 import {
   PrivateMempool,
   SequencerModulesRecord,
-  TimedBlockTrigger,
+  // TimedBlockTrigger,
   BlockProducerModule,
-  WithdrawalQueue,
-  MinaBaseLayer,
-  LocalTaskQueue
+  MinaBaseLayer
 } from "@proto-kit/sequencer";
-import { SettlementModule } from "./settlement/SettlementModule";
+import { TimedBlockTrigger } from "./protocol/production/trigger/TimedBlockTrigger";
 import { ModulesConfig } from "@proto-kit/common";
-import { PrivateKey } from "o1js";
-
+import { IndexerNotifier } from "@proto-kit/indexer";
+import { SettlementModule } from "./settlements/SettlementModule";
 import { ConstantFeeStrategy } from "./protocol/baselayer/fees/ConstantFeeStrategy";
+import { PrivateKey } from "o1js";
 
 export const apiSequencerModules = {
   GraphqlServer,
@@ -38,31 +37,35 @@ export const baseSequencerModules = {
   ...apiSequencerModules,
   Mempool: PrivateMempool,
   BlockProducerModule: BlockProducerModule,
-  BaseLayer: MinaBaseLayer,
-  TaskQueue: LocalTaskQueue,
-  FeeStrategy: ConstantFeeStrategy,
-  SettlementModule: SettlementModule,
   BlockTrigger: TimedBlockTrigger,
-  // WithdrawalQueue: WithdrawalQueue,
+  BaseLayer: MinaBaseLayer,
+  FeeStrategy: ConstantFeeStrategy,
+  SettlementModule: SettlementModule
 } satisfies SequencerModulesRecord;
 
 export const baseSequencerModulesConfig = {
   ...apiSequencerModulesConfig,
   Mempool: {},
   BlockProducerModule: {},
+  BlockTrigger: {
+    blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL!),
+    produceEmptyBlocks: true,
+  },
   BaseLayer: {
     network: {
-      local: true
+      type: "local"
     }
   },
-  TaskQueue: {},
   FeeStrategy: {},
   SettlementModule: {
     feepayer: PrivateKey.fromBase58("EKDhmW7LrEpL365ZJsb1efZQwjTstSu1B8qWmgKwNLG6xmjgsCMr")
-  },
-  BlockTrigger: {
-    blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL!),
-    produceEmptyBlocks: false,
   }
-  // WithdrawalQueue: {},
 } satisfies ModulesConfig<typeof baseSequencerModules>;
+
+export const indexerSequencerModules = {
+  IndexerNotifier: IndexerNotifier,
+} satisfies SequencerModulesRecord;
+
+export const indexerSequencerModulesConfig = {
+  IndexerNotifier: {},
+} satisfies ModulesConfig<typeof indexerSequencerModules>;

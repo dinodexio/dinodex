@@ -164,22 +164,6 @@
     position: relative;
 }
 
-.token-info-name-text,
-.token-info-symbol-text {
-    color: var(--black-text-color);
-    text-align: center;
-    font-size: 28px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    text-transform: capitalize;
-}
-
-.token-info-symbol-text{
-    font-weight: 500;
-    opacity: 0.5;
-}
-
 .token-chart-container {
     min-height: 342px;
     width: 100%;

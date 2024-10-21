@@ -294,6 +294,7 @@
 
 .token-swap-container .slippage-container {
     gap: 13px;
+    flex-wrap: wrap;
 }
 
 .token-swap-container .slippage-head,

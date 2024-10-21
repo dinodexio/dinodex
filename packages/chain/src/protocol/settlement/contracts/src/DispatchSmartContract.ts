@@ -19,7 +19,7 @@ import { InMemoryMerkleTreeStorage, TypedClass } from "./common/index.js";
 import { RuntimeMethodIdMapping, RuntimeTransaction,  MinaActions, MinaEvents } from "./protocol/index.js";
 import { Deposit } from "./messages/Deposit.js";
 
-import type { SettlementContractType } from "./SettlementSmartContract";
+import type { SettlementContractType } from "./SettlementSmartContract.js";
 import { TokenBridgeDeploymentAuth } from "./authorizations/TokenBridgeDeploymentAuth.js";
 import { UpdateMessagesHashAuth } from "./authorizations/UpdateMessagesHashAuth.js";
 import {

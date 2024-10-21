@@ -1,0 +1,305 @@
+.menu-token-item {
+    color: var(--black-text-color);
+    text-align: center;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    opacity: 0.5;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.menu-token-item:hover {
+    opacity: 1;
+}
+
+.menu-token-item-active {
+    color: var(--bg-button-active-color);
+    opacity: 1;
+}
+
+/* menu net work */
+.network-content:first-child {
+    height: 30px;
+}
+
+.network-content {
+    display: flex;
+    padding: 1px 4px 1px 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border-radius: 6px;
+    border: 0.5px solid var(--black-text-color);
+    background: var(--white-text-color);
+    cursor: pointer;
+    height: 32px;
+    position: relative;
+    width: max-content;
+}
+
+.network-content-menu {
+    display: flex;
+    padding: 5px 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    align-self: stretch;
+    border-radius: 6px;
+    border: 0.5px solid var(--bg-button-active-color);
+    background: var(--white-text-color);
+    position: absolute;
+    width: max-content;
+    z-index: -1;
+    top: 30px;
+    right: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.network-content-menu-show {
+    opacity: 1;
+    visibility: visible;
+    z-index: 100;
+}
+
+.network-content-menu-header,
+.network-content-menu-item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 5px 8px 5px 12px;
+    transition: background 0.3s ease;
+    width: 100%;
+}
+
+.network-content-menu-item:hover {
+    background: var(--bg-overlay-color);
+}
+
+.network-content-menu-item-text {
+    font-size: 18px !important;
+}
+
+.network-content-menu-item-text,
+.network-content-menu-header-text {
+    color: var(--black-text-color);
+    text-align: center;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.network-content-menu-item-active {
+    display: flex;
+    align-items: center;
+}
+
+.img-active-volume {
+    display: none;
+}
+
+.network-content-menu-item-active .img-active-volume {
+    display: block;
+}
+
+.filter-sort-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-token-container {
+    display: flex;
+    height: 30px;
+    padding: 3px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    border: 0.5px solid var(--black-text-color);
+    background: var(--white-text-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.input-search-token {
+    width: 0;
+    height: 100%;
+    border: 0;
+    outline: none;
+    color: var(--black-text-color);
+    text-align: start;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    margin: 0;
+    transition: all 0.3s ease;
+}
+
+.input-search-token::placeholder {
+    opacity: 0.3;
+}
+
+.show-input-search{
+    border-color: var(--bg-button-active-color);
+}
+
+.show-input-search .input-search-token {
+    width: 100px;
+    margin-left: 10px;
+    margin-right: 26px;
+}
+
+/* filter sort detail*/
+
+.filter-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    margin-bottom: 18px;
+}
+
+.filter-time-container {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    border-radius: 6px;
+    border: .5px solid var(--black-text-color);
+    width: max-content;
+}
+
+.filter-time-item {
+    display: flex;
+    padding: 4px 12px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    border-left: .5px solid transparent;
+    border-right: .5px solid transparent;
+    color: var(--black-text-color);
+    text-align: center;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-transform: uppercase;
+    transition: all .3s ease;
+    cursor: pointer;
+    transition: all .3s ease;
+}
+
+.filter-time-item:hover {
+    background-color: var(--bg-overlay-color);
+}
+
+.filter-time-item-active,
+.filter-time-item-active:hover {
+    background-color: var(--bg-button-active-color);
+    border-color: var(--black-text-color);
+}
+
+.stats-card {
+    display: flex;
+    width: 49%;
+    padding: 12px var(--20125-rem, 20px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    align-self: stretch;
+    border-radius: 12px;
+    border: 1.5px solid var(--bg-button-active-color);
+    background: rgba(255, 255, 255, 0.50);
+}
+
+.stats-title {
+    color: var(--black-text-color);
+    text-align: center;
+    font-family: "SF Pro Display";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.stats-value {
+    color: var(--bg-button-active-color);
+    font-family: "SF Pro Display";
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.stats-subtext{
+    color: var(--black-text-color);
+text-align: center;
+font-family: "SF Pro Display";
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+opacity: 0.75;
+}
+
+@media (max-width: 965px) {
+    .network-content:first-child .network-content-menu {
+        right: unset;
+        left: 0;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .menu-token-item {
+        font-size: 18px;
+    }
+
+    .filter-sort-container {
+        gap: 8px;
+    }
+
+    .token-info-logo>img {
+        width: 30px;
+        height: 30px;
+    }
+
+    /* detail token */
+
+    /* filter sort detail */
+    .filter-container {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .token-layout-menu-time-price {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .token-layout-menu-time-price-item {
+        padding: 5px 26px;
+        font-size: 14px;
+    }
+
+    .filter-time-container,
+    .filter-sort-container {
+        width: 100%;
+    }
+
+    .filter-time-item {
+        width: 25%;
+    }
+
+    .filter-sort-container .network-content:last-child {
+        flex: 1;
+    }
+}

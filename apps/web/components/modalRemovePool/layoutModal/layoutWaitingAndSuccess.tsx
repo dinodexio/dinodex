@@ -1,8 +1,9 @@
 import Image from "next/image";
 import React from "react";
-import "../../style.css";
 import { DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import styles from '../../css/pool.module.css'
+import stylesButton from '../../css/button.module.css'
 
 export interface layoutWaitingAndSuccessProps {
   statusLayout: any;
@@ -29,7 +30,7 @@ export function LayoutWaitingAndSuccess({
       : valueTokenPool?.tokenB_amount;
   const textType = type === "remove" ? "Removing" : "Deposited";
   return (
-    <div className="modal-waiting h-max w-full">
+    <div className={`${styles["modal-waiting"]} h-max w-full`}>
       <div className="relative mb-[15px] flex flex-col items-center justify-center gap-[50px]">
         <DialogClose className="absolute right-[-6px] top-[-10px]">
           <svg
@@ -49,7 +50,7 @@ export function LayoutWaitingAndSuccess({
         </DialogClose>
         <div className="relative">
           <div
-            className={`loading-waiting ${statusLayout.waiting ? "opacity-100" : "opacity-0"}`}
+            className={`${styles["loading-waiting"]} ${statusLayout.waiting ? "opacity-100" : "opacity-0"}`}
             style={{ transition: "opacity 0.3s ease" }}
           >
             <Image
@@ -102,7 +103,7 @@ export function LayoutWaitingAndSuccess({
               <Button
                 loading={false}
                 type={"submit"}
-                className={`button-swap btn-supply-remove`}
+                className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]}`}
                 style={{ width: "100%" }}
                 onClick={() => handleClosePool && handleClosePool()}
               >

@@ -1,4 +1,4 @@
-# Mina zkApp: Smartcontract
+# Mina zkApp: Contracts
 
 This template uses TypeScript.
 

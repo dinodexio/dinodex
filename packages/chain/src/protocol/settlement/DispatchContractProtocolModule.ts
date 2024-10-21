@@ -1,15 +1,13 @@
 import { inject, injectable } from "tsyringe";
+import { PublicKey } from "o1js";
 
-import { type RuntimeLike } from "./contracts/src/common/model/RuntimeLike"
-import {
-  ContractModule,
-  SmartContractClassFromInterface,
-} from "./ContractModule";
-
+import type { RuntimeLike } from "@proto-kit/protocol";
+import { ContractModule, SmartContractClassFromInterface } from "./ContractModule.js";
 import {
   DispatchSmartContract,
   DispatchContractType,
-} from "./contracts/src/DispatchSmartContract";
+  DispatchSmartContractBase,
+} from "./contracts/build/src/DispatchSmartContract.js";
 
 export type DispatchContractConfig = {
   incomingMessagesMethods: Record<string, `${string}.${string}`>;
@@ -18,22 +16,33 @@ export type DispatchContractConfig = {
 @injectable()
 export class DispatchContractProtocolModule extends ContractModule<
   DispatchContractType,
-  undefined,
   DispatchContractConfig
 > {
   public constructor(@inject("Runtime") private readonly runtime: RuntimeLike) {
     super();
   }
 
+  public eventsDefinition() {
+    return new DispatchSmartContract(PublicKey.empty<typeof PublicKey>())
+      .events;
+  }
+
   public contractFactory(): SmartContractClassFromInterface<DispatchContractType> {
     const { incomingMessagesMethods } = this.config;
     const methodIdMappings = this.runtime.methodIdResolver.methodIdMap();
 
-    DispatchSmartContract.args = {
+    DispatchSmartContractBase.args = {
       incomingMessagesPaths: incomingMessagesMethods,
       methodIdMappings,
     };
 
     return DispatchSmartContract;
+  }
+
+  public async compile() {
+    const contractVk = await DispatchSmartContract.compile();
+    return {
+      DispatchSmartContract: contractVk,
+    };
   }
 }

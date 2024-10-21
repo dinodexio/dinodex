@@ -37,7 +37,7 @@ const num0 = zkAppInstance.num.get();
 console.log('state after init:', num0.toString());
 
 
-const zkAppDispathInstance = new BridgeContract(zkAppDispathAddress);
+const zkAppDispathInstance = new DispatchSmartContract(zkAppDispathAddress);
 const deployTxn2 = await Mina.transaction(deployerAccount, async () => {
   AccountUpdate.fundNewAccount(deployerAccount);
   await zkAppDispathInstance.deploy();

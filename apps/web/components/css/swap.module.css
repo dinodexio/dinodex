@@ -52,12 +52,8 @@
     position: relative;
 }
 
-.swap-item-first .swap-item-select-have-token {
+.swap-item-first .swap-item-select-have-token,.swap-item-first .swap-item-select-have-token:hover {
     background-color: var(--button-connect-wallet-color);
-}
-
-.swap-item-second .swap-item-select-have-token {
-    background-color: var(--button-connected-wallet-color);
 }
 
 .swap-button {
@@ -135,6 +131,7 @@
 .swap-item-select-have-token {
     padding: 5.471px 11px 5.471px 10px;
     width: max-content;
+    background-color: var(--button-connected-wallet-color);
 }
 
 .swap-item-footer {
@@ -293,7 +290,8 @@
 }
 
 .token-swap-container .slippage-container {
-    gap: 13px;
+    gap:8px 50px;
+    flex-wrap: wrap;
 }
 
 .token-swap-container .slippage-head,
@@ -355,58 +353,6 @@
 .swap-item-input::placeholder{
     color: var(--black-text-color);
     opacity: 0.5;
-}
-
-/* button */
-
-.button-swap {
-    width: 100%;
-    height: 70px;
-    border-radius: 10px;
-    border: 2px solid var(--black-text-color);
-    background-color: var(--bg-button-active-color);
-    color: var(--white-text-color);
-    font-size: 30.353px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.button-swap::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    border-radius: 8px;
-    width: 100%;
-    height: 100%;
-    background: var(--button-header-hover-color);
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-.button-swap>span {
-    position: relative;
-    z-index: 10;
-}
-
-.button-swap:hover::after {
-    opacity: 1;
-}
-
-.button-swap-disabled {
-    cursor: no-drop;
-    opacity: 0.3;
-}
-
-.button-swap-disabled::after {
-    opacity: 0 !important;
 }
 
 @media (max-height: 800px) {
@@ -484,14 +430,6 @@
         font-size: 50px !important;
     }
 
-
-    .button-swap {
-        width: 100%;
-        padding: 16px 0px;
-        font-size: 22px;
-        height: max-content;
-    }
-
     .slippage-container{
         gap: unset;
         justify-content: space-between;
@@ -511,25 +449,4 @@
     .bg-overlay{
         background: rgba(0, 0, 0, 0.60);
     }
-
-    .modal-container{
-        top: unset;
-        bottom: 0;
-        left: 0;
-        transform: translateY(0);
-        border-radius: 12px;
-        height: 621px;
-    }
-}
-
-.button-wallet {
-    height: 48px;
-    display: flex;
-    padding: 12px var(--100625-rem, 10px);
-    color: var(white-text-color);
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
-    border-radius: 12px;
 }

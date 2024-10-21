@@ -8,6 +8,8 @@ import { useState } from "react";
 import { TransactionPanel } from "./transaction-panel";
 import { PoolPanel } from "./pool-panel";
 import { Swap } from "../swap/swap";
+import stylesTokens from "../css/tokens.module.css";
+import stylesDetails from "../css/detailToken.module.css";
 import {
   Drawer,
   DrawerClose,
@@ -44,17 +46,17 @@ export function InfoLayout({ type, params }: InfoLayoutProps) {
     <>
       <div className="mt-[40px] w-full mx-auto flex flex-col items-center gap-[20px] xl:mt-[63px] xl:gap-[46px] xl:flex-row xl:items-start xl:justify-center lg:gap-[32px] lg:items-start">
         <div className="w-full max-w-[734px]">
-          <div className="token-info-container">
-            <div className="token-detail-info-logo">
+          <div className={stylesDetails["token-info-container"]}>
+            <div className={stylesTokens["token-detail-info-logo"]}>
               <Image src={`/${token?.logo}` || ""} alt="token-1" width={40} height={40} />
             </div>
-            <span className="token-info-name-text">{token?.name}</span>
-            <span className="token-info-symbol-text">{token?.symbol}</span>
+            <span className={stylesDetails["token-info-name-text"]}>{token?.name}</span>
+            <span className={stylesDetails["token-info-symbol-text"]}>{token?.symbol}</span>
           </div>
-          <div className="token-chart-container">
-            <div className="token-chart-price">
-              <span className="token-chart-price-text">${token?.price}</span>
-              <span className="token-chart-change-text text-red">
+          <div className={stylesDetails["token-chart-container"]}>
+            <div className={stylesDetails["token-chart-price"]}>
+              <span className={stylesDetails["token-chart-price-text"]}>${token?.price}</span>
+              <span className={`${stylesDetails["token-chart-change-text"]} ${stylesDetails["text-red"]}`}>
                 <img src="/images/token/change-down.svg" alt="token-1" />
                 -0.01%
               </span>
@@ -62,24 +64,24 @@ export function InfoLayout({ type, params }: InfoLayoutProps) {
             <ChartToken type="token" />
           </div>
           <FilterSort />
-          <div className="stats-token-container">
-            <span className="stats-token-title">Stats</span>
-            <div className="stats-token-info">
-              <div className="stats-token-info-item">
-                <span className="stats-token-info-item-title">TVL</span>
-                <span className="stats-token-info-item-value">$165.3M</span>
+          <div className={stylesDetails["stats-token-container"]}>
+            <span className={stylesDetails["stats-token-title"]}>Stats</span>
+            <div className={stylesDetails["stats-token-info"]}>
+              <div className={stylesDetails["stats-token-info-item"]}>
+                <span className={stylesDetails["stats-token-info-item-title"]}>TVL</span>
+                <span className={stylesDetails["stats-token-info-item-value"]}>$165.3M</span>
               </div>
-              <div className="stats-token-info-item">
-                <span className="stats-token-info-item-title">Market Cap</span>
-                <span className="stats-token-info-item-value">$118.8B</span>
+              <div className={stylesDetails["stats-token-info-item"]}>
+                <span className={stylesDetails["stats-token-info-item-title"]}>Market Cap</span>
+                <span className={stylesDetails["stats-token-info-item-value"]}>$118.8B</span>
               </div>
-              <div className="stats-token-info-item">
-                <span className="stats-token-info-item-title">FDV</span>
-                <span className="stats-token-info-item-value">$118.8B</span>
+              <div className={stylesDetails["stats-token-info-item"]}>
+                <span className={stylesDetails["stats-token-info-item-title"]}>FDV</span>
+                <span className={stylesDetails["stats-token-info-item-value"]}>$118.8B</span>
               </div>
-              <div className="stats-token-info-item">
-                <span className="stats-token-info-item-title">1 day volume</span>
-                <span className="stats-token-info-item-value">$99.9M</span>
+              <div className={stylesDetails["stats-token-info-item"]}>
+                <span className={stylesDetails["stats-token-info-item-title"]}>1 day volume</span>
+                <span className={stylesDetails["stats-token-info-item-value"]}>$99.9M</span>
               </div>
             </div>
           </div>
@@ -91,7 +93,7 @@ export function InfoLayout({ type, params }: InfoLayoutProps) {
                   onClick={() => {
                     setTab(item.value);
                   }}
-                  className={`menu-token-item ${tab === item.value ? "menu-token-item-active" : ""}`}
+                  className={`${stylesTokens["menu-token-item"]} ${tab === item.value ? stylesTokens["menu-token-item-active"] : ""}`}
                 >
                   {item.label}
                 </span>
@@ -105,18 +107,18 @@ export function InfoLayout({ type, params }: InfoLayoutProps) {
           <div className="w-full hidden xl:block lg:block sm:hidden">
             <Swap token={token} type="tokenDetail" />
           </div>
-          <div className="swap-container-info">
-            <span className="swap-text">Info</span>
-            <div className="swap-info-content">
-              <div className="swap-info-item copy-btn" data-address="0xFd08as123u8asy348123FCbb9">
+          <div className={stylesDetails["swap-container-info"]}>
+            <span className={stylesDetails["swap-text"]}>Info</span>
+            <div className={stylesDetails["swap-info-content"]}>
+              <div className={stylesDetails["swap-info-item"]} data-address="0xFd08as123u8asy348123FCbb9">
                 <Image src="/icon/icon-copy.svg" alt="info" width={18} height={18} />
                 <span className="swap-info-item-text">0xFd08...FCbb9</span>
               </div>
-              <div className="swap-info-item">
+              <div className={stylesDetails["swap-info-item"]}>
                 <Image src="/icon/icon-explorer.svg" alt="info" width={24} height={24} />
                 <span className="swap-info-item-text">Explorer</span>
               </div>
-              <div className="swap-info-item">
+              <div className={stylesDetails["swap-info-item"]}>
                 <Image src="/icon/web-icon.svg" alt="info" width={24} height={24} />
                 <span className="swap-info-item-text">Website</span>
               </div>

@@ -3,7 +3,6 @@ import { Header } from "../header";
 import { Toaster } from "@/components/ui/toaster";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import "../style.css";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +28,8 @@ import { ModalRemovePool } from "../modalRemovePool/modalRemovePool";
 import { PoolPosition } from "./position";
 import { Balances } from "../wallet/wallet";
 import { TokenId } from "@proto-kit/library";
+import stylesButton from '../css/button.module.css'
+import styles from '../css/pool.module.css'
 export interface PoolRemoveProps {
   walletElement?: JSX.Element;
   tokenParams?: any;
@@ -138,10 +139,10 @@ export function PoolRemove({
 
   const valueTokenPool = useMemo(() => {
     const tokenA_amount = dataPooled?.first
-      ? parseFloat(dataPooled.first) * (valueRange / 100)
+      ? parseFloat(String(dataPooled.first)) * (valueRange / 100)
       : 0;
     const tokenB_amount = dataPooled?.second
-      ? parseFloat(dataPooled.second) * (valueRange / 100)
+      ? parseFloat(String(dataPooled.second)) * (valueRange / 100)
       : 0;
 
     return {
@@ -259,7 +260,7 @@ export function PoolRemove({
                       max={100}
                       value={valueRange}
                       onChange={handleChange}
-                      className="slider"
+                      className={styles['slider']}
                     />
                   </div>
                   <div className="mt-[-10px] flex w-full items-center justify-between sm:mt-[-10px] lg:mt-0 xl:mt-0">
@@ -381,7 +382,7 @@ export function PoolRemove({
                         Number(valueTokenPool?.tokenA_amount) / 100 === 0 &&
                         Number(valueTokenPool?.tokenB_amount) / 100 === 0
                       }
-                      className={`button-swap btn-supply-remove w-full`}
+                      className={`${stylesButton['button-swap']} ${stylesButton['btn-supply-remove']} w-full`}
                       // onClick={handleRemoveLiquidity}
                     >
                       <span>Remove</span>

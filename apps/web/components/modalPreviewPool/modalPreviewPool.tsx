@@ -1,7 +1,8 @@
 import Image from "next/image";
 import React from "react";
-import '../style.css'
 import { DialogClose } from "../ui/dialog";
+import styles from '../css/modalPreviewPool.module.css'
+import stylesButton from '../css/button.module.css'
 
 export interface modalPreviewPoolProps {
     dataPool: any,
@@ -23,70 +24,70 @@ export function ModalPreviewPool({ dataPool,onClickAddPool }: modalPreviewPoolPr
                 </DialogClose>
             </div>
             <div className="flex flex-col gap-[15px] mt-[26px] mb-[15px]">
-                <div className="content-modal-preview-header">
-                    <div className="content-modal-preview-header-token">
-                        <div className="content-modal-preview-header-token" style={{ gap: 0 }}>
+                <div className={styles["content-modal-preview-header"]}>
+                    <div className={styles["content-modal-preview-header-token"]}>
+                        <div className={styles["content-modal-preview-header-token"]} style={{ gap: 0 }}>
                             <Image src={'/' + dataPool?.tokenPool?.first?.logo} width={26} height={26} alt="" />
                             <Image src={'/' + dataPool?.tokenPool?.second?.logo} width={26} height={26} alt="" style={{ marginLeft: '-11px' }} />
                         </div>
-                        <span className="preview-header-text">{dataPool?.tokenPool?.first?.symbol}/{dataPool?.tokenPool?.second?.symbol}</span>
+                        <span className={styles["preview-header-text"]}>{dataPool?.tokenPool?.first?.symbol}/{dataPool?.tokenPool?.second?.symbol}</span>
                     </div>
-                    <div className="content-modal-preview-header-status">
-                        <span className="preview-header-text">In Range</span>
-                        <div className="preview-header-status-info status-in-range"></div>
+                    <div className={styles["content-modal-preview-header-status"]}>
+                        <span className={styles["preview-header-text"]}>In Range</span>
+                        <div className={`${styles["preview-header-status-info"]} ${styles["status-in-range"]}`}></div>
                     </div>
                 </div>
-                <div className="content-preview-pool-token">
-                    <div className="preview-pool-token-item">
-                        <div className="preview-pool-token-item-info">
+                <div className={styles["content-preview-pool-token"]}>
+                    <div className={styles["preview-pool-token-item"]}>
+                        <div className={styles["preview-pool-token-item-info"]}>
                             <Image src={'/' + dataPool?.tokenPool?.first?.logo} width={26} height={26} alt="" />
-                            <span className="preview-header-text">{dataPool?.tokenPool?.first?.symbol}</span>
+                            <span className={styles["preview-header-text"]}>{dataPool?.tokenPool?.first?.symbol}</span>
                         </div>
-                        <span className="preview-header-text">{dataPool?.deposit_amount?.first}</span>
+                        <span className={styles["preview-header-text"]}>{dataPool?.deposit_amount?.first}</span>
                     </div>
-                    <div className="preview-pool-token-item">
-                        <div className="preview-pool-token-item-info">
+                    <div className={styles["preview-pool-token-item"]}>
+                        <div className={styles["preview-pool-token-item-info"]}>
                             <Image src={'/' + dataPool?.tokenPool?.second?.logo} width={26} height={26} alt="" />
-                            <span className="preview-header-text">{dataPool?.tokenPool?.second?.symbol}</span>
+                            <span className={styles["preview-header-text"]}>{dataPool?.tokenPool?.second?.symbol}</span>
                         </div>
-                        <span className="preview-header-text">{dataPool?.deposit_amount?.second}</span>
+                        <span className={styles["preview-header-text"]}>{dataPool?.deposit_amount?.second}</span>
                     </div>
-                    <div className="preview-pool-token-item">
+                    <div className={styles["preview-pool-token-item"]}>
                         <span className="preview-header-fee-tier-text">Fee Tier</span>
                         <span className="preview-header-fee-tier-text">{dataPool?.feeTier}%</span>
                     </div>
                 </div>
-                <div className="selected-range-content">
-                    <span className="selected-range-content-header">
+                <div className={styles["selected-range-content"]}>
+                    <span className={styles["selected-range-content-header"]}>
                         Selected Range
                     </span>
-                    <div className="switch-select-range">
-                        <div className="switch-select-range-item switch-select-range-item-active">{dataPool?.tokenPool?.first?.symbol}</div>
-                        <div className="switch-select-range-item">{dataPool?.tokenPool?.second?.symbol}</div>
+                    <div className={styles["switch-select-range"]}>
+                        <div className={`${styles["switch-select-range-item"]} ${styles["switch-select-range-item-active"]}`}>{dataPool?.tokenPool?.first?.symbol}</div>
+                        <div className={`${styles["switch-select-range-item"]}`}>{dataPool?.tokenPool?.second?.symbol}</div>
                     </div>
                 </div>
-                <div className="content-min-price">
-                    <div className="content-min-price-item">
-                        <span className="content-min-price-item-title">Min Price</span>
-                        <span className="header-preview-pool-text">{dataPool?.valueMinPrice?.first < 0.001 ? `< 0.001` : dataPool?.valueMinPrice?.first}</span>
-                        <span className="content-min-price-item-title">{dataPool?.tokenPool?.first?.symbol} per {dataPool?.tokenPool?.second?.symbol}</span>
-                        <span className="content-min-price-item-desc">Your position will be 100% composed of ETH at this
+                <div className={styles["content-min-price"]}>
+                    <div className={styles["content-min-price-item"]}>
+                        <span className={styles["content-min-price-item-title"]}>Min Price</span>
+                        <span className={styles["header-preview-pool-text"]}>{dataPool?.valueMinPrice?.first < 0.001 ? `< 0.001` : dataPool?.valueMinPrice?.first}</span>
+                        <span className={styles["content-min-price-item-title"]}>{dataPool?.tokenPool?.first?.symbol} per {dataPool?.tokenPool?.second?.symbol}</span>
+                        <span className={styles["content-min-price-item-desc"]}>Your position will be 100% composed of ETH at this
                             price</span>
                     </div>
-                    <div className="content-min-price-item">
-                        <span className="content-min-price-item-title">Min Price</span>
-                        <span className="header-preview-pool-text">{dataPool?.valueMinPrice?.second < 0.001 ? `< 0.001` : dataPool?.valueMinPrice?.second}</span>
-                        <span className="content-min-price-item-title">{dataPool?.tokenPool?.first?.symbol} per {dataPool?.tokenPool?.second?.symbol}</span>
-                        <span className="content-min-price-item-desc">Your position will be 100% composed of ETH at this
+                    <div className={styles["content-min-price-item"]}>
+                        <span className={styles["content-min-price-item-title"]}>Min Price</span>
+                        <span className={styles["header-preview-pool-text"]}>{dataPool?.valueMinPrice?.second < 0.001 ? `< 0.001` : dataPool?.valueMinPrice?.second}</span>
+                        <span className={styles["content-min-price-item-title"]}>{dataPool?.tokenPool?.first?.symbol} per {dataPool?.tokenPool?.second?.symbol}</span>
+                        <span className={styles["content-min-price-item-desc"]}>Your position will be 100% composed of ETH at this
                             price</span>
                     </div>
                 </div>
                 <div className="flex py-[12px] px-[10px] flex-col items-center justify-center gap-[10px] border border-black w-full rounded-[21px]">
-                    <span className="content-min-price-item-title">Current Price</span>
-                    <span className="header-preview-pool-text">1.002</span>
-                    <span className="content-min-price-item-title">ETH per WBTC</span>
+                    <span className={styles["content-min-price-item-title"]}>Current Price</span>
+                    <span className={styles["header-preview-pool-text"]}>1.002</span>
+                    <span className={styles["content-min-price-item-title"]}>ETH per WBTC</span>
                 </div>
-                <div className="button-swap btn-modal-preview-pool" onClick={() => onClickAddPool && onClickAddPool()}>
+                <div className={`${stylesButton["button-swap"]} ${stylesButton["btn-modal-preview-pool"]}`} onClick={() => onClickAddPool && onClickAddPool()}>
                     <span>Add</span>
                 </div>
             </div>

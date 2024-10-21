@@ -26,7 +26,7 @@ import { Path } from "./protocol/index.js";
 import {OutgoingMessageArgumentBatch, OUTGOING_MESSAGE_BATCH_SIZE} from "./messages/OutgoingMessageArgument.js"
 import { Withdrawal } from "./messages/Withdrawal.js";
 
-import type { SettlementContractType } from "./SettlementSmartContract";
+import type { SettlementContractType } from "./SettlementSmartContract.js";
 
 export type BridgeContractType = {
   stateRoot: State<Field>;

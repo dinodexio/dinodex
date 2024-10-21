@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "../style.css";
-import styles from '../css/swap.module.css'
+import styles from "../css/swap.module.css";
+import stylesButton from "../css/button.module.css";
 import { SLIPPAGE } from "@/constants";
 import Image from "next/image";
 import {
@@ -16,12 +17,12 @@ import {
   removePrecision,
 } from "@/containers/xyk/add-liquidity-form";
 import { Button } from "../ui/button";
-import { pools, tokens } from "@/tokens";
+import { generatePools, pools, tokens } from "@/tokens";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { useBalancesStore, useObserveBalance } from "@/lib/stores/balances";
 import { dijkstra, PoolKey, prepareGraph, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
-import { useObservePool, useSellPath } from "@/lib/stores/xyk";
+import { useObservePool, useSellPath, useXYKStore } from "@/lib/stores/xyk";
 import { Balance } from "../ui/balance";
 import { Collapsible, CollapsibleContent } from "../ui/collapsible";
 import { USDBalance } from "../ui/usd-balance";
@@ -32,6 +33,8 @@ export interface SwapProps {
 }
 
 const INIT_SLIPPPAGE = 0.5;
+
+// const pools = generatePools();
 
 export function Swap({ token, type }: SwapProps) {
   const [loading, setLoading] = useState(false);
@@ -52,6 +55,8 @@ export function Swap({ token, type }: SwapProps) {
     },
     route: [],
   });
+
+  // const {pools} = useXYKStore();
 
   const [valueInputSwap, setValueInputSwap] = useState<any>({
     tokenIn: null,
@@ -134,6 +139,7 @@ export function Swap({ token, type }: SwapProps) {
       });
     }
   };
+
   const routerPools = pools.map(([tokenA, tokenB]) => {
     const poolKey = PoolKey.fromTokenPair(
       TokenPair.from(TokenId.from(tokenA), TokenId.from(tokenB)),
@@ -330,27 +336,31 @@ export function Swap({ token, type }: SwapProps) {
   return (
     <Dialog>
       <div
-        className={`swap-container ${
-          type === "tokenDetail" ? "token-swap-container pc-swap-token" : ""
+        className={`${styles["swap-container"]} ${
+          type === "tokenDetail"
+            ? `${styles["token-swap-container"]} ${styles["pc-swap-token"]}`
+            : ""
         }`}
       >
-        <span className="swap-text">Swap</span>
+        <span className={styles["swap-text"]}>Swap</span>
         <div
-          className={`swap-content ${
-            type === "tokenDetail" ? "token-swap-content" : ""
+          className={`${styles["swap-content"]} ${
+            type === "tokenDetail" ? styles["token-swap-content"] : ""
           }`}
         >
           <div
-            className={`swap-container-form ${
-              type === "tokenDetail" ? "token-swap-form" : ""
+            className={`${styles["swap-container-form"]} ${
+              type === "tokenDetail" ? styles["token-swap-form"] : ""
             }`}
           >
-            <div className="swap-content-item swap-item-first">
-              <span className="swap-item-header">You pay</span>
-              <div className="line-swap-item"></div>
-              <div className="swap-item-content">
+            <div
+              className={`${styles["swap-content-item"]} ${styles["swap-item-first"]}`}
+            >
+              <span className={styles["swap-item-header"]}>You pay</span>
+              <div className={styles["line-swap-item"]}></div>
+              <div className={styles["swap-item-content"]}>
                 <input
-                  className="swap-item-input"
+                  className={styles["swap-item-input"]}
                   type="text"
                   autoComplete="false"
                   placeholder="0"
@@ -360,8 +370,9 @@ export function Swap({ token, type }: SwapProps) {
                 />
                 <DialogTrigger>
                   <div
-                    className={`swap-item-select ${
-                      tokenSwap.tokenIn.name && "swap-item-select-have-token"
+                    className={`${styles["swap-item-select"]} ${
+                      tokenSwap.tokenIn.name &&
+                      styles["swap-item-select-have-token"]
                     }`}
                     onClick={() => setTypeOpenModal("tokenIn")}
                   >
@@ -386,26 +397,28 @@ export function Swap({ token, type }: SwapProps) {
                     />
                   </div>
                 </DialogTrigger>
-                <USDBalance className="value-price" balance="" />
+                {/* <USDBalance className="value-price" balance="" /> */}
                 {/* {valueInputSwap.tokenIn && (
                   <span className="value-price">$932.85</span>
                 )} */}
               </div>
-              <div className="swap-item-footer">
-                <span className="swap-item-footer-text">
+              <div className={styles["swap-item-footer"]}>
+                <span className={styles["swap-item-footer-text"]}>
                   Balance: <Balance balance={balance} />
                 </span>
               </div>
             </div>
-            <div className="swap-button" onClick={() => changeSwap()}>
+            <div className={styles["swap-button"]} onClick={() => changeSwap()}>
               <img src="/images/swap/swap-button-icon.svg" alt="swap-button" />
             </div>
-            <div className="swap-content-item swap-item-second">
-              <span className="swap-item-header">You get</span>
-              <div className="line-swap-item"></div>
-              <div className="swap-item-content">
+            <div
+              className={`${styles["swap-content-item"]} ${styles["swap-item-second"]}}`}
+            >
+              <span className={styles["swap-item-header"]}>You get</span>
+              <div className={styles["line-swap-item"]}></div>
+              <div className={styles["swap-item-content"]}>
                 <input
-                  className="swap-item-input"
+                  className={styles["swap-item-input"]}
                   type="text"
                   autoComplete="false"
                   placeholder="0"
@@ -416,8 +429,9 @@ export function Swap({ token, type }: SwapProps) {
                 />
                 <DialogTrigger>
                   <div
-                    className={`swap-item-select ${
-                      tokenSwap?.tokenOut?.name && "swap-item-select-have-token"
+                    className={`${styles["swap-item-select"]} ${
+                      tokenSwap?.tokenOut?.name &&
+                      styles["swap-item-select-have-token"]
                     }`}
                     onClick={() => setTypeOpenModal("tokenOut")}
                   >
@@ -442,13 +456,13 @@ export function Swap({ token, type }: SwapProps) {
                     />
                   </div>
                 </DialogTrigger>
-                <USDBalance className="value-price" balance="" />
+                {/* <USDBalance className={styles["value-price"]} balance="" /> */}
                 {/* {valueInputSwap.tokenOut && (
                   <span className="value-price">$932.98</span>
                 )} */}
               </div>
-              <div className="swap-item-footer">
-                <span className="swap-item-footer-text">
+              <div className={styles["swap-item-footer"]}>
+                <span className={styles["swap-item-footer-text"]}>
                   Balance: <Balance balance={balanceOut} />
                 </span>
               </div>
@@ -457,7 +471,7 @@ export function Swap({ token, type }: SwapProps) {
           <Button
             loading={loading}
             disabled={renderButtonSwap.isDisabled}
-            className={styles["button-swap"]}
+            className={stylesButton["button-swap"]}
             style={{ marginTop: "-12px" }}
             onClick={() => handleSwap()}
           >
@@ -465,12 +479,12 @@ export function Swap({ token, type }: SwapProps) {
           </Button>
         </div>
 
-        <div className="slippage-container">
-          <div className="slippage-head">Slippage</div>
+        <div className={styles["slippage-container"]}>
+          <div className={styles["slippage-head"]}>Slippage</div>
           {SLIPPAGE?.map((item, index) => (
             <div
-              className={`slippage-item ${
-                item?.value === slippage ? "slippage-item-active" : ""
+              className={`${styles["slippage-item"]} ${
+                item?.value === slippage ? styles["slippage-item-active"] : ""
               }`}
               onClick={() => handleChangeSlippage(item?.value)}
               data-slippage={item?.value}
@@ -550,7 +564,7 @@ export function Swap({ token, type }: SwapProps) {
           </div> */}
           </CollapsibleContent>
         </Collapsible>
-        <DialogOverlay className="bg-overlay" />
+        <DialogOverlay className={styles["bg-overlay"]} />
         <DialogContent className="modal-container bg-white px-[19.83px] pb-[33.88px] pt-[21.49px]">
           <ModalListToken
             tokenSelected={tokenSwap[typeOpenModal]}

@@ -10,6 +10,7 @@ import { useWalletStore } from "./wallet";
 import { getTokenID } from '@/tokens';
 import { usePoolKey } from "../xyk/usePoolKey";
 import { LPTokenId, TokenPair } from "chain";
+import BigNumber from "bignumber.js";
 
 export interface BalancesState {
   loading: boolean;
@@ -190,6 +191,11 @@ export const useObservePooled = (
     [tickerB],
   );
 
+  const calculatePooledToken = (lpBalance: BigNumber.Value, lpTotalSupply: BigNumber.Value, tokenTotalOfPool: BigNumber.Value) => {
+    if ([lpTotalSupply, tokenTotalOfPool].includes(0)) return 0
+    return BigNumber(tokenTotalOfPool).multipliedBy(lpBalance).div(lpTotalSupply).toString()
+  }
+
   // Memoize the pool key and token pair to avoid recalculating when tokenA or tokenB change
   const { tokenPair, poolKey } = usePoolKey(tokenA, tokenB);
   // const {
@@ -197,8 +203,8 @@ export const useObservePooled = (
   // } = useWalletStore();
 
   // Observe balances for both tokens and the total supply of the liquidity pool token
-  const first = useObserveBalance(tokenA, poolKey);
-  const second = useObserveBalance(tokenB, poolKey);
+  const totalTokenALp = useObserveBalance(tokenA, poolKey);
+  const totalTokenBLp = useObserveBalance(tokenB, poolKey);
   const lpTotalSupply = useObserveTotalSupply(
     LPTokenId.fromTokenPair(tokenPair).toString(),
   );
@@ -207,8 +213,11 @@ export const useObservePooled = (
     if (!balance || !lpTotalSupply) return 0;
     return ((Number(balance) / Number(lpTotalSupply)) * 100).toFixed(2);
   }, [balance, lpTotalSupply]);
-
-  return { first, second, poolOfShare };
+  return {
+    first: calculatePooledToken(balance || 0, lpTotalSupply || 0, totalTokenALp || 0),
+    second: calculatePooledToken(balance || 0, lpTotalSupply || 0, totalTokenBLp || 0),
+    poolOfShare
+  };
 };
 
 export const useFaucet = () => {

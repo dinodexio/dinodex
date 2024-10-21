@@ -28,10 +28,10 @@ import {
 import { singleton } from "tsyringe";
 
 import { NetworkState, BlockHashMerkleTree, BlockProverPublicInput, BlockProverPublicOutput } from "./protocol/index.js";
-import {SettlementStateRecord, SettlementHookInputs, ProvableSettlementHook} from "./common/modularity/ProvableSettlementHook";
+import {SettlementStateRecord, SettlementHookInputs, ProvableSettlementHook} from "./common/modularity/ProvableSettlementHook.js";
 
-import { DispatchContractType } from "./DispatchSmartContract";
-import { BridgeContractType } from "./BridgeContract";
+import { DispatchContractType } from "./DispatchSmartContract.js";
+import { BridgeContractType } from "./BridgeContract.js";
 import { TokenBridgeDeploymentAuth } from "./authorizations/TokenBridgeDeploymentAuth.js";
 import { UpdateMessagesHashAuth } from "./authorizations/UpdateMessagesHashAuth.js";
 

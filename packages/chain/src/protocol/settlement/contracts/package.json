@@ -1,5 +1,5 @@
 {
-  "name": "smartcontract",
+  "name": "contracts",
   "version": "0.1.0",
   "description": "",
   "author": "",
@@ -26,7 +26,7 @@
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-typescript": "^7.16.0",
     "@types/jest": "^27.0.3",
-    "@types/lodash": "^4.17.9",
+    "@types/lodash": "^4.17.12",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
     "eslint": "^8.7.0",
@@ -36,16 +36,12 @@
     "ts-jest": "^28.0.8",
     "typescript": "^5.1"
   },
-  "peerDependencies": {
-    "o1js": "1.6.0"
-  },
   "engines": {
     "node": ">=18.14.0"
   },
   "dependencies": {
-    "@proto-kit/common": "^0.1.1-develop.833",
-    "@proto-kit/protocol": "^0.1.1-develop.833",
     "lodash": "^4.17.21",
-    "tsyringe": "^4.8.0"
+    "o1js": "^1.6.0",
+    "typescript-memoize": "^1.1.1"
   }
 }
