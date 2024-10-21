@@ -2,7 +2,7 @@ import { injectable, inject } from "tsyringe";
 import { range } from "@proto-kit/common";
 import { PrivateKey, Mina, Lightnet, PublicKey, AccountUpdate } from "o1js";
 
-import {MinaTransactionSender, type BaseLayer, MinaBaseLayer} from "@proto-kit/sequencer"
+import { MinaTransactionSender, type BaseLayer, MinaBaseLayer } from "@proto-kit/sequencer";
 import { type FeeStrategy } from "../fees/FeeStrategy";
 
 type LocalBlockchain = Awaited<ReturnType<typeof Mina.LocalBlockchain>>;
@@ -31,7 +31,7 @@ export class MinaBlockchainAccounts {
     if (!this.isMinaBaseLayer(baseLayer)) {
       throw new Error("Baselayer not defined or not subclass of MinaBaseLayer");
     }
-    if (baseLayer.config.network.archive === "local") {
+    if (baseLayer.config.network.type === "local") {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const local = baseLayer.network! as LocalBlockchain;
       const accounts = local.testAccounts.slice(
@@ -41,9 +41,9 @@ export class MinaBlockchainAccounts {
       this.keysRetrieved += num;
       return accounts.map((acc) => acc.key);
     }
-    if (baseLayer.config.network.archive === "lightnet") {
+    if (baseLayer.config.network.type === "lightnet") {
       return await Promise.all(
-        range(0, num).map(async (i) => {
+        range(num).map(async (i) => {
           const pair = await Lightnet.acquireKeyPair({
             isRegularAccount: true,
           });
@@ -63,7 +63,7 @@ export class MinaBlockchainAccounts {
     if (!this.isMinaBaseLayer(baseLayer)) {
       throw new Error("Baselayer not defined or not subclass of MinaBaseLayer");
     }
-    if (baseLayer.config.network.archive === "local") {
+    if (baseLayer.config.network.type === "local") {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       (baseLayer.network as LocalBlockchain).addAccount(
         receiver,
@@ -81,7 +81,8 @@ export class MinaBlockchainAccounts {
         }
       );
       await this.transactionSender.proveAndSendTransaction(
-        tx.sign([sender])
+        tx.sign([sender]),
+        "included"
       );
     }
   }

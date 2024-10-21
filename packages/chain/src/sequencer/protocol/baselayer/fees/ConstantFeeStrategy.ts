@@ -1,9 +1,6 @@
 import { noop } from "@proto-kit/common";
 
-import {
-  sequencerModule,
-  SequencerModule,
-} from "../../../sequencer/builder/SequencerModule";
+import { SequencerModule, sequencerModule } from "@proto-kit/sequencer";
 
 import { FeeStrategy } from "./FeeStrategy";
 

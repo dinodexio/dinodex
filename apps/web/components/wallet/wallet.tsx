@@ -132,7 +132,7 @@ export function Wallet({
       >
         <div
           className={cn(
-            "absolute right-0 flex h-full w-full flex-col items-center justify-center border-l-2 border-l-black bg-neutral-50 opacity-90",
+            "absolute right-0 flex h-full w-full flex-col items-center justify-center bg-neutral-50 opacity-90",
             {
               hidden: !loading,
             },
@@ -174,7 +174,7 @@ export function Wallet({
                 if (!token || (BigInt(tokenId) > BigInt(3) && balance == "0"))
                   return null;
                 return (
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between" key={tokenId}>
                     <div className="flex items-center">
                       <img className="mr-[10px] h-8 w-8" src={token.logo} />
                       <div>
@@ -196,9 +196,9 @@ export function Wallet({
             </div>
           </div>
           <div className="flex items-center justify-center gap-[17px] mb-[25px]">
-              <Image src={"/images/social/git.svg"} alt="logo" width={35} height={35} />
-              <Image src={"/images/social/x.svg"} alt="logo" width={35} height={35} />
-              <Image src={"/images/social/discord.svg"} alt="logo" width={35} height={35} />
+              <Image src={"/images/social/git.svg"} alt="logo" width={35} height={35} style={{cursor:'pointer'}} />
+              <Image src={"/images/social/x.svg"} alt="logo" width={35} height={35} style={{cursor:'pointer'}} />
+              <Image src={"/images/social/discord.svg"} alt="logo" width={35} height={35} style={{cursor:'pointer'}} />
           </div>
           <div className="flex flex-col gap-[15px]">
             <Button

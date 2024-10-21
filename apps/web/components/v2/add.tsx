@@ -3,9 +3,9 @@ import { Header } from "../header";
 import { Toaster } from "@/components/ui/toaster";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
-import "../style.css";
-import styles from '../css/swap.module.css'
-import stylesPool from '../css/pool.module.css'
+import stylesButton from "../css/button.module.css";
+import styles from "../css/swap.module.css";
+import stylesPool from "../css/pool.module.css";
 import {
   Dialog,
   DialogContent,
@@ -318,7 +318,7 @@ export function PoolAdd({
   );
 
   const spotPrice = useSpotPrice(tokenAReserve, tokenBReserve);
-  
+
   useEffect(() => {
     if (!userTokenABalance || !userTokenBBalance) return;
     balanceARef.current = userTokenABalance;
@@ -409,6 +409,36 @@ export function PoolAdd({
     dataPoolCreate.deposit_amount.first,
     dataPoolCreate.deposit_amount.second,
     pool,
+  ]);
+
+  // Sử dụng BigNumber để tính toán chính xác
+  const shareOfPool = useMemo(() => {
+    // Chuyển đổi lpTotalSupply thành BigNumber, mặc định là 0 nếu undefined
+    const lpTotalSupplyValue = new BigNumber(lpTotalSupply || "0");
+    if (
+      (pool &&
+        pool?.exists &&
+        dataPoolCreate?.deposit_amount?.first === null) ||
+      dataPoolCreate?.deposit_amount?.first === undefined ||
+      dataPoolCreate?.deposit_amount?.first === ""
+    )
+      return null;
+
+    // Sử dụng BigNumber để tính toán chính xác
+    return new BigNumber(dataPoolCreate.tokenLP_amount || "0")
+      .dividedBy(
+        new BigNumber(dataPoolCreate.tokenLP_amount || "0").plus(
+          lpTotalSupplyValue,
+        ),
+      )
+      .multipliedBy(100)
+      .toNumber()
+      .toFixed(2);
+  }, [
+    dataPoolCreate.tokenLP_amount,
+    lpTotalSupply,
+    pool,
+    dataPoolCreate?.deposit_amount?.first,
   ]);
 
   return (
@@ -634,7 +664,7 @@ export function PoolAdd({
                             </div>
                             <div className="flex w-[30%] max-w-[150px] flex-col items-center gap-[10px]">
                               <span className="text-[15px] font-[500] text-textBlack sm:text-[15px] lg:text-[18px] xl:text-[18px]">
-                                ~ %
+                                {shareOfPool || "~"} %
                               </span>
                               <span className="text-[15px] font-[600] text-textBlack opacity-[0.6] sm:text-[15px] lg:text-[18px] xl:text-[18px]">
                                 Share of pool
@@ -654,12 +684,15 @@ export function PoolAdd({
                 </Dialog>
                 {approve.active ? (
                   <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-                    <DialogTrigger disabled={validatePoolCreation.isRequired} onClick={() => setIsOpen(true)}>
+                    <DialogTrigger
+                      disabled={validatePoolCreation.isRequired}
+                      onClick={() => setIsOpen(true)}
+                    >
                       <Button
                         loading={loading}
                         type={"submit"}
                         disabled={validatePoolCreation.isRequired}
-                        className={`${styles['button-swap']} ${stylesPool['btn-prview']} ${stylesPool['btn-approve-new']}`}
+                        className={`${stylesButton["button-swap"]} ${stylesButton["btn-prview"]} ${stylesButton["btn-approve-new"]}`}
                       >
                         <span>
                           {validatePoolCreation.text ??
@@ -667,6 +700,10 @@ export function PoolAdd({
                         </span>
                       </Button>
                     </DialogTrigger>
+                    <DialogOverlay
+                      className="bg-[rgba(0,0,0,0.5)]"
+                      onClick={(e) => e.stopPropagation()}
+                    />
                     <DialogOverlay
                       className="bg-[rgba(0,0,0,0.5)]"
                       onClick={(e) => e.stopPropagation()}
@@ -694,7 +731,7 @@ export function PoolAdd({
                       dataPoolCreate.deposit_amount.first === null ||
                       dataPoolCreate.deposit_amount.second === null
                         ? "flex h-max cursor-no-drop items-center justify-center rounded-[20px] border border-textBlack bg-white px-[10px] py-5 text-[20px] font-[600] sm:text-[20px] lg:text-[26px] xl:text-[26px]"
-                        : "button-swap btn-prview btn-approve-new"
+                        : `${stylesButton["button-swap"]} ${stylesButton["btn-prview"]} ${stylesButton["btn-approve-new"]}`
                     }
                     // onClick={() => ClickApprove()}
                   >

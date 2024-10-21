@@ -1,6 +1,7 @@
 import { Square } from './Square.js';
 import { DispatchSmartContract } from './DispatchSmartContract.js';
 import { SettlementSmartContract } from './SettlementSmartContract.js';
+import { BridgeContract } from './BridgeContract.js';
 import { Field, Mina, PrivateKey, AccountUpdate } from 'o1js';
 
 const useProof = false;
@@ -36,7 +37,7 @@ const num0 = zkAppInstance.num.get();
 console.log('state after init:', num0.toString());
 
 
-const zkAppDispathInstance = new SettlementSmartContract(zkAppDispathAddress);
+const zkAppDispathInstance = new DispatchSmartContract(zkAppDispathAddress);
 const deployTxn2 = await Mina.transaction(deployerAccount, async () => {
   AccountUpdate.fundNewAccount(deployerAccount);
   await zkAppDispathInstance.deploy();

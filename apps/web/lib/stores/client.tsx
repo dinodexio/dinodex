@@ -16,11 +16,7 @@ export const useClientStore = create<ClientState, [["zustand/immer", never]]>(
       set((state) => {
         state.loading = true;
       });
-      client.configurePartial({
-        GraphqlClient: {
-          url: "https://graphql.dinodex.io/graphql",
-        },
-      });
+
       await client.start();
 
       set((state) => {

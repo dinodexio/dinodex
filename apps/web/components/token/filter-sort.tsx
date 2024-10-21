@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { FILTER_NETWORK, FILTER_VOL } from "@/constants";
 import useClickOutside from "@/hook/useClickOutside";
+import styles from '../css/tokens.module.css'
 export interface FilterSortProps {
   handleSearch: (value: string) => void;
 }
@@ -39,9 +40,9 @@ export function FilterSort({ handleSearch }: FilterSortProps) {
   };
 
   return (
-    <div className="filter-sort-container">
+    <div className={styles["filter-sort-container"]}>
       <div
-        className="network-content"
+        className={styles["network-content"]}
         onClick={() => {
           setOpenNetWork(!openNetWork);
           setOpenVol(false);
@@ -61,17 +62,17 @@ export function FilterSort({ handleSearch }: FilterSortProps) {
           alt="network"
         />
         <div
-          className={`network-content-menu mt-2 ${openNetWork ? "network-content-menu-show" : ""}`}
+          className={`${styles["network-content-menu"]} mt-2 ${openNetWork ? styles["network-content-menu-show"] : ""}`}
         >
           {FILTER_NETWORK.map((item, index) => (
             <div
-              className="network-content-menu-item"
+              className={styles["network-content-menu-item"]}
               key={index}
               onClick={() => handleClickNetwork(item)}
               data-network={item.key}
             >
               <Image width={20} height={20} src={item.logo} alt="network" />
-              <span className="network-content-menu-item-text">
+              <span className={styles["network-content-menu-item-text"]}>
                 {item.name}
               </span>
             </div>
@@ -79,14 +80,14 @@ export function FilterSort({ handleSearch }: FilterSortProps) {
         </div>
       </div>
       <div
-        className="network-content"
+        className={styles["network-content"]}
         ref={refVol}
         onClick={() => {
           setOpenVol(!openVol);
           setOpenNetWork(false);
         }}
       >
-        <span className="network-content-menu-item-text">{dataVol.label}</span>
+        <span className={styles["network-content-menu-item-text"]}>{dataVol.label}</span>
         <Image
           width={19}
           height={20}
@@ -94,16 +95,16 @@ export function FilterSort({ handleSearch }: FilterSortProps) {
           alt="network"
         />
         <div
-          className={`network-content-menu mt-2 ${openVol ? "network-content-menu-show" : ""}`}
+          className={`${styles["network-content-menu"]} mt-2 ${openVol ? styles["network-content-menu-show"] : ""}`}
         >
           {FILTER_VOL.map((item, index) => (
             <div
-              className="network-content-menu-item"
+              className={styles["network-content-menu-item"]}
               key={index}
               onClick={() => handleClickVol(item)}
               data-network={item.key}
             >
-              <span className="network-content-menu-item-text">
+              <span className={styles["network-content-menu-item-text"]}>
                 {item.label}
               </span>
               <img
@@ -117,13 +118,13 @@ export function FilterSort({ handleSearch }: FilterSortProps) {
       </div>
       <div
         ref={refSearch}
-        className={`search-token-container ${openInputSearch ? "show-input-search" : null}`}
+        className={`${styles["search-token-container"]} ${openInputSearch ? styles["show-input-search"] : null}`}
         onClick={() => setOpenSearch(true)}
       >
         <Image width={24} height={24} src="/icon/btn-search.svg" alt="search" />
         <input
           type="text"
-          className="input-search-token"
+          className={styles["input-search-token"]}
           placeholder="Search Token"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
         />

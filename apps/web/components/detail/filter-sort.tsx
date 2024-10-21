@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { FILTER_NETWORK, FILTER_VOL } from "@/constants";
 import useClickOutside from "@/hook/useClickOutside";
+import styles from '../css/tokens.module.css'
 export interface FilterSortProps {
 }
 let dataFilterTime = [
@@ -63,52 +64,52 @@ export function FilterSort({ }: FilterSortProps) {
     }
 
     return (
-        <div className="filter-container">
-            <div className="filter-time-container">
+        <div className={styles["filter-container"]}>
+            <div className={styles["filter-time-container"]}>
                 {dataFilterTime.map((item, index) => (
                     <div
                         onClick={() => setDataTime(item.value)}
-                        className={`filter-time-item ${item.value === dataTime ? 'filter-time-item-active' : ''}`}
+                        className={`${styles["filter-time-item"]} ${item.value === dataTime ? styles['filter-time-item-active'] : ''}`}
                         key={index}
                     >
-                        <span className="filter-time-item-text">{item.label}</span>
+                        <span className={styles["filter-time-item-text"]}>{item.label}</span>
                     </div>
                 ))}
             </div>
-            <div className="filter-sort-container">
-                <div className="network-content" onClick={() => {
+            <div className={styles["filter-sort-container"]}>
+                <div className={styles["network-content"]} onClick={() => {
                     setOpenNetWork(!openNetWork)
                 }} ref={refNetWork}>
                     <Image width={20} height={20} src={dataNetWork ? dataNetWork.logo : "/icon/network-icon.svg"} alt="network" />
                     <Image width={20} height={20} src="/icon/drop-down-icon.svg" alt="network" />
-                    <div className={`network-content-menu ${openNetWork ? 'network-content-menu-show' : ''}`}>
+                    <div className={`${styles["network-content-menu"]} ${openNetWork ? styles['network-content-menu-show'] : ''}`}>
                         {FILTER_NETWORK.map((item, index) => (
-                            <div className="network-content-menu-item" key={index}
+                            <div className={styles["network-content-menu-item"]} key={index}
                                 onClick={() => handleClickNetwork(item)}
                                 data-network={item.key}
                             >
                                 <Image width={20} height={20} src={item.logo} alt="network" />
-                                <span className="network-content-menu-item-text">{item.name}</span>
+                                <span className={styles["network-content-menu-item-text"]}>{item.name}</span>
                             </div>
                         ))}
                     </div>
                 </div>
-                <div className="network-content" onClick={() => {
+                <div className={styles["network-content"]} onClick={() => {
                     setOpenNetWork(false)
                     setOpenFiltersChart(!openFiltersChart)
                 }} ref={refFiltersChart}>
-                    <span className="network-content-menu-item-text">Price</span>
+                    <span className={styles["network-content-menu-item-text"]}>Price</span>
                     <Image width={20} height={20} src="/icon/drop-down-icon.svg" alt="network" />
-                    <div className={`network-content-menu ${openFiltersChart ? 'network-content-menu-show' : ''}`}>
+                    <div className={`${styles["network-content-menu"]} ${openFiltersChart ? styles['network-content-menu-show'] : ''}`}>
                         {FilterChart.map((item, index) => (
-                            <div className="network-content-menu-item" key={index}
+                            <div className={styles["network-content-menu-item"]} key={index}
                                 onClick={() => {
                                     setDataFiltersChart(item.value)
                                     setOpenFiltersChart(false)
                                 }}
                                 data-network={item.value}
                             >
-                                <span className="network-content-menu-item-text">{item.label}</span>
+                                <span className={styles["network-content-menu-item-text"]}>{item.label}</span>
                                 <img src="/icon/tick-icon.svg" alt="network" style={{ opacity: item.value === dataFiltersChart ? '1' : "0" }} />
                             </div>
                         ))}

@@ -5,6 +5,7 @@ import { DialogClose } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { tokens } from "@/tokens";
 import { Balance } from "../ui/balance";
+import stylesButton from "../css/button.module.css";
 import { LayoutWaitingAndSuccess } from "../modalRemovePool/layoutModal/layoutWaitingAndSuccess";
 
 export interface modalSupplyComfirmProps {
@@ -186,7 +187,7 @@ export function ModalSupplyComfirm({
               </div>
               <Button
                 loading={loading}
-                className={`button-swap btn-prview btn-approve-new mt-0 sm:mt-0 lg:mt-[-25px] xl:mt-[-25px]`}
+                className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]} ${stylesButton["btn-approve-new"]} ${stylesButton["btn-prview"]}}mt-0 sm:mt-0 lg:mt-[-25px] xl:mt-[-25px]`}
                 onClick={() => clickConfirm()}
               >
                 <span>Confirm</span>

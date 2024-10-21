@@ -262,7 +262,7 @@
 
 @media (max-width: 900px) {
     .header-content {
-        display: none;
+        display: none !important;
     }
 
     .button-connect-wallet {

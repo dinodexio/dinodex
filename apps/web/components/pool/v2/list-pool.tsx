@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "../../style.css";
 import styles from '../../css/pool.module.css'
+import stylesButton from '../../css/button.module.css'
 import Image from "next/image";
 import Link from "next/link";
 import { EMPTY_DATA } from "@/constants";
@@ -30,6 +31,10 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
   const [valueTicker, setValueTicker] = useState<any>(null);
 
   const toggleActiveItem = (item: any) => {
+    if(activeItems.includes(item?.id)) {
+      setActiveItems((prev: any) => prev.filter((i: any) => i !== item?.id));
+      return;
+    }
     setActiveItems([item?.id]);
     setValueTicker({
       first: item?.tokenSelectedPool?.first?.symbol,
@@ -103,11 +108,11 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
   let dataPool: PoolBalance[] =
     poolBalances && poolBalances.length > 0
       ? poolBalances
-          .filter((el: PoolBalance | null) => el !== null)
-          ?.map((el: PoolBalance | null, index: number) => ({
-            ...el,
-            id: index + 1,
-          }))
+        .filter((el: PoolBalance | null) => el !== null)
+        ?.map((el: PoolBalance | null, index: number) => ({
+          ...el,
+          id: index + 1,
+        }))
       : [];
 
   return (
@@ -158,19 +163,19 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
           </span>
           <div className="flex items-center gap-2">
             <div
-              className="btn-pool flex items-center justify-center rounded-[12px] border border-textBlack hover:bg-[#EBEBEB]"
+              className={`flex items-center justify-center rounded-[12px] border border-textBlack hover:bg-[#EBEBEB] ${stylesButton["btn-pool"]}`}
               onClick={() => handleActionPool("add")}
             >
               <span>Create a Pair</span>
             </div>
             <div
-              className="button-swap btn-pool-active flex items-center justify-center rounded-[12px] border border-textBlack"
+              className={`flex items-center justify-center rounded-[12px] border border-textBlack ${stylesButton["button-swap"]} ${stylesButton["btn-pool-active"]}`}
               onClick={() => handleActionPool("find")}
             >
               <span>Import Pool</span>
             </div>
             <div
-              className="button-swap btn-pool-active flex items-center justify-center rounded-[12px] border border-textBlack "
+              className={`flex items-center justify-center rounded-[12px] border border-textBlack ${stylesButton["button-swap"]} ${stylesButton["btn-pool-active"]}`}
               onClick={() => handleActionPool("add")}
             >
               <span>Add liquidity</span>
@@ -271,25 +276,25 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                     </div>
                   </CardHeader>
                   <div
-                    className={`content-pool-item ${isActive ? "content-pool-item-show" : ""}`}
+                    className={`${styles["content-pool-item"]} ${isActive ? styles["content-pool-item-show"] : ""}`}
                   >
-                    <div className="info-item">
-                      <div className="info-content">
-                        <span className="info-content-title">
+                    <div className={styles["info-item"]}>
+                      <div className={styles["info-content"]}>
+                        <span className={styles["info-content-title"]}>
                           Your total pool tokens
                         </span>
-                        <span className="info-content-value">
+                        <span className={styles["info-content-value"]}>
                           {" "}
                           <Balance balance={item?.balance} />
                         </span>
                       </div>
-                      <div className="info-content">
-                        <span className="info-content-title">
+                      <div className={styles["info-content"]}>
+                        <span className={styles["info-content-title"]}>
                           Pooled {poolFirstSymbol}
                         </span>
-                        <span className="info-content-value">
+                        <span className={styles["info-content-value"]}>
                           <Balance
-                            balance={isActive ? dataPooled?.first : undefined}
+                            balance={isActive ? String(dataPooled?.first) : undefined}
                           />
                           <Image
                             src={item?.tokenSelectedPool?.first?.logo}
@@ -299,13 +304,13 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                           />
                         </span>
                       </div>
-                      <div className="info-content">
-                        <span className="info-content-title">
+                      <div className={styles["info-content"]}>
+                        <span className={styles["info-content-title"]}>
                           Pooled {poolSecondSymbol}
                         </span>
-                        <span className="info-content-value">
+                        <span className={styles["info-content-value"]}>
                           <Balance
-                            balance={isActive ? dataPooled?.second : undefined}
+                            balance={isActive ? String(dataPooled?.second) : undefined}
                           />
                           <Image
                             src={item?.tokenSelectedPool?.second?.logo}
@@ -315,11 +320,11 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                           />
                         </span>
                       </div>
-                      <div className="info-content">
-                        <span className="info-content-title">
+                      <div className={styles["info-content"]}>
+                        <span className={styles["info-content-title"]}>
                           Your pool share
                         </span>
-                        <span className="info-content-value">
+                        <span className={styles["info-content-value"]}>
                           {dataPooled?.poolOfShare || EMPTY_DATA} %
                         </span>
                       </div>
@@ -335,7 +340,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                         </span>
                       </div>
                     </div>
-                    <div className="content-item-button">
+                    <div className={styles["content-item-button"]}>
                       {/* <div
                         className="button-swap btn-pool-info"
                         onClick={() => handleActionPool("migrate")}
@@ -343,13 +348,13 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                         <span>Migrate</span>
                       </div> */}
                       <div
-                        className="button-swap btn-pool-info"
+                        className={`${stylesButton["button-swap"]} ${stylesButton["btn-pool-info"]}`}
                         onClick={() => handleActionPool("add")}
                       >
                         <span>Add</span>
                       </div>
                       <div
-                        className="button-swap btn-pool-info"
+                        className={`${stylesButton["button-swap"]} ${stylesButton["btn-pool-info"]}`}
                         onClick={() => handleActionPool("remove")}
                       >
                         <span>Remove</span>

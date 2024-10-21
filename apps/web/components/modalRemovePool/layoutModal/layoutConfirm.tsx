@@ -1,9 +1,9 @@
 import Image from "next/image";
 import React from "react";
-import "../../style.css";
 import { DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { tokens } from "@/tokens";
+import stylesButton from "../../css/button.module.css";
 
 export interface layoutConfirmProps {
   onClickConFirm: () => void;
@@ -119,7 +119,7 @@ export function LayoutConfirm({
         <Button
           loading={false}
           type={"submit"}
-          className={`button-swap btn-supply-remove`}
+          className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]}`}
           style={{ width: "100%" }}
           onClick={() => onClickConFirm && onClickConFirm()}
         >
