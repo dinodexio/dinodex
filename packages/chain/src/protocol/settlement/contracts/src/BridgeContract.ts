@@ -26,7 +26,9 @@ import { Path } from "./protocol/index.js";
 import {OutgoingMessageArgumentBatch, OUTGOING_MESSAGE_BATCH_SIZE} from "./messages/OutgoingMessageArgument.js"
 import { Withdrawal } from "./messages/Withdrawal.js";
 
-import type { SettlementContractType } from "./SettlementSmartContract.js";
+import { SettlementContractType, SettlementSmartContract } from "./SettlementSmartContract.js";
+
+const withdrawalStatePath = ["Withdrawals", "withdrawals"];
 
 export type BridgeContractType = {
   stateRoot: State<Field>;
@@ -118,13 +120,13 @@ export abstract class BridgeContractBase extends TokenContractV2 {
 
     const settlementContractAddress =
       this.settlementContractAddress.getAndRequireEquals();
-    const SettlementContractClass = BridgeContractBase.args.SettlementContract;
-    if (SettlementContractClass === undefined) {
-      throw new Error(
-        "Settlement Contract class hasn't been set yet, something is wrong with your module composition"
-      );
-    }
-    const settlementContract = new SettlementContractClass(
+    // const SettlementContractClass = BridgeContractBase.args.SettlementContract;
+    // if (SettlementContractClass === undefined) {
+    //   throw new Error(
+    //     "Settlement Contract class hasn't been set yet, something is wrong with your module composition"
+    //   );
+    // }
+    const settlementContract = new SettlementSmartContract(
       settlementContractAddress
     );
     const accountUpdate = settlementContract.assertStateRoot(root);
@@ -137,8 +139,8 @@ export abstract class BridgeContractBase extends TokenContractV2 {
     let counter = this.outgoingMessageCursor.getAndRequireEquals();
     const stateRoot = this.stateRoot.getAndRequireEquals();
 
-    const [withdrawalModule, withdrawalStateName] =
-      BridgeContractBase.args.withdrawalStatePath;
+    const [withdrawalModule, withdrawalStateName] = withdrawalStatePath;
+      // BridgeContractBase.args.withdrawalStatePath;
     const mapPath = Path.fromProperty(withdrawalModule, withdrawalStateName);
 
     // Count account creation fee to return later, so that the sender can fund

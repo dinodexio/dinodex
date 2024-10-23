@@ -1,9 +1,8 @@
 import { Square } from './Square.js';
 import { DispatchSmartContract } from './DispatchSmartContract.js';
-import { SettlementSmartContract } from './SettlementSmartContract.js';
+import { SettlementSmartContract, LazyBlockProof } from './SettlementSmartContract.js';
 import { BridgeContract } from './BridgeContract.js';
 import { Field, Mina, PrivateKey, AccountUpdate } from 'o1js';
-
 const useProof = false;
 
 const Local = await Mina.LocalBlockchain({ proofsEnabled: useProof });
@@ -18,6 +17,15 @@ const senderKey = senderAccount.key;
 // Create a public/private key pair. The public key is your address and where you deploy the zkApp to
 const zkAppPrivateKey = PrivateKey.random();
 const zkAppAddress = zkAppPrivateKey.toPublicKey();
+
+const sequencerKey = PrivateKey.random();
+const sequencerAddress = sequencerKey.toPublicKey();
+const settlementKey = PrivateKey.fromBase58("EKDrKGjfNoXeuZ5cZM6n4xcJSPV9CTg76iQY5jx49M18D5rit8Vo");
+const settlementAddress = settlementKey.toPublicKey();
+const dispatchKey = PrivateKey.fromBase58("EKE7Bz5UcunUSw535vwd4PybL2vMbcDKYKvFSnXrQP4GdrdpaTsq");
+const dispatchAddress = dispatchKey.toPublicKey();
+const bridgeKey = PrivateKey.fromBase58("EKFcZ2yHLv9V3cosJvvvUa6QX1Ur9EFp14vx2yisNPq1HjHPRbsT");
+const bridgeAddress = bridgeKey.toPublicKey();
 
 const zkAppDispathKey = PrivateKey.random();
 const zkAppDispathAddress = zkAppDispathKey.toPublicKey();
@@ -37,13 +45,26 @@ const num0 = zkAppInstance.num.get();
 console.log('state after init:', num0.toString());
 
 
-const zkAppDispathInstance = new DispatchSmartContract(zkAppDispathAddress);
+LazyBlockProof.tag =  () => {
+  return { name: "Settlement" };
+};
+
+const zkAppSettlementInstance = new SettlementSmartContract(settlementAddress);
+const zkAppDispathInstance = new DispatchSmartContract(dispatchAddress);
+const zkAppBridgeInstance = new BridgeContract(zkAppDispathAddress);
+
+console.log(JSON.stringify((await SettlementSmartContract.compile()).verificationKey));
+console.log(JSON.stringify((await DispatchSmartContract.compile()).verificationKey));
+console.log(JSON.stringify((await BridgeContract.compile()).verificationKey));
+
+
 const deployTxn2 = await Mina.transaction(deployerAccount, async () => {
   AccountUpdate.fundNewAccount(deployerAccount);
+  
   await zkAppDispathInstance.deploy();
 });
-await deployTxn2.sign([deployerKey, zkAppDispathKey]).send();
-console.log("deployTxn2 ", deployTxn2.toPretty());
+await deployTxn2.sign([deployerKey, dispatchKey]).send();
+// console.log("deployTxn2 ", deployTxn2.toPretty());
 // ----------------------------------------------------
 
 const txn1 = await Mina.transaction(senderAccount, async () => {

@@ -19,7 +19,7 @@ import { InMemoryMerkleTreeStorage, TypedClass } from "./common/index.js";
 import { RuntimeMethodIdMapping, RuntimeTransaction,  MinaActions, MinaEvents } from "./protocol/index.js";
 import { Deposit } from "./messages/Deposit.js";
 
-import type { SettlementContractType } from "./SettlementSmartContract.js";
+import { SettlementContractType, SettlementSmartContract } from "./SettlementSmartContract.js";
 import { TokenBridgeDeploymentAuth } from "./authorizations/TokenBridgeDeploymentAuth.js";
 import { UpdateMessagesHashAuth } from "./authorizations/UpdateMessagesHashAuth.js";
 import {
@@ -50,7 +50,8 @@ export interface DispatchContractType {
 const tokenBridgeRoot = new TokenBridgeTree(
   new InMemoryMerkleTreeStorage()
 ).getRoot();
-
+const defaultIncomingMessagesPaths: Record<string, `${string}.${string}`> = {"deposit": "Balances.deposit"};
+const defaultMethodIdMappings : RuntimeMethodIdMapping = { "Balances.deposit" : {"methodId" : 0n, "type": 'INCOMING_MESSAGE'}};
 export abstract class DispatchSmartContractBase extends SmartContract {
   public static args: {
     methodIdMappings: RuntimeMethodIdMapping;
@@ -95,8 +96,7 @@ export abstract class DispatchSmartContractBase extends SmartContract {
 
     const settlementContractAddress =
       this.settlementContract.getAndRequireEquals();
-    const settlementContract =
-      new DispatchSmartContractBase.args.settlementContractClass!(
+    const settlementContract = new SettlementSmartContract(
         settlementContractAddress
       );
 
@@ -170,7 +170,7 @@ export abstract class DispatchSmartContractBase extends SmartContract {
   ) {
     this.settlementContract.requireEquals(settlementContractAddress);
     const settlementContract =
-      new DispatchSmartContractBase.args.settlementContractClass!(
+      new SettlementSmartContract(
         settlementContractAddress
       );
 
@@ -305,9 +305,10 @@ export class DispatchSmartContract
       amount,
     });
 
-    const { methodIdMappings, incomingMessagesPaths } =
-      DispatchSmartContractBase.args;
-
+    // const { methodIdMappings, incomingMessagesPaths } =
+    //   DispatchSmartContractBase.args;
+    const methodIdMappings = defaultMethodIdMappings;
+    const incomingMessagesPaths = defaultIncomingMessagesPaths;
     const methodId = Field(
       methodIdMappings[incomingMessagesPaths.deposit].methodId
     ).toConstant();
