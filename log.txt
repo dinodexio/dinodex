@@ -1,0 +1,41 @@
+
+> starter-kit@ env:inmemory /Users/vuphong/Projects/aibb-new-project/mina_blockchain/dinodex
+> dotenv -e ./packages/chain/src/environments/inmemory/.env -- pnpm "run" "test" "--filter=chain" "--" "--watchAll"
+
+
+> starter-kit@ test /Users/vuphong/Projects/aibb-new-project/mina_blockchain/dinodex
+> turbo run test "--filter=chain" "--" "--watchAll"
+
+[2m• Packages in scope: chain[0m
+[2m• Running [0m[1m[2mtest[0m[2m in 1 packages
+[0m[2m• Remote caching disabled[0m
+[35mchain:test: [0mcache miss, executing [2mac84a20495c3dbdf[0m
+[35mchain:test: [0m
+[35mchain:test: [0m> chain@1.0.0 test /Users/vuphong/Projects/aibb-new-project/mina_blockchain/dinodex/packages/chain
+[35mchain:test: [0m> node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads ./node_modules/jest/bin/jest.js "--watchAll"
+[35mchain:test: [0m
+[35mchain:test: [0mwatchman warning:  Recrawled this watch 93 times, most recently because:
+[35mchain:test: [0mMustScanSubDirs UserDroppedTo resolve, please review the information on
+[35mchain:test: [0mhttps://facebook.github.io/watchman/docs/troubleshooting.html#recrawl
+[35mchain:test: [0mTo clear this warning, run:
+[35mchain:test: [0m`watchman watch-del '/Users/vuphong/Projects/aibb-new-project/mina_blockchain/dinodex' ; watchman watch-project '/Users/vuphong/Projects/aibb-new-project/mina_blockchain/dinodex'`
+[35mchain:test: [0m
+[35mchain:test: [0mRecrawled this watch 93 times, most recently because:
+[35mchain:test: [0mMustScanSubDirs UserDroppedTo resolve, please review the information on
+[35mchain:test: [0mhttps://facebook.github.io/watchman/docs/troubleshooting.html#recrawl
+[35mchain:test: [0mTo clear this warning, run:
+[35mchain:test: [0m`watchman watch-del '/Users/vuphong/Projects/aibb-new-project/mina_blockchain/dinodex' ; watchman watch-project '/Users/vuphong/Projects/aibb-new-project/mina_blockchain/dinodex'`
+[35mchain:test: [0m
+[35mchain:test: [0m(node:28594) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+[35mchain:test: [0m(Use `node --trace-warnings ...` to show where the warning was created)
+[35mchain:test: [0m[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mtest/sequencer/settlement/[22m[1mSettlement-unit.test.ts[22m
+[35mchain:test: [0m(node:28593) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+[35mchain:test: [0m(Use `node --trace-warnings ...` to show where the warning was created)
+[35mchain:test: [0m[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mtest/sequencer/settlement/[22m[1mMinaActionsHashList.test.ts[22m
+[35mchain:test: [0m[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mtest/protocol/[22m[1mBlockProver.test.ts[22m
+[35mchain:test: [0m(node:28592) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+[35mchain:test: [0m(Use `node --trace-warnings ...` to show where the warning was created)
+[35mchain:test: [0m[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mtest/sequencer/[22m[1mMempool.test.ts[22m
+[35mchain:test: [0m(node:28591) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+[35mchain:test: [0m(Use `node --trace-warnings ...` to show where the warning was created)
+[35mchain:test: [0m[0m[7m[1m[32m PASS [39m[22m[27m[0m [2mtest/runtime/modules/[22m[1mbalances.test.ts[22m

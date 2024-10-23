@@ -16,6 +16,7 @@ import { IndexerNotifier } from "@proto-kit/indexer";
 import { SettlementModule } from "./settlements/SettlementModule";
 import { ConstantFeeStrategy } from "./protocol/baselayer/fees/ConstantFeeStrategy";
 import { PrivateKey } from "o1js";
+import { LocalTaskQueue } from "@proto-kit/sequencer";
 
 export const apiSequencerModules = {
   GraphqlServer,
@@ -40,7 +41,8 @@ export const baseSequencerModules = {
   BlockTrigger: TimedBlockTrigger,
   BaseLayer: MinaBaseLayer,
   FeeStrategy: ConstantFeeStrategy,
-  SettlementModule: SettlementModule
+  SettlementModule: SettlementModule,
+  TaskQueue: LocalTaskQueue,
 } satisfies SequencerModulesRecord;
 
 export const baseSequencerModulesConfig = {
@@ -59,7 +61,8 @@ export const baseSequencerModulesConfig = {
   FeeStrategy: {},
   SettlementModule: {
     feepayer: PrivateKey.fromBase58("EKDhmW7LrEpL365ZJsb1efZQwjTstSu1B8qWmgKwNLG6xmjgsCMr")
-  }
+  },
+  TaskQueue: {}
 } satisfies ModulesConfig<typeof baseSequencerModules>;
 
 export const indexerSequencerModules = {

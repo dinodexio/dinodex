@@ -260,6 +260,8 @@ import {
           memo: "Protokit settlement deploy",
         },
         async () => {
+          await SettlementSmartContract.compile();
+          await DispatchSmartContract.compile();
           AccountUpdate.fundNewAccount(feepayer, 2);
           await settlement.deploy({
             // TODO Create compilation task that generates those artifacts if proofs enabled
