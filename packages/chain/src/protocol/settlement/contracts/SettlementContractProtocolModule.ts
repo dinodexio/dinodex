@@ -17,7 +17,7 @@ import {
   SettlementSmartContractBase,
 } from "./SettlementSmartContract";
 import { BridgeContractBase } from "./BridgeContract";
-import { DispatchContractProtocolModule } from ".//DispatchContractProtocolModule";
+import { DispatchContractProtocolModule } from "./DispatchContractProtocolModule";
 import { BridgeContractProtocolModule } from "./BridgeContractProtocolModule";
 
 export type SettlementContractConfig = {
@@ -36,13 +36,14 @@ export class SettlementContractProtocolModule extends ContractModule<
     @injectAll("ProvableSettlementHook")
     private readonly hooks: ProvableSettlementHook<unknown>[],
     @inject("BlockProver")
-    blockProver: BlockProvable,
+    private readonly blockProver: BlockProvable,
     @inject("DispatchContract")
     private readonly dispatchContractModule: DispatchContractProtocolModule,
     @inject("BridgeContract")
     private readonly bridgeContractModule: BridgeContractProtocolModule
   ) {
-    LazyBlockProof.tag = blockProver.zkProgrammable.zkProgram[0].Proof.tag;
+    LazyBlockProof.tag = blockProver.zkProgrammable.zkProgramFactory()[0].Proof.tag;
+    console.log("LazyBlockProof.tag", LazyBlockProof.tag);
     super();
   }
 

@@ -4,12 +4,12 @@ import {
   Path,
   Protocol,
 } from "@proto-kit/protocol";
-import { BridgeContractConfig } from "../../protocol/settlement/contracts_v2/BridgeContractProtocolModule";
-import { BridgeContractType } from "../../protocol/settlement/contracts_v2/BridgeContract";
+import { BridgeContractConfig } from "../../protocol/settlement/contracts/BridgeContractProtocolModule";
+import { BridgeContractType } from "../../protocol/settlement/contracts/BridgeContract";
 import { MandatorySettlementModulesRecord, SettlementContractModule } from "../../protocol/settlement/SettlementContractModule";
 import { OUTGOING_MESSAGE_BATCH_SIZE, OutgoingMessageArgument, OutgoingMessageArgumentBatch } from "../../protocol/settlement/messages/OutgoingMessageArgument";
-import { OutgoingMessageKey } from "../../protocol/settlement/contracts_v2/BridgeContract";
-import { TokenMapping } from "../../protocol/settlement/contracts_v2/SettlementSmartContract";
+import { OutgoingMessageKey } from "../../protocol/settlement/contracts/BridgeContract";
+import { TokenMapping } from "../../protocol/settlement/contracts/SettlementSmartContract";
 import {
   AccountUpdate,
   Field,
@@ -31,7 +31,7 @@ import {
 } from "@proto-kit/common";
 import { match, Pattern } from "ts-pattern";
 // import { FungibleToken } from "mina-fungible-token";
-import { FungibleToken } from "../../protocol/settlement/contracts_v2/FungibleToken";
+import { FungibleToken } from "../../protocol/settlement/contracts/FungibleToken";
 import { SequencerModule, sequencerModule,
     CachedMerkleTreeStore, type AsyncMerkleTreeStore,
     type MinaBaseLayer

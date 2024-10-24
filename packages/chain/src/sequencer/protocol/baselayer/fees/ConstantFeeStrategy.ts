@@ -2,8 +2,8 @@ import { noop } from "@proto-kit/common";
 
 import { SequencerModule, sequencerModule } from "@proto-kit/sequencer";
 
-import { FeeStrategy } from "./FeeStrategy";
-
+// import { FeeStrategy } from "./FeeStrategy";
+import { FeeStrategy } from "@proto-kit/sequencer/dist/protocol/baselayer/fees/FeeStrategy";
 export type ConstantFeeStrategyConfig = {
   fee?: number;
 };

@@ -4,7 +4,7 @@ import {
   SmartContractClassFromInterface,
 } from "@proto-kit/protocol";
 // import { FungibleToken } from "mina-fungible-token";
-import { FungibleToken } from "../../../protocol/settlement/contracts_v2/FungibleToken";
+import { FungibleToken } from "../../../protocol/settlement/contracts/FungibleToken";
 import { CompileArtifact } from "@proto-kit/common";
 
 @injectable()

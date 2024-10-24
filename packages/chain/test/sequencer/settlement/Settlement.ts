@@ -12,10 +12,10 @@ import {
   Protocol,
   ReturnType,
 } from "@proto-kit/protocol";
-import {BlockProverPublicInput} from "../../../src/protocol/prover/block/BlockProvable";
-import {BridgeContract} from "../../../src/protocol/settlement/contracts_v2/BridgeContract"
-import {SettlementSmartContractBase} from "../../../src/protocol/settlement/contracts_v2/SettlementSmartContract";
-import {TokenBridgeAttestation, TokenBridgeTree} from "../../../src/protocol/settlement/contracts_v2/TokenBridgeTree";
+import { BlockProverPublicInput } from "@proto-kit/protocol";
+import {BridgeContract} from "../../../src/protocol/settlement/contracts/BridgeContract"
+import {SettlementSmartContractBase} from "../../../src/protocol/settlement/contracts/SettlementSmartContract";
+import {TokenBridgeAttestation, TokenBridgeTree} from "../../../src/protocol/settlement/contracts/TokenBridgeTree";
 import {SettlementContractModule} from "../../../src/protocol/settlement/SettlementContractModule"
 import {
   AppChain,
@@ -39,8 +39,8 @@ import {
 import "reflect-metadata";
 import { container } from "tsyringe";
 // import { FungibleToken, FungibleTokenAdmin } from "mina-fungible-token";
-import { FungibleToken } from "../../../src/protocol/settlement/contracts_v2/FungibleToken";
-import { FungibleTokenAdmin } from "../../../src/protocol/settlement/contracts_v2/FungibleTokenAdmin";
+import { FungibleToken } from "../../../src/protocol/settlement/contracts/FungibleToken";
+import { FungibleTokenAdmin } from "../../../src/protocol/settlement/contracts/FungibleTokenAdmin";
 import {
   ManualBlockTrigger,
   PendingTransaction,
@@ -51,6 +51,10 @@ import {
   MinaTransactionSender,
   MinaBaseLayerConfig,
 } from "@proto-kit/sequencer";
+// import { ProtocolStartupModule } from "@proto-kit/sequencer";
+import {ProtocolStartupModule} from "../../../src/sequencer/protocol/ProtocolStartupModule";
+import {StateTransitionProver} from "../../../src/protocol/prover/statetransition/StateTransitionProver";
+import { BlockProver } from "../../../src/protocol/prover/block/BlockProver";
 import { WithdrawalQueue } from "../../../src/sequencer/settlements/messages/WithdrawalQueue";
 import { SettlementModule } from "../../../src/sequencer/settlements/SettlementModule";
 import { SignedSettlementPermissions } from "../../../src/sequencer/settlements/permissions/SignedSettlementPermissions";
@@ -59,7 +63,8 @@ import { BlockProofSerializer } from "@proto-kit/sequencer/dist/protocol/product
 import { testingSequencerFromModules } from "../TestingSequencer";
 import { createTransaction } from "../integration/utils";
 import { MinaBlockchainAccounts } from "../../../src/sequencer/protocol/baselayer/accounts/MinaBlockchainAccounts";
-import { FeeStrategy } from "../../../src/sequencer/protocol/baselayer/fees/FeeStrategy";
+// import { FeeStrategy } from "../../../src/sequencer/protocol/baselayer/fees/FeeStrategy";
+import { FeeStrategy } from "@proto-kit/sequencer/src/protocol/baselayer/fees/FeeStrategy";
 import { BridgingModule } from "../../../src/sequencer/settlements/BridgingModule";
 import { SettlementUtils } from "../../../src/sequencer/settlements/utils/SettlementUtils";
 import { FungibleTokenContractModule } from "../../../src/sequencer/settlements/utils/FungibleTokenContractModule";
@@ -127,6 +132,7 @@ export const settlementTestFn = (
           BaseLayer: MinaBaseLayer,
           SettlementModule: SettlementModule,
           OutgoingMessageQueue: WithdrawalQueue,
+          ProtocolStartupModule: ProtocolStartupModule
         },
         {
           SettlementProvingTask,
@@ -140,6 +146,8 @@ export const settlementTestFn = (
         Protocol: Protocol.from({
           modules: {
             ...VanillaProtocolModules.mandatoryModules({}),
+            StateTransitionProver: StateTransitionProver,
+            BlockProver: BlockProver,
             SettlementContractModule: SettlementContractModule.with({
               FungibleToken: FungibleTokenContractModule,
               FungibleTokenAdmin: FungibleTokenAdminContractModule,
@@ -173,6 +181,7 @@ export const settlementTestFn = (
           BaseLayer: baseLayerConfig,
           BlockProducerModule: {},
           FeeStrategy: {},
+          ProtocolStartupModule: {},
           SettlementModule: {
             feepayer: sequencerKey,
           },
@@ -309,6 +318,7 @@ export const settlementTestFn = (
           settlementKey,
           dispatchKey,
           minaBridgeKey,
+          // blockProver,
           {
             nonce: nonceCounter,
           }

@@ -1,7 +1,7 @@
 import { Field, PublicKey, UInt32 } from "o1js";
 
 import { ProtocolModule, NetworkState, BlockProof } from "@proto-kit/protocol";
-import { SettlementSmartContractBase } from "../contracts_v2/SettlementSmartContract";
+import { SettlementSmartContractBase } from "../contracts/SettlementSmartContract";
 export type SettlementStateRecord = {
   sequencerKey: PublicKey;
   lastSettlementL1BlockHeight: UInt32;

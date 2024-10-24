@@ -17,7 +17,8 @@ import { SettlementModule } from "./settlements/SettlementModule";
 import { ConstantFeeStrategy } from "./protocol/baselayer/fees/ConstantFeeStrategy";
 import { PrivateKey } from "o1js";
 import { LocalTaskQueue } from "@proto-kit/sequencer";
-
+// import { ProtocolStartupModule } from "@proto-kit/sequencer";
+import { ProtocolStartupModule } from "./protocol/ProtocolStartupModule";
 export const apiSequencerModules = {
   GraphqlServer,
   Graphql: GraphqlSequencerModule.from({
@@ -43,6 +44,7 @@ export const baseSequencerModules = {
   FeeStrategy: ConstantFeeStrategy,
   SettlementModule: SettlementModule,
   TaskQueue: LocalTaskQueue,
+  ProtocolStartupModule: ProtocolStartupModule,
 } satisfies SequencerModulesRecord;
 
 export const baseSequencerModulesConfig = {
@@ -62,7 +64,8 @@ export const baseSequencerModulesConfig = {
   SettlementModule: {
     feepayer: PrivateKey.fromBase58("EKDhmW7LrEpL365ZJsb1efZQwjTstSu1B8qWmgKwNLG6xmjgsCMr")
   },
-  TaskQueue: {}
+  TaskQueue: {},
+  ProtocolStartupModule: {}
 } satisfies ModulesConfig<typeof baseSequencerModules>;
 
 export const indexerSequencerModules = {

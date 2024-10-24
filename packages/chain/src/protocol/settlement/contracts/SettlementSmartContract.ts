@@ -31,17 +31,20 @@ import { singleton } from "tsyringe";
 import { NetworkState } from "@proto-kit/protocol";
 // import { BlockHashMerkleTree } from "../../prover/block/accummulators/BlockHashMerkleTree";
 import { BlockHashMerkleTree } from "@proto-kit/protocol";
-import {
-  BlockProverPublicInput,
-  BlockProverPublicOutput,
-} from "../../prover/block/BlockProvable";
+// import {
+//   BlockProverPublicInput,
+//   BlockProverPublicOutput,
+// } from "../../prover/block/BlockProvable";
+import { BlockProverPublicInput, BlockProverPublicOutput } from "@proto-kit/protocol";
 import { ProvableSettlementHook, SettlementHookInputs, SettlementStateRecord } from "../modularity/ProvableSettlementHook";
 import { DispatchContractType } from "./DispatchSmartContract";
 import { BridgeContractType } from "./BridgeContract";
 import { TokenBridgeDeploymentAuth } from "./authorizations/TokenBridgeDeploymentAuth";
 import { UpdateMessagesHashAuth } from "./authorizations/UpdateMessagesHashAuth";
-
+import { FlexibleProvablePure } from "o1js";
+import { BlockProver, BlockProverProgrammable } from "@proto-kit/protocol";
 /* eslint-disable @typescript-eslint/lines-between-class-members */
+
 
 export class LazyBlockProof extends Proof<
   BlockProverPublicInput,
@@ -51,9 +54,11 @@ export class LazyBlockProof extends Proof<
 
   public static publicOutputType = BlockProverPublicOutput;
 
+  
   public static tag: () => { name: string } = () => {
     throw new Error("Tag not initialized yet");
   };
+  // public static publicBlockProver: () => {name: string, publicInputType: FlexibleProvablePure<BlockProverPublicInput>, publicOutputType: FlexibleProvablePure<BlockProverPublicOutput> };
 }
 
 export class TokenMapping extends Struct({

@@ -11,21 +11,21 @@ import {
   
   import { ProtocolEnvironment, ProtocolModule } from "@proto-kit/protocol";
   import { ContractModule, SmartContractClassFromInterface } from "./ContractModule.js";
-  import { DispatchContractProtocolModule } from "./contracts_v2/DispatchContractProtocolModule.js"
-  import { DispatchContractType } from "./contracts_v2/DispatchSmartContract.js"
+  import { DispatchContractProtocolModule } from "./contracts/DispatchContractProtocolModule.js"
+  import { DispatchContractType } from "./contracts/DispatchSmartContract.js"
   import {
     SettlementContractConfig,
     SettlementContractProtocolModule
-  } from "./contracts_v2/SettlementContractProtocolModule";
+  } from "./contracts/SettlementContractProtocolModule.js";
   // import { SettlementContractType } from "./contracts/build/src/SettlementSmartContract.js";
-  import { SettlementContractType } from "./contracts_v2/SettlementSmartContract.js";
+  import { SettlementContractType } from "./contracts/SettlementSmartContract.js";
   // import { BridgeContractType } from "./contracts/build/src/BridgeContract.js";
-  import { BridgeContractType } from "./contracts_v2/BridgeContract.js";
+  import { BridgeContractType } from "./contracts/BridgeContract.js";
   // import {
   //   BridgeContractConfig,
   //   BridgeContractProtocolModule,
   // } from "./BridgeContractProtocolModule.js";
-  import { BridgeContractConfig, BridgeContractProtocolModule } from "./contracts_v2/BridgeContractProtocolModule.js";
+  import { BridgeContractConfig, BridgeContractProtocolModule } from "./contracts/BridgeContractProtocolModule.js";
   
   export type SettlementModulesRecord = ModulesRecord<
     TypedClass<ContractModule<unknown, unknown>>
