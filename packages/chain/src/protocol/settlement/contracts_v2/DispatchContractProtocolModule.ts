@@ -1,13 +1,18 @@
 import { inject, injectable } from "tsyringe";
 import { PublicKey } from "o1js";
 
+// import { RuntimeLike } from "../../model/RuntimeLike";
 import type { RuntimeLike } from "@proto-kit/protocol";
-import { ContractModule, SmartContractClassFromInterface } from "./ContractModule.js";
+import {
+  ContractModule,
+  SmartContractClassFromInterface,
+} from "../ContractModule";
+
 import {
   DispatchSmartContract,
   DispatchContractType,
   DispatchSmartContractBase,
-} from "./contracts/build/src/DispatchSmartContract.js";
+} from "./DispatchSmartContract";
 
 export type DispatchContractConfig = {
   incomingMessagesMethods: Record<string, `${string}.${string}`>;

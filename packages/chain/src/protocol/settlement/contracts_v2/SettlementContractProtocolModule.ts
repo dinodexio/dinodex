@@ -1,26 +1,31 @@
 import { CompileArtifact } from "@proto-kit/common";
 import { inject, injectable, injectAll } from "tsyringe";
 
-import type { BlockProvable } from "../prover/block/BlockProvable.js";
-import { ContractModule, SmartContractClassFromInterface } from "./ContractModule.js";
-import { ProvableSettlementHook } from "./contracts/build/src/common/modularity/ProvableSettlementHook.js";
-import { DispatchSmartContractBase } from "./contracts/build/src/DispatchSmartContract.js";
+// import { BlockProvable } from "../../prover/block/BlockProvable";
+import type { BlockProvable } from "@proto-kit/protocol";
+import {
+  ContractModule,
+  SmartContractClassFromInterface,
+} from "../ContractModule";
+import { ProvableSettlementHook } from "../modularity/ProvableSettlementHook";
+// import { ProvableSettlementHook } from "@proto-kit/protocol";
+import { DispatchSmartContractBase } from "./DispatchSmartContract";
 import {
   LazyBlockProof,
   SettlementContractType,
   SettlementSmartContract,
   SettlementSmartContractBase,
-} from "./contracts/build/src/SettlementSmartContract.js";
-import { BridgeContractBase } from "./contracts/build/src/BridgeContract.js";
-import { DispatchContractProtocolModule } from "./DispatchContractProtocolModule.js";
-import { BridgeContractProtocolModule } from "./BridgeContractProtocolModule.js";
+} from "./SettlementSmartContract";
+import { BridgeContractBase } from "./BridgeContract";
+import { DispatchContractProtocolModule } from ".//DispatchContractProtocolModule";
+import { BridgeContractProtocolModule } from "./BridgeContractProtocolModule";
 
 export type SettlementContractConfig = {
   escapeHatchSlotsInterval?: number;
 };
 
 // 24 hours
-export const DEFAULT_ESCAPE_HATCH = (60 / 3) * 24;
+const DEFAULT_ESCAPE_HATCH = (60 / 3) * 24;
 
 @injectable()
 export class SettlementContractProtocolModule extends ContractModule<

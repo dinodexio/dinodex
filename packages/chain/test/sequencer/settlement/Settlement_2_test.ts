@@ -12,11 +12,11 @@ import {
   Protocol,
   ReturnType,
 } from "@proto-kit/protocol";
-import {BlockProverPublicInput} from "../../../src/protocol/prover/block/BlockProvable";
-import {BridgeContract} from "../../../src/protocol/settlement/contracts_v2/BridgeContract"
-import {SettlementSmartContractBase} from "../../../src/protocol/settlement/contracts_v2/SettlementSmartContract";
-import {TokenBridgeAttestation, TokenBridgeTree} from "../../../src/protocol/settlement/contracts_v2/TokenBridgeTree";
-import {SettlementContractModule} from "../../../src/protocol/settlement/SettlementContractModule"
+import { BlockProverPublicInput } from "../../../src/protocol/prover/block/BlockProvable";
+import { BridgeContract } from "../../../src/protocol/settlement/contracts_v2/BridgeContract";
+import { SettlementContractModule } from "../../../src/protocol/settlement/SettlementContractModule";
+import { SettlementSmartContractBase } from "../../../src/protocol/settlement/contracts_v2/SettlementSmartContract";
+import { TokenBridgeAttestation, TokenBridgeTree } from "../../../src/protocol/settlement/contracts_v2/TokenBridgeTree";
 import {
   AppChain,
   BlockStorageNetworkStateModule,
@@ -51,32 +51,49 @@ import {
   MinaTransactionSender,
   MinaBaseLayerConfig,
 } from "@proto-kit/sequencer";
+import { ProvenSettlementPermissions } from "../../../src/sequencer/settlements/permissions/ProvenSettlementPermissions";
+import { SignedSettlementPermissions } from "../../../src/sequencer/settlements/permissions/SignedSettlementPermissions";
 import { WithdrawalQueue } from "../../../src/sequencer/settlements/messages/WithdrawalQueue";
 import { SettlementModule } from "../../../src/sequencer/settlements/SettlementModule";
-import { SignedSettlementPermissions } from "../../../src/sequencer/settlements/permissions/SignedSettlementPermissions";
-import { ProvenSettlementPermissions } from "../../../src/sequencer/settlements/permissions/ProvenSettlementPermissions";
+//   import { BlockProofSerializer } from "../../src/protocol/production/helpers/BlockProofSerializer";
 import { BlockProofSerializer } from "@proto-kit/sequencer/dist/protocol/production/helpers/BlockProofSerializer";
 import { testingSequencerFromModules } from "../TestingSequencer";
 import { createTransaction } from "../integration/utils";
+//   import { MinaBlockchainAccounts } from "../../src/protocol/baselayer/accounts/MinaBlockchainAccounts";
 import { MinaBlockchainAccounts } from "../../../src/sequencer/protocol/baselayer/accounts/MinaBlockchainAccounts";
-import { FeeStrategy } from "../../../src/sequencer/protocol/baselayer/fees/FeeStrategy";
+//   import { FeeStrategy } from "../../src/protocol/baselayer/fees/FeeStrategy";
+import { FeeStrategy } from "@proto-kit/sequencer/dist/protocol/baselayer/fees/FeeStrategy";
+//   import { BridgingModule } from "../../src/settlement/BridgingModule";
 import { BridgingModule } from "../../../src/sequencer/settlements/BridgingModule";
+//   import { SettlementUtils } from "../../src/settlement/utils/SettlementUtils";
 import { SettlementUtils } from "../../../src/sequencer/settlements/utils/SettlementUtils";
+//   import { FungibleTokenContractModule } from "../../src/settlement/utils/FungibleTokenContractModule";
 import { FungibleTokenContractModule } from "../../../src/sequencer/settlements/utils/FungibleTokenContractModule";
+//   import { FungibleTokenAdminContractModule } from "../../src/settlement/utils/FungibleTokenAdminContractModule";
 import { FungibleTokenAdminContractModule } from "../../../src/sequencer/settlements/utils/FungibleTokenAdminContractModule";
+
 import { Balances, BalancesKey } from "./mocks/Balances";
 import { Withdrawals } from "./mocks/Withdrawals";
 
 log.setLevel("DEBUG");
 
-export const settlementTestFn = (
-  settlementType: "signed" | "mock-proofs",
-  baseLayerConfig: MinaBaseLayerConfig,
-  tokenConfig?: {
-    tokenOwner: TypedClass<FungibleToken> & typeof SmartContract;
+const settlementType = "signed"; // or "mock-proofs"
+const baseLayerConfig = {
+  network: {
+    type: "local",
   },
-  timeout: number = 120_000
-) => {
+} as const;
+const tokenConfig = null;
+const timeout = 120_000;
+
+// export const settlementTestFn = (
+//   settlementType: "signed" | "mock-proofs",
+//   baseLayerConfig: MinaBaseLayerConfig,
+//   tokenConfig?: {
+//     tokenOwner: TypedClass<FungibleToken> & typeof SmartContract;
+//   },
+//   timeout: number = 120_000
+// ) => {
   // eslint-disable-next-line no-lone-blocks
   {
     let testAccounts: PrivateKey[] = [];
@@ -92,10 +109,10 @@ export const settlementTestFn = (
       tokenOwner: PrivateKey.random(),
       admin: PrivateKey.random(),
     };
-    const tokenOwner =
+    const tokenOwner = 
       tokenConfig !== undefined
         ? // eslint-disable-next-line new-cap
-          new tokenConfig.tokenOwner(tokenOwnerKey.tokenOwner.toPublicKey())
+        new FungibleToken(tokenOwnerKey.tokenOwner.toPublicKey())
         : undefined;
 
     let trigger: ManualBlockTrigger;
@@ -305,6 +322,8 @@ export const settlementTestFn = (
       "should deploy",
       async () => {
         // Deploy contract
+        const blockProver = appChain.protocol.resolve("BlockProver");
+        await blockProver.zkProgrammable.zkProgram[0].compile();
         await settlementModule.deploy(
           settlementKey,
           dispatchKey,
@@ -779,5 +798,5 @@ export const settlementTestFn = (
       timeout
     );
   }
-};
+// };
 /* eslint-enable no-inner-declarations */

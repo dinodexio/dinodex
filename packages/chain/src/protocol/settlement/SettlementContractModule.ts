@@ -11,19 +11,21 @@ import {
   
   import { ProtocolEnvironment, ProtocolModule } from "@proto-kit/protocol";
   import { ContractModule, SmartContractClassFromInterface } from "./ContractModule.js";
-  import { DispatchContractProtocolModule } from "./DispatchContractProtocolModule.js";
-  import { DispatchContractType } from "./contracts/build/src/DispatchSmartContract.js";
+  import { DispatchContractProtocolModule } from "./contracts_v2/DispatchContractProtocolModule.js"
+  import { DispatchContractType } from "./contracts_v2/DispatchSmartContract.js"
   import {
     SettlementContractConfig,
-    SettlementContractProtocolModule,
-    DEFAULT_ESCAPE_HATCH
-  } from "./SettlementContractProtocolModule.js";
-  import { SettlementContractType } from "./contracts/build/src/SettlementSmartContract.js";
-  import { BridgeContractType } from "./contracts/build/src/BridgeContract.js";
-  import {
-    BridgeContractConfig,
-    BridgeContractProtocolModule,
-  } from "./BridgeContractProtocolModule.js";
+    SettlementContractProtocolModule
+  } from "./contracts_v2/SettlementContractProtocolModule";
+  // import { SettlementContractType } from "./contracts/build/src/SettlementSmartContract.js";
+  import { SettlementContractType } from "./contracts_v2/SettlementSmartContract.js";
+  // import { BridgeContractType } from "./contracts/build/src/BridgeContract.js";
+  import { BridgeContractType } from "./contracts_v2/BridgeContract.js";
+  // import {
+  //   BridgeContractConfig,
+  //   BridgeContractProtocolModule,
+  // } from "./BridgeContractProtocolModule.js";
+  import { BridgeContractConfig, BridgeContractProtocolModule } from "./contracts_v2/BridgeContractProtocolModule.js";
   
   export type SettlementModulesRecord = ModulesRecord<
     TypedClass<ContractModule<unknown, unknown>>

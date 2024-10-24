@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { Withdrawal } from "../../../protocol/settlement/contracts/build/src/messages/Withdrawal";
+import { Withdrawal } from "../../../protocol/settlement/messages/Withdrawal";
 import { Field, Struct } from "o1js";
 import { splitArray } from "../../../common/utils";
 

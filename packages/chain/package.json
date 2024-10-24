@@ -94,6 +94,7 @@
     "graphql-fields": "^2.0.3",
     "graphql-scalars": "^1.22.4",
     "lodash": "^4.17.21",
+    "mina-fungible-token": "github:MinaFoundation/mina-fungible-token",
     "reflect-metadata": "^0.1.13",
     "ts-pattern": "^5.5.0",
     "typescript-memoize": "^1.1.1"

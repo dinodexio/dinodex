@@ -25,7 +25,7 @@ import {
   Provable,
   TokenId,
 } from "o1js";
-// import { singleton } from "tsyringe";
+import { singleton } from "tsyringe";
 
 import { NetworkState, BlockHashMerkleTree, BlockProverPublicInput, BlockProverPublicOutput } from "./protocol/index.js";
 import {SettlementStateRecord, SettlementHookInputs, ProvableSettlementHook} from "./common/modularity/ProvableSettlementHook.js";
@@ -36,12 +36,6 @@ import { TokenBridgeDeploymentAuth } from "./authorizations/TokenBridgeDeploymen
 import { UpdateMessagesHashAuth } from "./authorizations/UpdateMessagesHashAuth.js";
 
 /* eslint-disable @typescript-eslint/lines-between-class-members */
-const DEFAULT_ESCAPE_HATCH = (60 / 3) * 24;
-const defaultBridgeContractPermissions : Permissions = Permissions.default();
-const defaultBridgeContractVerificationKey : VerificationKey = VerificationKey.fromValue({
-  "data": "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",
-  "hash": 4264645620316403855980514226827210121771031247239717607990738817962250689384n
-});
 
 export class LazyBlockProof extends Proof<
   BlockProverPublicInput,
@@ -90,8 +84,19 @@ export interface SettlementContractType {
 // Some random prefix for the sequencer signature
 export const BATCH_SIGNATURE_PREFIX = prefixToField("pk-batchSignature");
 
-
-const defaultHooks : ProvableSettlementHook<unknown>[] = [];
+@singleton()
+export class SettlementSmartContractStaticArgs {
+  public args?: {
+    DispatchContract: TypedClass<DispatchContractType & SmartContract>;
+    hooks: ProvableSettlementHook<unknown>[];
+    escapeHatchSlotsInterval: number;
+    BridgeContract: TypedClass<BridgeContractType> & typeof SmartContract;
+    // Lazily initialized
+    BridgeContractVerificationKey: VerificationKey | undefined;
+    BridgeContractPermissions: Permissions | undefined;
+    signedSettlements: boolean | undefined;
+  };
+}
 
 export abstract class SettlementSmartContractBase extends TokenContractV2 {
   // This pattern of injecting args into a smartcontract is currently the only
@@ -133,11 +138,7 @@ export abstract class SettlementSmartContractBase extends TokenContractV2 {
   // TODO Like these properties, I am too lazy to properly infer the types here
   private assertLazyConfigsInitialized() {
     const uninitializedProperties: string[] = [];
-    // const { args } = SettlementSmartContractBase;
-    const args = {
-      BridgeContractPermissions: Permissions.default(),
-      signedSettlements: false
-    }
+    const { args } = SettlementSmartContractBase;
     if (args.BridgeContractPermissions === undefined) {
       uninitializedProperties.push("BridgeContractPermissions");
     }
@@ -157,26 +158,22 @@ export abstract class SettlementSmartContractBase extends TokenContractV2 {
     tokenId: Field,
     address: PublicKey,
     dispatchContractAddress: PublicKey,
-    dispatchContractPreconditionEnforced = false,
-    bridgeContractVerificationKey: VerificationKey,
-    signedSettlements: boolean,
-    bridgeContractPermissions: Permissions
-
+    dispatchContractPreconditionEnforced = false
   ) {
     Provable.asProver(() => {
       this.assertLazyConfigsInitialized();
     });
 
-    // const { args } = SettlementSmartContractBase;
-    // const BridgeContractClass = args.BridgeContract;
-    const bridgeContract = new BridgeContract(address, tokenId);
+    const { args } = SettlementSmartContractBase;
+    const BridgeContractClass = args.BridgeContract;
+    const bridgeContract = new BridgeContractClass(address, tokenId);
 
     // This function is not a zkapps method, therefore it will be part of this methods execution
     // The returning account update (owner.self) is therefore part of this circuit and is assertable
     const deploymentAccountUpdate = await bridgeContract.deployProvable(
-      bridgeContractVerificationKey,
-      signedSettlements,
-      bridgeContractPermissions,
+      args.BridgeContractVerificationKey,
+      args.signedSettlements!,
+      args.BridgeContractPermissions!,
       this.address
     );
 
@@ -211,7 +208,7 @@ export abstract class SettlementSmartContractBase extends TokenContractV2 {
       }).hash()
     );
     const dispatchContract =
-      new DispatchSmartContract(
+      new SettlementSmartContractBase.args.DispatchContract(
         dispatchContractAddress
       );
     await dispatchContract.enableTokenDeposits(tokenId, address, this.address);
@@ -235,9 +232,8 @@ export abstract class SettlementSmartContractBase extends TokenContractV2 {
     this.networkStateHash.set(NetworkState.empty().hash());
     this.dispatchContractAddressX.set(dispatchContract.x);
 
-    // const { DispatchContract } = SettlementSmartContractBase.args;
-    // const contractInstance = new DispatchContract(dispatchContract);
-    const contractInstance = new DispatchSmartContract(dispatchContract);
+    const { DispatchContract } = SettlementSmartContractBase.args;
+    const contractInstance = new DispatchContract(dispatchContract);
     await contractInstance.initialize(this.address);
 
     // Deploy bridge contract for $Mina
@@ -245,10 +241,7 @@ export abstract class SettlementSmartContractBase extends TokenContractV2 {
       this.tokenId,
       bridgeContract,
       dispatchContract,
-      true,
-      defaultBridgeContractVerificationKey,
-      false,
-      defaultBridgeContractPermissions
+      true
     );
 
     contractKey.toPublicKey().assertEquals(this.address);
@@ -282,11 +275,13 @@ export abstract class SettlementSmartContractBase extends TokenContractV2 {
       "DispatchContract address not provided correctly"
     );
 
-    // const { DispatchContract, escapeHatchSlotsInterval, hooks } = SettlementSmartContractBase.args;
+    const { DispatchContract, escapeHatchSlotsInterval, hooks } =
+      SettlementSmartContractBase.args;
+
     // Get dispatch contract values
     // These values are witnesses but will be checked later on the AU
     // call to the dispatch contract via .updateMessagesHash()
-    const dispatchContract = new DispatchSmartContract(dispatchContractAddress);
+    const dispatchContract = new DispatchContract(dispatchContractAddress);
     const promisedMessagesHash = dispatchContract.promisedMessagesHash.get();
 
     // Get block height and use the lower bound for all ops
@@ -307,7 +302,7 @@ export abstract class SettlementSmartContractBase extends TokenContractV2 {
       lastSettlementL1BlockHeight.value,
     ]);
     const escapeHatchActivated = lastSettlementL1BlockHeight
-      .add(UInt32.from(DEFAULT_ESCAPE_HATCH))
+      .add(UInt32.from(escapeHatchSlotsInterval))
       .lessThan(minBlockHeightIncluded);
     signatureValid
       .or(escapeHatchActivated)
@@ -347,7 +342,6 @@ export abstract class SettlementSmartContractBase extends TokenContractV2 {
       toNetworkState: outputNetworkState,
       currentL1BlockHeight: minBlockHeightIncluded,
     };
-    const hooks = defaultHooks;
     await mapSequential(hooks, async (hook) => {
       await hook.beforeSettlement(this, inputs);
     });
@@ -439,7 +433,7 @@ export class SettlementSmartContract
     address: PublicKey,
     dispatchContract: PublicKey
   ) {
-    await this.deployTokenBridge(tokenId, address, dispatchContract, true, defaultBridgeContractVerificationKey, false, defaultBridgeContractPermissions);
+    await this.deployTokenBridge(tokenId, address, dispatchContract);
   }
 
   @method

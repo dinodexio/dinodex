@@ -14,21 +14,28 @@ import {
   TokenId,
   UInt64,
 } from "o1js";
-import { InMemoryMerkleTreeStorage, TypedClass } from "./common/index.js";
+import { InMemoryMerkleTreeStorage, TypedClass } from "@proto-kit/common";
 
-import { RuntimeMethodIdMapping, RuntimeTransaction,  MinaActions, MinaEvents } from "./protocol/index.js";
-import { Deposit } from "./messages/Deposit.js";
+// import { RuntimeMethodIdMapping } from "../../model/RuntimeLike";
+import { RuntimeMethodIdMapping } from "@proto-kit/protocol";
+// import { RuntimeTransaction } from "../../model/transaction/RuntimeTransaction";
+import { RuntimeTransaction } from "@proto-kit/protocol";
+import {
+  MinaActions,
+  MinaEvents,
+} from "../../utils/MinaPrefixedProvableHashList";
+import { Deposit } from "../messages/Deposit";
 
-import { SettlementContractType, SettlementSmartContract } from "./SettlementSmartContract.js";
-import { TokenBridgeDeploymentAuth } from "./authorizations/TokenBridgeDeploymentAuth.js";
-import { UpdateMessagesHashAuth } from "./authorizations/UpdateMessagesHashAuth.js";
+import type { SettlementContractType } from "./SettlementSmartContract";
+import { TokenBridgeDeploymentAuth } from "./authorizations/TokenBridgeDeploymentAuth";
+import { UpdateMessagesHashAuth } from "./authorizations/UpdateMessagesHashAuth";
 import {
   TokenBridgeAttestation,
   TokenBridgeEntry,
   TokenBridgeTree,
   TokenBridgeTreeAddition,
   TokenBridgeTreeWitness,
-} from "./TokenBridgeTree.js";
+} from "./TokenBridgeTree";
 
 export const ACTIONS_EMPTY_HASH = Reducer.initialActionState;
 
@@ -50,8 +57,7 @@ export interface DispatchContractType {
 const tokenBridgeRoot = new TokenBridgeTree(
   new InMemoryMerkleTreeStorage()
 ).getRoot();
-const defaultIncomingMessagesPaths: Record<string, `${string}.${string}`> = {"deposit": "Balances.deposit"};
-const defaultMethodIdMappings : RuntimeMethodIdMapping = { "Balances.deposit" : {"methodId" : 0n, "type": 'INCOMING_MESSAGE'}};
+
 export abstract class DispatchSmartContractBase extends SmartContract {
   public static args: {
     methodIdMappings: RuntimeMethodIdMapping;
@@ -96,7 +102,8 @@ export abstract class DispatchSmartContractBase extends SmartContract {
 
     const settlementContractAddress =
       this.settlementContract.getAndRequireEquals();
-    const settlementContract = new SettlementSmartContract(
+    const settlementContract =
+      new DispatchSmartContractBase.args.settlementContractClass!(
         settlementContractAddress
       );
 
@@ -170,7 +177,7 @@ export abstract class DispatchSmartContractBase extends SmartContract {
   ) {
     this.settlementContract.requireEquals(settlementContractAddress);
     const settlementContract =
-      new SettlementSmartContract(
+      new DispatchSmartContractBase.args.settlementContractClass!(
         settlementContractAddress
       );
 
@@ -305,10 +312,9 @@ export class DispatchSmartContract
       amount,
     });
 
-    // const { methodIdMappings, incomingMessagesPaths } =
-    //   DispatchSmartContractBase.args;
-    const methodIdMappings = defaultMethodIdMappings;
-    const incomingMessagesPaths = defaultIncomingMessagesPaths;
+    const { methodIdMappings, incomingMessagesPaths } =
+      DispatchSmartContractBase.args;
+
     const methodId = Field(
       methodIdMappings[incomingMessagesPaths.deposit].methodId
     ).toConstant();

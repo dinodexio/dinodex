@@ -15,20 +15,17 @@ import {
   TokenId,
   VerificationKey,
 } from "o1js";
-import { noop, range, TypedClass } from "./common/index.js";
+import { noop, range, TypedClass } from "@proto-kit/common";
 
-// import {
-//   OUTGOING_MESSAGE_BATCH_SIZE,
-//   OutgoingMessageArgumentBatch,
-// } from "../messages/OutgoingMessageArgument";
-import { Path } from "./protocol/index.js";
+import {
+  OUTGOING_MESSAGE_BATCH_SIZE,
+  OutgoingMessageArgumentBatch,
+} from "../messages/OutgoingMessageArgument";
 // import { Path } from "../../model/Path";
-import {OutgoingMessageArgumentBatch, OUTGOING_MESSAGE_BATCH_SIZE} from "./messages/OutgoingMessageArgument.js"
-import { Withdrawal } from "./messages/Withdrawal.js";
+import { Path } from "@proto-kit/protocol";
+import { Withdrawal } from "../messages/Withdrawal";
 
-import { SettlementContractType, SettlementSmartContract } from "./SettlementSmartContract.js";
-
-const withdrawalStatePath = ["Withdrawals", "withdrawals"];
+import type { SettlementContractType } from "./SettlementSmartContract";
 
 export type BridgeContractType = {
   stateRoot: State<Field>;
@@ -120,13 +117,13 @@ export abstract class BridgeContractBase extends TokenContractV2 {
 
     const settlementContractAddress =
       this.settlementContractAddress.getAndRequireEquals();
-    // const SettlementContractClass = BridgeContractBase.args.SettlementContract;
-    // if (SettlementContractClass === undefined) {
-    //   throw new Error(
-    //     "Settlement Contract class hasn't been set yet, something is wrong with your module composition"
-    //   );
-    // }
-    const settlementContract = new SettlementSmartContract(
+    const SettlementContractClass = BridgeContractBase.args.SettlementContract;
+    if (SettlementContractClass === undefined) {
+      throw new Error(
+        "Settlement Contract class hasn't been set yet, something is wrong with your module composition"
+      );
+    }
+    const settlementContract = new SettlementContractClass(
       settlementContractAddress
     );
     const accountUpdate = settlementContract.assertStateRoot(root);
@@ -139,8 +136,8 @@ export abstract class BridgeContractBase extends TokenContractV2 {
     let counter = this.outgoingMessageCursor.getAndRequireEquals();
     const stateRoot = this.stateRoot.getAndRequireEquals();
 
-    const [withdrawalModule, withdrawalStateName] = withdrawalStatePath;
-      // BridgeContractBase.args.withdrawalStatePath;
+    const [withdrawalModule, withdrawalStateName] =
+      BridgeContractBase.args.withdrawalStatePath;
     const mapPath = Path.fromProperty(withdrawalModule, withdrawalStateName);
 
     // Count account creation fee to return later, so that the sender can fund

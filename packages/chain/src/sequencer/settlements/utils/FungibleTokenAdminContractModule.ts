@@ -3,7 +3,8 @@ import {
   ContractModule,
   SmartContractClassFromInterface,
 } from "@proto-kit/protocol";
-import { FungibleTokenAdmin } from "../../../protocol/settlement/contracts/build/src/FungibleTokenAdmin";
+// import { FungibleTokenAdmin } from "mina-fungible-token";
+import { FungibleTokenAdmin } from "../../../protocol/settlement/contracts_v2/FungibleTokenAdmin";
 import { CompileArtifact } from "@proto-kit/common";
 
 @injectable()

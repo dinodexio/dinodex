@@ -6,7 +6,7 @@ import {
   state,
 } from "@proto-kit/module";
 import { StateMap } from "@proto-kit/protocol";
-import {Withdrawal} from "../../../../src/protocol/settlement/contracts/build/src/messages/Withdrawal";
+import {Withdrawal} from "../../../../src/protocol/settlement/messages/Withdrawal";
 import { Field, PublicKey, Struct, UInt64 } from "o1js";
 import { inject } from "tsyringe";
 

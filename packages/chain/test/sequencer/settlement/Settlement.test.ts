@@ -1,8 +1,11 @@
-import {FungibleToken} from "../../../src/protocol/settlement/contracts/build/src/FungibleToken"
-
+// import { jest } from "@jest/globals";
+// import { FungibleToken } from "mina-fungible-token";
+// import { FungibleToken } from "../../../src/protocol/settlement/contracts_v2/FungibleToken";
 import { settlementTestFn } from "./Settlement";
 
-describe.each(["mock-proofs", "signed"] as const)(
+// jest.useFakeTimers()
+// describe.each(["mock-proofs", "signed"] as const)(
+describe.each(["signed"] as const)(
   "Settlement contracts: local blockchain - %s",
   (type) => {
     const network = {

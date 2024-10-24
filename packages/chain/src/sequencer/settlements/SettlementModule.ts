@@ -3,8 +3,8 @@ import {
     MandatoryProtocolModulesRecord,
   } from "@proto-kit/protocol";
   import { BlockProverPublicOutput } from "../../protocol/prover/block/BlockProvable";
-  import { BATCH_SIGNATURE_PREFIX, SettlementSmartContractBase, SettlementSmartContract } from "../../protocol/settlement/contracts/build/src/SettlementSmartContract";
-  import { DispatchSmartContract } from "../../protocol/settlement/contracts/build/src/DispatchSmartContract";
+  import { BATCH_SIGNATURE_PREFIX, SettlementSmartContractBase, SettlementSmartContract } from "../../protocol/settlement/contracts_v2/SettlementSmartContract";
+  import { DispatchSmartContract } from "../../protocol/settlement/contracts_v2/DispatchSmartContract";
   import { SettlementContractModule, MandatorySettlementModulesRecord } from "../../protocol/settlement/SettlementContractModule";
   import {
     AccountUpdate,
@@ -260,8 +260,8 @@ import {
           memo: "Protokit settlement deploy",
         },
         async () => {
-          await SettlementSmartContract.compile();
-          await DispatchSmartContract.compile();
+          // await SettlementSmartContract.compile();
+          // await DispatchSmartContract.compile();
           AccountUpdate.fundNewAccount(feepayer, 2);
           await settlement.deploy({
             // TODO Create compilation task that generates those artifacts if proofs enabled

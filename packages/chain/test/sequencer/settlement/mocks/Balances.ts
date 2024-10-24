@@ -7,7 +7,7 @@ import {
   runtimeMessage,
 } from "@proto-kit/module";
 import { StateMap, assert } from "@proto-kit/protocol";
-import {Deposit} from "../../../../src/protocol/settlement/contracts/build/src/messages/Deposit"
+import {Deposit} from "../../../../src/protocol/settlement/messages/Deposit"
 import { Field, PublicKey, Struct, Provable, UInt64 } from "o1js";
 
 export const errors = {

@@ -45,9 +45,9 @@ const num0 = zkAppInstance.num.get();
 console.log('state after init:', num0.toString());
 
 
-LazyBlockProof.tag =  () => {
-  return { name: "Settlement" };
-};
+// LazyBlockProof.tag =  () => {
+//   return { name: "Settlement" };
+// };
 
 const zkAppSettlementInstance = new SettlementSmartContract(settlementAddress);
 const zkAppDispathInstance = new DispatchSmartContract(dispatchAddress);

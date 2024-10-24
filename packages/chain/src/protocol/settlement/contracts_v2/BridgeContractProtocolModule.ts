@@ -1,13 +1,12 @@
 import { injectable } from "tsyringe";
 
-import { ContractModule } from "./ContractModule";
-// import { ContractModule } from "@proto-kit/protocol";
+import { ContractModule } from "../ContractModule";
 
 import {
   BridgeContract,
   BridgeContractBase,
   BridgeContractType,
-} from "./contracts/build/src/BridgeContract.js";
+} from "./BridgeContract";
 
 export type BridgeContractConfig = {
   withdrawalStatePath: `${string}.${string}`;
