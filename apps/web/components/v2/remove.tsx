@@ -50,7 +50,6 @@ const removePrecision = (value: string) =>
   new BigNumber(value).div(10 ** precision).toString();
 
 export function PoolRemove({
-  walletElement,
   tokenParams,
   balances,
 }: PoolRemoveProps) {
@@ -215,7 +214,7 @@ export function PoolRemove({
                     />
                   </Link>
                   <span className="text-[24px] font-[600] text-textBlack">
-                    Add liquidity
+                  Remove liquidity
                   </span>
                   <Image
                     src="/icon/icon-setting.svg"
@@ -233,18 +232,17 @@ export function PoolRemove({
                       className="text-[16px] font-[400] text-textBlack sm:text-[16px] lg:text-[24px] xl:text-[24px]"
                       style={{ lineHeight: "normal" }}
                     >
-                      <strong className="font-[600]">Tip:</strong>When you add
-                      liquidity, you will receive pool tokens representing your
-                      position. These tokens automatically earn fees
-                      proportional to your share of the pool, and can be
-                      redeemed at any time.
+                      <strong className="font-[600]">Tip:</strong>Removing pool tokens 
+                      converts your position back into underlying 
+                      tokens at the current rate, proportional to your share of the pool. 
+                      Accrued fees are included in the amounts you receive.
                     </span>
                   </div>
                 </div>
                 <div className="flex w-full flex-col items-start gap-[30px] rounded-[20px] border border-textBlack px-[20px] pb-[20px] pt-[30px]">
                   <div className="flex w-full items-center justify-between">
                     <span className="text-[18px] font-[600] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[20px]">
-                      Deposit Amounts
+                    Withdraw Amounts
                     </span>
                     {/* <span className="text-[18px] font-[600] text-borderOrColor sm:text-[18px] lg:text-[20px] xl:text-[20px]">
                       Detailed
@@ -412,7 +410,6 @@ export function PoolRemove({
           />
         </DialogContent>
       </Dialog>
-      {walletElement}
     </>
   );
 }

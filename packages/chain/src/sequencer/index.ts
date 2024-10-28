@@ -6,16 +6,11 @@ import {
 import {
   PrivateMempool,
   SequencerModulesRecord,
-  // TimedBlockTrigger,
+  TimedBlockTrigger,
   BlockProducerModule,
-  MinaBaseLayer
 } from "@proto-kit/sequencer";
-import { TimedBlockTrigger } from "./protocol/production/trigger/TimedBlockTrigger";
 import { ModulesConfig } from "@proto-kit/common";
 import { IndexerNotifier } from "@proto-kit/indexer";
-import { SettlementModule } from "./settlements/SettlementModule";
-import { ConstantFeeStrategy } from "./protocol/baselayer/fees/ConstantFeeStrategy";
-import { PrivateKey } from "o1js";
 
 export const apiSequencerModules = {
   GraphqlServer,
@@ -38,9 +33,6 @@ export const baseSequencerModules = {
   Mempool: PrivateMempool,
   BlockProducerModule: BlockProducerModule,
   BlockTrigger: TimedBlockTrigger,
-  BaseLayer: MinaBaseLayer,
-  FeeStrategy: ConstantFeeStrategy,
-  SettlementModule: SettlementModule
 } satisfies SequencerModulesRecord;
 
 export const baseSequencerModulesConfig = {
@@ -51,15 +43,6 @@ export const baseSequencerModulesConfig = {
     blockInterval: Number(process.env.PROTOKIT_BLOCK_INTERVAL!),
     produceEmptyBlocks: true,
   },
-  BaseLayer: {
-    network: {
-      type: "local"
-    }
-  },
-  FeeStrategy: {},
-  SettlementModule: {
-    feepayer: PrivateKey.fromBase58("EKDhmW7LrEpL365ZJsb1efZQwjTstSu1B8qWmgKwNLG6xmjgsCMr")
-  }
 } satisfies ModulesConfig<typeof baseSequencerModules>;
 
 export const indexerSequencerModules = {

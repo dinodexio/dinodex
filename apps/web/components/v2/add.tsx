@@ -2,10 +2,8 @@
 import { Header } from "../header";
 import { Toaster } from "@/components/ui/toaster";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import stylesButton from "../css/button.module.css";
-import styles from "../css/swap.module.css";
-import stylesPool from "../css/pool.module.css";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +21,6 @@ import {
 import { usePoolKey } from "@/lib/xyk/usePoolKey";
 import {
   useObserveBalance,
-  useObservePooled,
   useObserveTotalSupply,
 } from "@/lib/stores/balances";
 import { useWalletStore } from "@/lib/stores/wallet";
@@ -68,7 +65,6 @@ const initDataPoolCreate = {
 };
 
 export function PoolAdd({
-  walletElement,
   tokenParams,
   balances,
 }: PoolAddProps) {
@@ -130,22 +126,28 @@ export function PoolAdd({
     wallet,
   );
 
-  const handleSelectToken = (token: any) => {
-    const newDataPoolCreate = {
-      ...dataPoolCreate,
-      tokenPool: {
-        ...dataPoolCreate.tokenPool,
-        [typeOpenModal]: token,
-      },
-      deposit_amount: {
-        ...dataPoolCreate.deposit_amount,
-        [`${typeOpenModal}_token`]: token.value,
-      },
-    };
-    setDataPoolCreate(newDataPoolCreate);
-    let url = `/add/${newDataPoolCreate.tokenPool.first?.label}/${newDataPoolCreate.tokenPool.second?.label || ""}`;
-    window.history.replaceState(null, "", url);
-  };
+  const handleSelectToken = useCallback(
+    (token: any) => {
+      const newDataPoolCreate = {
+        ...dataPoolCreate,
+        tokenPool: {
+          ...dataPoolCreate.tokenPool,
+          [typeOpenModal]: token,
+        },
+        deposit_amount: {
+          ...dataPoolCreate.deposit_amount,
+          [`${typeOpenModal}_token`]: token.value,
+        },
+      };
+      setDataPoolCreate(newDataPoolCreate);
+      window.history.replaceState(
+        null,
+        "",
+        `/add/${newDataPoolCreate.tokenPool.first?.label}/${newDataPoolCreate.tokenPool.second?.label || ""}`,
+      );
+    },
+    [dataPoolCreate, typeOpenModal],
+  );
 
   const handleChangeDepositAmount = (type: string, event: any) => {
     event.target.value = event.target.value.replace(/[^0-9.]/g, "");
@@ -196,12 +198,10 @@ export function PoolAdd({
     if (
       !dataPoolCreate.tokenPool?.first ||
       !dataPoolCreate.tokenPool?.second ||
-      dataPoolCreate.deposit_amount.first === null ||
-      dataPoolCreate.deposit_amount.second === null ||
-      dataPoolCreate.deposit_amount.first === 0 ||
-      dataPoolCreate.deposit_amount.second === 0 ||
-      dataPoolCreate.deposit_amount.first === "" ||
-      dataPoolCreate.deposit_amount.second === ""
+      !dataPoolCreate.deposit_amount.first ||
+      !dataPoolCreate.deposit_amount.second ||
+      new BigNumber(dataPoolCreate.deposit_amount.first).isZero() ||
+      new BigNumber(dataPoolCreate.deposit_amount.second).isZero()
     ) {
       text =
         !dataPoolCreate.tokenPool?.first || !dataPoolCreate.tokenPool?.second
@@ -500,10 +500,10 @@ export function PoolAdd({
                           placeholder="0"
                         />
                         <DialogTrigger
-                          className={`flex items-center gap-[4px] rounded-[18px] border border-textBlack px-[18px] py-[6px] hover:bg-[#EBEBEB] ${
+                          className={`flex items-center gap-[4px] rounded-[18px] border border-textBlack px-[18px] py-[6px] ${
                             dataPoolCreate.tokenPool.first
                               ? "bg-[#C5B4E3] hover:bg-[#C5B4E3]"
-                              : ""
+                              : "hover:bg-[#EBEBEB]"
                           }`}
                           style={{ transition: "all 0.3s ease" }}
                           onClick={() => setTypeOpenModal("first")}
@@ -576,10 +576,10 @@ export function PoolAdd({
                           placeholder="0"
                         />
                         <DialogTrigger
-                          className={`flex items-center gap-[4px] rounded-[18px] border border-textBlack px-[18px] py-[6px] hover:bg-[#EBEBEB] ${
+                          className={`flex items-center gap-[4px] rounded-[18px] border border-textBlack px-[18px] py-[6px] ${
                             dataPoolCreate.tokenPool.second
                               ? "bg-[#9FE4C9] hover:bg-[#9FE4C9]"
-                              : ""
+                              : "hover:bg-[#EBEBEB] "
                           }`}
                           style={{ transition: "all 0.3s ease" }}
                           onClick={() => setTypeOpenModal("second")}
@@ -634,7 +634,7 @@ export function PoolAdd({
                       dataPoolCreate.tokenPool?.second && (
                         <div className="flex w-full flex-col gap-[10px] rounded-[20px] border border-textBlack pt-[15px] sm:pt-[15px] lg:pt-[25px] xl:pt-[25px]">
                           <span className="px-5 text-[16px] font-[600] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                            Deposit Amounts
+                            Prices and pool share
                           </span>
                           <div
                             className="flex w-full items-center justify-between rounded-[20px] px-[20px] py-[25px] sm:px-[20px] lg:px-[25px] xl:px-[25px]"
@@ -664,7 +664,10 @@ export function PoolAdd({
                             </div>
                             <div className="flex w-[30%] max-w-[150px] flex-col items-center gap-[10px]">
                               <span className="text-[15px] font-[500] text-textBlack sm:text-[15px] lg:text-[18px] xl:text-[18px]">
-                                {shareOfPool || "~"} %
+                                {shareOfPool && dataPoolCreate?.tokenLP_amount
+                                  ? shareOfPool
+                                  : "~"}{" "}
+                                %
                               </span>
                               <span className="text-[15px] font-[600] text-textBlack opacity-[0.6] sm:text-[15px] lg:text-[18px] xl:text-[18px]">
                                 Share of pool
@@ -679,6 +682,7 @@ export function PoolAdd({
                     <ModalListToken
                       tokenSelected={dataPoolCreate.tokenPool[typeOpenModal]}
                       onClickToken={(token) => handleSelectToken(token)}
+                      dialogClose={true}
                     />
                   </DialogContent>
                 </Dialog>
@@ -710,6 +714,7 @@ export function PoolAdd({
                     />
                     <DialogContent className="modal-container modal-pool w-[99%] max-w-[625px] border-none bg-white px-[20px] pb-[20px] pt-[27px] sm:px-[20px] sm:pt-[27px] lg:px-[30px] lg:pt-[35px] xl:px-[30px] xl:pt-[35px]">
                       <ModalSupplyComfirm
+                        poolExists={poolExists}
                         tokenParams={tokenParams}
                         dataPool={dataPoolCreate}
                         valuePer={valuePer}
@@ -751,7 +756,6 @@ export function PoolAdd({
           </div>
         </div>
       </div>
-      {walletElement}
     </>
   );
 }

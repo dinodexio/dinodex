@@ -175,6 +175,7 @@ export function PoolJoin({ }: PoolJoinProps) {
                         [typeOpenModal]: token
                       }
                     })}
+                    dialogClose={true}
                   />
                 </DialogContent>
               </Dialog>

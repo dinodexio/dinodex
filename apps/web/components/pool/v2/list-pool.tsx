@@ -31,7 +31,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
   const [valueTicker, setValueTicker] = useState<any>(null);
 
   const toggleActiveItem = (item: any) => {
-    if(activeItems.includes(item?.id)) {
+    if (activeItems.includes(item?.id)) {
       setActiveItems((prev: any) => prev.filter((i: any) => i !== item?.id));
       return;
     }
@@ -168,12 +168,12 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
             >
               <span>Create a Pair</span>
             </div>
-            <div
+            {/* <div
               className={`flex items-center justify-center rounded-[12px] border border-textBlack ${stylesButton["button-swap"]} ${stylesButton["btn-pool-active"]}`}
               onClick={() => handleActionPool("find")}
             >
               <span>Import Pool</span>
-            </div>
+            </div> */}
             <div
               className={`flex items-center justify-center rounded-[12px] border border-textBlack ${stylesButton["button-swap"]} ${stylesButton["btn-pool-active"]}`}
               onClick={() => handleActionPool("add")}
@@ -192,7 +192,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
           </div>
         ) : (
           <>
-            <div
+            {/* <div
               className="flex items-center justify-between rounded-[12px] border border-textBlack"
               style={{ padding: "15px 20px", marginBottom: 12 }}
             >
@@ -214,7 +214,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                 height={20}
                 alt="arrow icon"
               />
-            </div>
+            </div> */}
             {dataPool?.map((item: any, index: number) => {
               const isActive = activeItems.includes(item.id);
               const toggleIconRotation = isActive
@@ -326,6 +326,14 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                         </span>
                         <span className={styles["info-content-value"]}>
                           {dataPooled?.poolOfShare || EMPTY_DATA} %
+                        </span>
+                      </div>
+                      <div className={styles["info-content"]}>
+                        <span className={styles["info-content-title"]}>
+                          Accrued fees
+                        </span>
+                        <span className={styles["info-content-value"]}>
+                          ~
                         </span>
                       </div>
                       <div className="mt-[2px] flex items-center justify-center">

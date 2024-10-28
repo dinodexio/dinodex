@@ -22,10 +22,9 @@ import { useWalletStore } from "@/lib/stores/wallet";
 import { useBalancesStore, useObserveBalance } from "@/lib/stores/balances";
 import { dijkstra, PoolKey, prepareGraph, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
-import { useObservePool, useSellPath, useXYKStore } from "@/lib/stores/xyk";
+import { useObservePool, useSellPath, } from "@/lib/stores/xyk";
 import { Balance } from "../ui/balance";
 import { Collapsible, CollapsibleContent } from "../ui/collapsible";
-import { USDBalance } from "../ui/usd-balance";
 
 export interface SwapProps {
   token: any;
@@ -68,14 +67,14 @@ export function Swap({ token, type }: SwapProps) {
   const [typeOpenModal, setTypeOpenModal] = useState<string>("tokenIn");
 
   const renderButtonSwap = useMemo(() => {
-    console.log(
-      "walletBalance",
-      walletBalance.current,
-      valueInputSwap.tokenIn,
-      new BigNumber(valueInputSwap.tokenIn).lte(
-        removePrecision(walletBalance.current),
-      ),
-    );
+    // console.log(
+    //   "walletBalance",
+    //   walletBalance.current,
+    //   valueInputSwap.tokenIn,
+    //   new BigNumber(valueInputSwap.tokenIn).lte(
+    //     removePrecision(walletBalance.current),
+    //   ),
+    // );
     let text = "Swap";
     let isDisabled = false;
 
@@ -255,10 +254,10 @@ export function Swap({ token, type }: SwapProps) {
         .multipliedBy(tokenOutReserve)
         .div(new BigNumber(tokenInReserve).plus(addPrecision(amountIn)));
 
-      console.log(
-        "intermediateAmountOut",
-        removePrecision(intermediateAmountOut.toFixed(2)),
-      );
+      // console.log(
+      //   "intermediateAmountOut",
+      //   removePrecision(intermediateAmountOut.toFixed(2)),
+      // );
 
       const amountOutWithoutFee = intermediateAmountOut.minus(
         intermediateAmountOut.multipliedBy(3).dividedBy(100000),
@@ -269,21 +268,15 @@ export function Swap({ token, type }: SwapProps) {
     });
 
     if (new BigNumber(amountOut).isNaN()) return;
-
-    console.log("new amount out", {
-      balances: balances.balances,
-      amountOut,
-    });
     setValueInputSwap({
       ...valueInputSwap,
       tokenOut: removePrecision(
-        `${(Number(amountOut) * (100 - slippage)) / 100}`,
+        `${Number(amountOut)}`,
       ),
     });
   }, [
     tokenSwap.route,
     valueInputSwap.tokenIn,
-    slippage,
     // valueInputSwap.tokenOut,
     balances.balances,
   ]);
@@ -320,7 +313,8 @@ export function Swap({ token, type }: SwapProps) {
         tokenSwap.route,
         addPrecision(valueInputSwap.tokenIn),
         // TODO add slippage
-        addPrecision(valueInputSwap.tokenOut),
+        addPrecision(`${Number(valueInputSwap.tokenOut) * (100 - slippage) / 100}`),
+        { ...tokenSwap, ...valueInputSwap }
       );
     } finally {
       setLoading(false);
@@ -336,22 +330,19 @@ export function Swap({ token, type }: SwapProps) {
   return (
     <Dialog>
       <div
-        className={`${styles["swap-container"]} ${
-          type === "tokenDetail"
-            ? `${styles["token-swap-container"]} ${styles["pc-swap-token"]}`
-            : ""
-        }`}
+        className={`${styles["swap-container"]} ${type === "tokenDetail"
+          ? `${styles["token-swap-container"]} ${styles["pc-swap-token"]}`
+          : ""
+          }`}
       >
         <span className={styles["swap-text"]}>Swap</span>
         <div
-          className={`${styles["swap-content"]} ${
-            type === "tokenDetail" ? styles["token-swap-content"] : ""
-          }`}
+          className={`${styles["swap-content"]} ${type === "tokenDetail" ? styles["token-swap-content"] : ""
+            }`}
         >
           <div
-            className={`${styles["swap-container-form"]} ${
-              type === "tokenDetail" ? styles["token-swap-form"] : ""
-            }`}
+            className={`${styles["swap-container-form"]} ${type === "tokenDetail" ? styles["token-swap-form"] : ""
+              }`}
           >
             <div
               className={`${styles["swap-content-item"]} ${styles["swap-item-first"]}`}
@@ -370,10 +361,9 @@ export function Swap({ token, type }: SwapProps) {
                 />
                 <DialogTrigger>
                   <div
-                    className={`${styles["swap-item-select"]} ${
-                      tokenSwap.tokenIn.name &&
+                    className={`${styles["swap-item-select"]} ${tokenSwap.tokenIn.name &&
                       styles["swap-item-select-have-token"]
-                    }`}
+                      }`}
                     onClick={() => setTypeOpenModal("tokenIn")}
                   >
                     {tokenSwap.tokenIn.name ? (
@@ -425,14 +415,13 @@ export function Swap({ token, type }: SwapProps) {
                   id="input-second"
                   value={valueInputSwap.tokenOut}
                   disabled
-                  //   onChange={(e) => handleChangeInput("tokenOut", e)}
+                //   onChange={(e) => handleChangeInput("tokenOut", e)}
                 />
                 <DialogTrigger>
                   <div
-                    className={`${styles["swap-item-select"]} ${
-                      tokenSwap?.tokenOut?.name &&
+                    className={`${styles["swap-item-select"]} ${tokenSwap?.tokenOut?.name &&
                       styles["swap-item-select-have-token"]
-                    }`}
+                      }`}
                     onClick={() => setTypeOpenModal("tokenOut")}
                   >
                     {tokenSwap.tokenOut.name ? (
@@ -483,9 +472,8 @@ export function Swap({ token, type }: SwapProps) {
           <div className={styles["slippage-head"]}>Slippage</div>
           {SLIPPAGE?.map((item, index) => (
             <div
-              className={`${styles["slippage-item"]} ${
-                item?.value === slippage ? styles["slippage-item-active"] : ""
-              }`}
+              className={`${styles["slippage-item"]} ${item?.value === slippage ? styles["slippage-item-active"] : ""
+                }`}
               onClick={() => handleChangeSlippage(item?.value)}
               data-slippage={item?.value}
               key={index}
@@ -577,6 +565,7 @@ export function Swap({ token, type }: SwapProps) {
               };
               setTokenSwap({ ...tokenSwap, [typeOpenModal]: tmpToken });
             }}
+            dialogClose={true}
           />
         </DialogContent>
       </div>

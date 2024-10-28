@@ -40,10 +40,9 @@ export function AddressInput({
             ])}
           />
         </div>
-        <div className="mt-2.5  text-muted-foreground">
-          <p className="flex items-center text-sm">
-            <Info className="mr-1 h-4 w-4" />
-            Kaupang only supports Mina's B62 addresses
+        <div className="mt-2.5">
+          <p className="text-[9.202px] font-[500] italic text-textBlack opacity-60">
+            Dinodex only supports Mina's B62 addresses
           </p>
         </div>
       </div>

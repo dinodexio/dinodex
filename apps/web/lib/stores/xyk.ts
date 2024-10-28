@@ -47,11 +47,11 @@ export interface XYKState {
   loadPool: (client: Client, key: string) => Promise<void>;
   pools: {
     [key: string]:
-    | {
-      loading: boolean;
-      exists: boolean;
-    }
-    | undefined;
+      | {
+          loading: boolean;
+          exists: boolean;
+        }
+      | undefined;
   };
 }
 
@@ -216,7 +216,7 @@ export const useCreatePool = () => {
         tokenBAmount,
       );
 
-      wallet.addPendingTransaction(pendingTransaction);
+      wallet.addPendingTransaction(pendingTransaction, "Create Pool");
     },
     [client.client, wallet.wallet],
   );
@@ -244,7 +244,7 @@ export const useAddLiquidity = () => {
         tokenBAmountLimit,
       );
 
-      wallet.addPendingTransaction(pendingTransaction);
+      wallet.addPendingTransaction(pendingTransaction, "Add Liquidity");
     },
     [client.client, wallet.wallet],
   );
@@ -274,7 +274,7 @@ export const useRemoveLiquidity = () => {
         tokenBAmountLimit,
       );
 
-      wallet.addPendingTransaction(pendingTransaction);
+      wallet.addPendingTransaction(pendingTransaction, "Remove Liquidity");
     },
     [client.client, wallet.wallet],
   );
@@ -284,9 +284,13 @@ export const useSellPath = () => {
   const client = useClientStore();
   const wallet = useWalletStore();
   const { sellPath } = useXYKStore();
-
   return useCallback(
-    async (path: string[], amountIn: string, amountOutMinLimit: string) => {
+    async (
+      path: string[],
+      amountIn: string,
+      amountOutMinLimit: string,
+      data?: any,
+    ) => {
       if (!client.client || !wallet.wallet) return;
       const pendingTransaction = await sellPath(
         client.client,
@@ -296,7 +300,7 @@ export const useSellPath = () => {
         amountOutMinLimit,
       );
 
-      wallet.addPendingTransaction(pendingTransaction);
+      wallet.addPendingTransaction(pendingTransaction, "Swap", data);
     },
     [client.client, wallet.wallet],
   );

@@ -1,158 +1,15 @@
 import { formatLargeNumber } from "@/lib/utils";
 import { Table } from "../table/table";
 import Image from "next/image";
-import { tokens } from "@/tokens";
 import { Balances } from "../pool/v2/list-pool";
 import { EMPTY_DATA } from "@/constants";
 import { useMemo } from "react";
+import { useAggregatorStore, usePollPools } from "@/lib/stores/aggregator";
 
 export interface PoolPanelProps {
   balances?: Balances;
   valueSearch: string;
 }
-
-let dataPoolToken = [
-  {
-    id: 1,
-    tokenselected: {
-      first: {
-        logo: "images/swap/logo-token-default.svg",
-        name: "ethereum",
-        symbol: "ETH",
-      },
-      second: {
-        logo: "images/swap/logo-token-dummy.svg",
-        name: "Wrapped Bitcoin",
-        symbol: "WBTC",
-      },
-    },
-    feeTier: 0.03,
-    tvl: 193000000,
-    apr: 1.23,
-    volume1d: 123456,
-    volume7d: 500000000,
-  },
-  {
-    id: 2,
-    tokenselected: {
-      first: {
-        logo: "images/swap/logo-token-default.svg",
-        name: "ethereum",
-        symbol: "ETH",
-      },
-      second: {
-        logo: "images/swap/logo-token-dummy.svg",
-        name: "Wrapped Bitcoin",
-        symbol: "WBTC",
-      },
-    },
-    feeTier: 0.03,
-    tvl: 193000000,
-    apr: 1.23,
-    volume1d: 123456,
-    volume7d: 500000000,
-  },
-  {
-    id: 3,
-    tokenselected: {
-      first: {
-        logo: "images/swap/logo-token-default.svg",
-        name: "ethereum",
-        symbol: "ETH",
-      },
-      second: {
-        logo: "images/swap/logo-token-dummy.svg",
-        name: "Wrapped Bitcoin",
-        symbol: "WBTC",
-      },
-    },
-    feeTier: 0.03,
-    tvl: 193000000,
-    apr: 1.23,
-    volume1d: 123456,
-    volume7d: 500000000,
-  },
-  {
-    id: 4,
-    tokenselected: {
-      first: {
-        logo: "images/swap/logo-token-default.svg",
-        name: "ethereum",
-        symbol: "ETH",
-      },
-      second: {
-        logo: "images/swap/logo-token-dummy.svg",
-        name: "Wrapped Bitcoin",
-        symbol: "WBTC",
-      },
-    },
-    feeTier: 0.03,
-    tvl: 193000000,
-    apr: 1.23,
-    volume1d: 123456,
-    volume7d: 500000000,
-  },
-  {
-    id: 5,
-    tokenselected: {
-      first: {
-        logo: "images/swap/logo-token-default.svg",
-        name: "ethereum",
-        symbol: "ETH",
-      },
-      second: {
-        logo: "images/swap/logo-token-dummy.svg",
-        name: "Wrapped Bitcoin",
-        symbol: "WBTC",
-      },
-    },
-    feeTier: 0.03,
-    tvl: 193000000,
-    apr: 1.23,
-    volume1d: 123456,
-    volume7d: 500000000,
-  },
-  {
-    id: 6,
-    tokenselected: {
-      first: {
-        logo: "images/swap/logo-token-default.svg",
-        name: "ethereum",
-        symbol: "ETH",
-      },
-      second: {
-        logo: "images/swap/logo-token-dummy.svg",
-        name: "Wrapped Bitcoin",
-        symbol: "WBTC",
-      },
-    },
-    feeTier: 0.03,
-    tvl: 193000000,
-    apr: 1.23,
-    volume1d: 123456,
-    volume7d: 500000000,
-  },
-  {
-    id: 7,
-    tokenselected: {
-      first: {
-        logo: "images/swap/logo-token-default.svg",
-        name: "ethereum",
-        symbol: "ETH",
-      },
-      second: {
-        logo: "images/swap/logo-token-dummy.svg",
-        name: "Wrapped Bitcoin",
-        symbol: "WBTC",
-      },
-    },
-    feeTier: 0.03,
-    tvl: 193000000,
-    apr: 1.23,
-    volume1d: 123456,
-    volume7d: 500000000,
-  },
-];
 
 let columTablePool = [
   {
@@ -166,7 +23,7 @@ let columTablePool = [
   },
   {
     id: 2,
-    title: "Token Names",
+    title: "Pool",
     key: "token-name",
     width: 230,
     render: (data: any) => {
@@ -193,8 +50,7 @@ let columTablePool = [
             </div>
           </div>
           <span className="token-name-text">
-            {data?.tokenselected?.first?.symbol}
-            {/* {data?.tokenselected?.second?.symbol} */}
+            {`${data?.tokenselected?.first?.ticker}/${data?.tokenselected?.second?.ticker}`}
           </span>
           <div className="fee-tier-text-table">
             {data?.feeTier || EMPTY_DATA}%
@@ -255,35 +111,8 @@ let columTablePool = [
 ];
 
 export function PoolPanel({ balances, valueSearch }: PoolPanelProps) {
-  const poolBalances = Object.entries(balances ?? {}).map(
-    ([tokenId, balance], index) => {
-      const token = tokens[tokenId];
-      if (!token || (BigInt(tokenId) > BigInt(3) && balance == "0")) return null;
-      if (token?.name === "LP Token")
-        return {
-          id: index,
-          type: "LPtoken",
-          tokenselected: {
-            first: {
-              name: token.name,
-              logo: token.logo,
-              symbol: token.ticker,
-            },
-            second: {
-              name: token.name,
-              logo: token.logo,
-              symbol: token.ticker,
-            },
-          },
-          feeTier: null,
-          tvl: null,
-          apr: null,
-          volume1d: null,
-          volume7d: null,
-        };
-      else return null;
-    },
-  );
+  const { pools: poolBalances = [] } = useAggregatorStore()
+  usePollPools()
   let dataPool: any =
     balances || poolBalances !== null
       ? [...poolBalances.filter((el) => el !== null)]
@@ -292,7 +121,7 @@ export function PoolPanel({ balances, valueSearch }: PoolPanelProps) {
   const filterDataPool = useMemo(() => {
     if (valueSearch) {
       return dataPool.filter((el: any) =>
-        el?.tokenselected?.first?.symbol
+        el?.tokenselected?.first?.ticker
           ?.toLocaleLowerCase()
           .includes(valueSearch.toLocaleLowerCase()),
       );
@@ -305,7 +134,7 @@ export function PoolPanel({ balances, valueSearch }: PoolPanelProps) {
       <Table
         data={filterDataPool || []}
         column={columTablePool}
-        onClickTr={() => {}}
+        onClickTr={() => { }}
         loading={false}
       />
     </>

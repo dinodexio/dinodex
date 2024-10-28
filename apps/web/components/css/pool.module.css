@@ -475,12 +475,13 @@
 }
 
 .pool-item-active {
-    height: 297px;
+    height: 327px;
 }
 
 .content-pool-item {
     opacity: 0;
     visibility: hidden;
+    height: 0;
     transition: all 0.3s ease;
 }
 
@@ -492,6 +493,7 @@
     align-items: center;
     flex-direction: column;
     gap: 25px;
+    height: 227px;
 }
 
 .info-item {
@@ -576,6 +578,39 @@
     animation: spin 1s linear infinite;
 }
 
+.token-pool-logo {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    border: 1px solid var(--black-text-color);
+    border-radius: 999px;
+}
+
+
+.token-pool-logo-item-first,
+.token-pool-logo-item-second {
+    position: relative;
+    display: flex;
+}
+
+.token-pool-logo-item-first {
+    width: 38px;
+    height: 76px;
+    overflow: hidden;
+}
+
+.token-pool-logo-item-second {
+    width: 38px;
+    height: 76px;
+    margin-top: -1px;
+    overflow: hidden;
+}
+
+.pool-logo-item{
+    max-width: 76px !important;
+    height: 76px !important;
+}
+
 @media (max-width: 600px) {
     .content-left-header {
         font-size: 18px;
@@ -652,6 +687,7 @@
 
     .content-pool-item-show {
         gap: 10px;
+        height: 212px;
     }
 
     .pool-item-active {

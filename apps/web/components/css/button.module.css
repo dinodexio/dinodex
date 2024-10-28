@@ -156,7 +156,7 @@
     opacity: 1;
 }
 
-.button-connect-wallet-active{
+.button-connect-wallet-active {
     background: var(--button-connected-wallet-color);
 }
 
@@ -375,7 +375,7 @@
     border-radius: 20px;
 }
 
-.btn-disable{
+.btn-disable {
     border: 1px solid var(--black-text-color);
     border-radius: 20px;
     width: 281px;
@@ -390,7 +390,7 @@
     cursor: no-drop;
 }
 
-.btn-disable > span{
+.btn-disable>span {
     opacity: 0.3;
 }
 
@@ -416,10 +416,13 @@
         font-size: 20px;
         padding: 12px 10px;
         height: 48px;
+        width: 100%;
+        border-radius: 12px;
     }
 
-    .btn-supply-remove,.btn-disable {
-        width: 190px;
+    .btn-supply-remove,
+    .btn-disable {
+        width: 100%;
         height: 56px;
         font-size: 20px;
         border-radius: 12px;
@@ -431,6 +434,7 @@
 }
 
 @media (max-width:500px) {
+
     .btn-pool-active,
     .btn-pool {
         padding: 10px 12px;
@@ -452,4 +456,35 @@
     .btn-modal-preview-pool {
         height: 48px;
     }
+}
+
+.button-wallet {
+    height: 48px;
+    display: flex;
+    padding: 12px var(--100625-rem, 10px);
+    color: var(white-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    border-radius: 12px;
+}
+
+.button-withdraw {
+    display: flex;
+    padding: 10.4px 5.2px;
+    height: 36.8px;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    border-radius: 10.4px;
+    border: 0.52px solid var(--black-text-color);
+    background: var(--bg-button-active-color);
+    color: var(--white-text-color);
+    font-family: "SF Pro Display";
+    font-size: 13.52px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    letter-spacing: 0.5px;
 }

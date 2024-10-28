@@ -233,7 +233,7 @@ export const useFaucet = () => {
       wallet.wallet,
     );
 
-    wallet.addPendingTransaction(pendingTransaction);
+    wallet.addPendingTransaction(pendingTransaction, "Faucet");
   }, [client.client, wallet.wallet]);
 };
 
@@ -254,7 +254,7 @@ export const useTransfer = () => {
         amount,
       );
 
-      wallet.addPendingTransaction(pendingTransaction);
+      wallet.addPendingTransaction(pendingTransaction, "Transfer");
     },
     [client.client, wallet.wallet],
   );

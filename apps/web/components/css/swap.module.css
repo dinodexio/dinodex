@@ -290,7 +290,7 @@
 }
 
 .token-swap-container .slippage-container {
-    gap:8px 50px;
+    gap:8px 20px;
     flex-wrap: wrap;
 }
 

@@ -1,8 +1,9 @@
 import { Table } from "../table/table";
 import Image from "next/image";
 import { formatLargeNumber, formatterInteger } from "@/lib/utils";
-import { DATA_TOKENS } from "@/constants";
 import { useRouter } from "next/navigation";
+import { LIST_TOKENS } from "@/tokens";
+import { EMPTY_DATA } from "@/constants";
 
 export interface TokenPanelProps {
 }
@@ -14,7 +15,7 @@ let columTableToken = [
         key: 'numberic',
         width: 57,
         render: (data: any) => {
-            return (<span>{data?.id}</span>)
+            return (<span>{data?.index}</span>)
         }
     },
     {
@@ -91,7 +92,7 @@ let columTableToken = [
     {
 
         id: 7,
-        title: <div style={{display:'flex',alignItems:'center',justifyContent:'end'}}><Image src="/icon/header-time-transaction-icon.svg" alt='' width={24} height={24}/>Volume</div>,
+        title: <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}><Image src="/icon/header-time-transaction-icon.svg" alt='' width={24} height={24} />Volume</div>,
         key: 'volume',
         width: 150,
         render: (data: any) => {
@@ -105,11 +106,25 @@ let columTableToken = [
         width: 100,
         render: (data: any) => {
             const randomImage = Math.random() < 0.5 ? 'chart-price-dummy-1.svg' : 'chart-price-dummy-2.svg';
-            return <span style={{display:'block',width:100,height:24}}><Image src={`images/token/${randomImage}`} alt="chart" width={100} height={24} /></span>
+            return <span style={{ display: 'block', width: 100, height: 24 }}><Image src={`images/token/${randomImage}`} alt="chart" width={100} height={24} /></span>
         }
     },
 
 ]
+
+const DATA_TOKENS = Object.entries(LIST_TOKENS).map(([tokenId, infoToken], index) => ({
+    index: index + 1,
+    id: tokenId,
+    logo: infoToken?.logo,
+    name: infoToken?.name,
+    slug: `${infoToken?.ticker}${tokenId}`, // TODO change slug after tokens contract
+    symbol: infoToken?.ticker,
+    price: EMPTY_DATA, // TODO change slug after tokens contract
+    change1h: EMPTY_DATA, // TODO change slug after tokens contract
+    change1d: EMPTY_DATA, // TODO change slug after tokens contract
+    fdv: EMPTY_DATA, // TODO change slug after tokens contract
+    volume: EMPTY_DATA, // TODO change slug after tokens contract
+}))
 
 export function TokenPanel({ }: TokenPanelProps) {
     const router = useRouter();

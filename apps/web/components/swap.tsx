@@ -5,12 +5,10 @@ import { Toaster } from "@/components/ui/toaster";
 
 export interface SwapProps {
   swapForm: JSX.Element;
-  wallet: JSX.Element;
+  wallet?: JSX.Element;
 }
 
-export function SwapForm({ swapForm, wallet }: SwapProps) {
-  const router = useRouter();
-  const pathname = usePathname();
+export function SwapForm({ swapForm }: SwapProps) {
   return (
     <div className="flex items-center justify-center">
       <Toaster />
@@ -18,7 +16,6 @@ export function SwapForm({ swapForm, wallet }: SwapProps) {
         <Header />
         {swapForm}
       </div>
-      {wallet}
     </div>
   );
 }

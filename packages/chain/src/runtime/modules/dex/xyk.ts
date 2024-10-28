@@ -3,6 +3,7 @@ import {
   runtimeMethod,
   runtimeModule,
   state,
+  RuntimeEvents
 } from "@proto-kit/module";
 import { StateMap, assert } from "@proto-kit/protocol";
 import { PoolKey } from "./pool-key";
@@ -43,6 +44,39 @@ export interface XYKConfig {
   fee: bigint;
 }
 
+export class CreatePoolEvent extends Struct({
+  creator: PublicKey,
+  tokenAId: TokenId,
+  tokenBId: TokenId,
+  tokenAAmount: Balance,
+  tokenBAmount: Balance,
+  tokenLPAmount: Balance
+}) {}
+
+export class AddLiquidityEvent extends Struct({
+  provider: PublicKey,
+  tokenAId: TokenId,
+  tokenBId: TokenId,
+  tokenAAmount: Balance,
+  tokenBAmount: Balance,
+  tokenLPAmount: Balance
+}) {}
+export class RemoveLiquidityEvent extends Struct({
+  provider: PublicKey,
+  tokenAId: TokenId,
+  tokenBId: TokenId,
+  tokenAAmount: Balance,
+  tokenBAmount: Balance,
+  tokenLPAmount: Balance
+}) {}
+
+export class SwapEvent extends Struct({
+  creator: PublicKey, 
+  tokenAId: TokenId,
+  tokenBId: TokenId,
+  tokenAAmount: Balance,
+  tokenBAmount: Balance
+}) {}
 /**
  * Runtime module responsible for providing trading/management functionalities for XYK pools.
  */
@@ -61,10 +95,17 @@ export class XYK extends RuntimeModule<XYKConfig> {
   ) {
     super();
   }
+  public events = new RuntimeEvents({
+    createPool: CreatePoolEvent,
+    addLiquidity: AddLiquidityEvent,
+    removeLiquidity: RemoveLiquidityEvent,
+    swap: SwapEvent
+  });
 
   public async poolExists(poolKey: PoolKey) {
     return (await this.pools.get(poolKey)).isSome;
   }
+  
 
   /**
    * Creates an XYK pool if one doesnt exist yet, and if the creator has
@@ -108,6 +149,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
       initialLPTokenSupply
     );
     await this.pools.set(poolKey, placeholderPoolValue);
+    this.events.emit( "createPool", new CreatePoolEvent({ creator, tokenAId, tokenBId, tokenAAmount, tokenBAmount, tokenLPAmount: initialLPTokenSupply}));
   }
 
   /**
@@ -165,6 +207,8 @@ export class XYK extends RuntimeModule<XYKConfig> {
     await this.balances.transfer(tokenAId, provider, poolKey, tokenAAmount);
     await this.balances.transfer(tokenBId, provider, poolKey, amountB);
     await this.balances.mintAndIncrementSupply(lpTokenId, provider, lpTokensToMint);
+    this.events.emit( "addLiquidity", new AddLiquidityEvent({ provider, tokenAId, tokenBId, tokenAAmount, tokenBAmount: amountB, tokenLPAmount: lpTokensToMint}));
+
   }
 
   public async removeLiquidity(
@@ -217,6 +261,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
     await this.balances.transfer(tokenAId, poolKey, provider, tokenAAmount);
     await this.balances.transfer(tokenBId, poolKey, provider, tokenBAmount);
     await this.balances.burnAndDecrementSupply(lpTokenId, provider, lpTokenAmount);
+    this.events.emit( "removeLiquidity", new RemoveLiquidityEvent({ provider, tokenAId, tokenBId, tokenAAmount, tokenBAmount, tokenLPAmount: lpTokenAmount}));
   }
 
   public calculateTokenOutAmountFromReserves(
@@ -303,6 +348,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
 
     // TODO: figure out if there are path variation edge cases
     // if yes, make the whole trade fail if the path is not valid
+
     for (let i = 0; i < MAX_PATH_LENGTH - 1; i++) {
       const tokenIn = path[i];
       const tokenOut = path[i + 1];
@@ -318,7 +364,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
       );
 
       const amoutOutWithoutFee = calculatedAmountOut.sub(
-        calculatedAmountOut.mul(3n).div(100000n)
+        calculatedAmountOut.mul(this.config.fee).div(this.config.feeDivider)
       );
 
       lastTokenOut = Provable.if(poolExists, TokenId, tokenOut, lastTokenOut);
@@ -328,9 +374,11 @@ export class XYK extends RuntimeModule<XYKConfig> {
       amountOut = Balance.from(Provable.if<Balance>(poolExists, Balance, amoutOutWithoutFee, amountOut));
 
       amountIn = Balance.from(Provable.if<Balance>(poolExists, Balance, amountIn, Balance.zero));
-
-      await this.balances.transfer(tokenIn, sender, lastPoolKey, amountIn);
-
+      
+      if(amountIn.greaterThan(UInt64.from(0))){
+        this.events.emit("swap", new SwapEvent({creator: seller, tokenAId: tokenIn, tokenBId: tokenOut, tokenAAmount: amountIn, tokenBAmount: amountOut}));
+        await this.balances.transfer(tokenIn, sender, lastPoolKey, amountIn); 
+      }
       sender = lastPoolKey;
       amountIn = amountOut;
     }

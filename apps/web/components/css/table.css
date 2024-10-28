@@ -3,6 +3,8 @@
     overflow-x: scroll;
     margin-bottom: 20px;
     background-color: #FFF;
+    border-radius: 12px;
+    border: 1px solid var(--black-text-color)
 }
 
 .table-layout{
@@ -17,7 +19,6 @@
 .container-table {
     width: 1146px;
     border-spacing: 0;
-    border: 1px solid var(--black-text-color);
     border-radius: 12px;
     border-collapse:unset
 }

@@ -4,9 +4,13 @@ import {
   CREATEPOOL,
   DRIPBUNDLE,
   EMPTY_DATA,
+  REMOVELIQUIDITY,
   SELLPATH,
+  TOKEN_PRICES,
+  TRANSFER,
 } from "@/constants";
 import { Token, Tokens } from "@/tokens";
+import BigNumber from "bignumber.js";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -41,6 +45,25 @@ export function formatterInteger(number: number) {
   return parts.join(".");
 }
 
+export function formatNumber(num: number | string): string {
+  // Convert the input to a number if it's a string
+  const value = typeof num === "string" ? parseFloat(num) : num;
+
+  if (isNaN(value)) {
+    return EMPTY_DATA;
+  }
+
+  if (value >= 1e9) {
+    return (value / 1e9).toFixed(2) + "B";
+  } else if (value >= 1e6) {
+    return (value / 1e6).toFixed(2) + "M";
+  } else if (value >= 1e3) {
+    return (value / 1e3).toFixed(2) + "K";
+  } else {
+    return value.toString();
+  }
+}
+
 export function truncateAddress(
   address: string | any[],
   frontChars = 6,
@@ -60,24 +83,29 @@ export const convertMethodname = (name: string) => {
   let type = "";
   switch (name) {
     case DRIPBUNDLE:
-      name = "Drip";
+      type = "Drip";
       break;
-
     case CREATEPOOL:
-      name = "Add";
+      type = "Create";
       break;
     case SELLPATH:
-      name = "Swap";
+      type = "Swap";
       break;
     case ADDLIQUIDITY:
-      name = "Add Liquidity";
+      type = "Add";
+      break;
+    case TRANSFER:
+      type = "Transfer";
+      break;
+    case REMOVELIQUIDITY:
+      type = "Remove";
       break;
     default:
-      name = "Swap";
+      type = "Swap";
       break;
   }
 
-  return name;
+  return type;
 };
 
 export const dataTokenDefault = {
@@ -104,18 +132,19 @@ export const createTokenDetails = (
   const token = getTokenData(tokenId, tokens);
 
   if (!token) return dataTokenDefault;
-
   return {
-    logo: token.logo,
-    name: token.name,
+    logo: token.logo || "",
+    name: token.name || "Empty",
     symbol: token.ticker,
-    amount: parseFloat(amount), // Convert amount to a number
+    amount: BigNumber(amount)
+      .dividedBy(10 ** 2)
+      .toNumber(), // Convert amount to a number
   };
 };
 // Step 3: Main function to pass new data
 export const passDataTokenByFields = (
   argsFields: string[], // Array of token IDs and amounts
-  tokens: Tokens, // Token mapping object
+  tokens: Tokens,
 ): { first: PassDataResult | null; second: PassDataResult | null } => {
   if (argsFields.length === 0)
     return { first: dataTokenDefault, second: dataTokenDefault };
@@ -127,3 +156,46 @@ export const passDataTokenByFields = (
     second: secondToken,
   };
 };
+
+export function formatPriceUSD(amount: number | string, ticket: string) {
+  switch (ticket) {
+    case "BTC":
+      return typeof amount === "number"
+        ? amount * TOKEN_PRICES.BTC
+        : parseFloat(amount) * TOKEN_PRICES.BTC;
+    case "ETH":
+      return typeof amount === "number"
+        ? amount * TOKEN_PRICES.ETH
+        : parseFloat(amount) * TOKEN_PRICES.ETH;
+    case "USDC":
+      return typeof amount === "number"
+        ? amount * TOKEN_PRICES.USDC
+        : parseFloat(amount) * TOKEN_PRICES.USDC;
+    case "USDT":
+      return typeof amount === "number"
+        ? amount * TOKEN_PRICES.USDT
+        : parseFloat(amount) * TOKEN_PRICES.USDT;
+    case "DAI":
+      return typeof amount === "number"
+        ? amount * TOKEN_PRICES.DAI
+        : parseFloat(amount) * TOKEN_PRICES.DAI;
+    case "MINA":
+      return typeof amount === "number"
+        ? amount * TOKEN_PRICES.MINA
+        : parseFloat(amount) * TOKEN_PRICES.MINA;
+    case "BNB":
+      return typeof amount === "number"
+        ? amount * TOKEN_PRICES.BNB
+        : parseFloat(amount) * TOKEN_PRICES.BNB;
+    default:
+      return typeof amount === "number" ? amount * 1 : parseFloat(amount) * 1;
+  }
+}
+
+export function truncateString(str: string, maxLength: number): string {
+  if (str.length > maxLength) {
+    return str.slice(0, maxLength) + "...";
+  } else {
+    return str;
+  }
+}

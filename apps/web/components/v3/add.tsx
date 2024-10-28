@@ -454,6 +454,7 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                           },
                         })
                       }
+                      dialogClose={true}
                     />
                   </DialogContent>
                 </Dialog>

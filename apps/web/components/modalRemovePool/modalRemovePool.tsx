@@ -39,6 +39,17 @@ export function ModalRemovePool({
     onCloseRemovePool && onCloseRemovePool();
   };
 
+  let dataPool = {
+    tokenPool:{
+      first:{
+        value: tokenParams?.tokenA?.value 
+      },
+      second:{
+        value: tokenParams?.tokenB?.value
+      },
+    }
+  }
+
   useEffect(() => {
     if (layoutModalRemovePool.waiting) {
       setLayoutModalRemovePool({
@@ -65,6 +76,7 @@ export function ModalRemovePool({
           tokenParams={tokenParams}
           valueTokenPool={valueTokenPool}
           handleClosePool={handleCloseRmovePool}
+          dataPool={dataPool}
         />
       )}
     </>

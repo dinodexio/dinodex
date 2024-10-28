@@ -1,0 +1,36 @@
+.menu-item:hover .image-default{
+    opacity: 0;
+}
+
+.menu-item:hover .image-hover{
+    opacity: 1;
+}
+
+.deposit-text{
+    color: var(--green2-text-color);
+}
+
+.withdraw-text{
+    color: var(--red-text-color);
+}
+
+.overlay-wallet{
+    background: var(--bg-overlay-black-color);
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.show-overlay-wallet{
+    opacity: 1;
+    visibility: visible;
+}
+
+.loading-waiting{
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

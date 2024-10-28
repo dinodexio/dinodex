@@ -186,10 +186,10 @@ export function SwapForm() {
         .multipliedBy(tokenOutReserve)
         .div(new BigNumber(tokenInReserve).plus(addPrecision(amountIn)));
 
-      console.log(
-        "intermediateAmountOut",
-        removePrecision(intermediateAmountOut.toFixed(2)),
-      );
+      // console.log(
+      //   "intermediateAmountOut",
+      //   removePrecision(intermediateAmountOut.toFixed(2)),
+      // );
 
       const amountOutWithoutFee = intermediateAmountOut.minus(
         intermediateAmountOut.multipliedBy(3).dividedBy(100000),
@@ -200,11 +200,6 @@ export function SwapForm() {
     });
 
     if (new BigNumber(amountOut).isNaN()) return;
-
-    console.log("new amount out", {
-      balances: balances.balances,
-      amountOut,
-    });
     form.setValue("tokenOut_amount", removePrecision(amountOut), {
       shouldValidate: true,
     });

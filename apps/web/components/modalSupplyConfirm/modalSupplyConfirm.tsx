@@ -15,9 +15,11 @@ export interface modalSupplyComfirmProps {
   onClickAddPool?: () => void;
   onClosePool?: () => void;
   tokenParams?: any;
+  poolExists?: boolean;
 }
 
 export function ModalSupplyComfirm({
+  poolExists,
   dataPool,
   valuePer,
   loading,
@@ -87,7 +89,7 @@ export function ModalSupplyComfirm({
           <div className="mt-[33px] flex w-full flex-col items-center justify-center gap-[30px]">
             <div className="flex items-center justify-center sm:items-center lg:items-end xl:items-end">
               <span
-                className="text-[34px] font-[600] text-black sm:text-[34px] lg:text-[52px] xl:text-[52px]"
+                className="h-[45px] text-[34px] font-[600] text-black sm:text-[34px] lg:text-[52px] xl:text-[52px]"
                 style={{ lineHeight: "52px", letterSpacing: "-1px" }}
               >
                 {dataPool?.tokenLP_amount}
@@ -161,21 +163,23 @@ export function ModalSupplyComfirm({
                     {dataPool?.deposit_amount?.second}
                   </span>
                 </div>
-                <div className="flex w-full items-center justify-between">
-                  <span className="text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                    Rate
-                  </span>
-                  <div className="flex flex-col items-end gap-5  text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                    <span>
-                      1 {dataPool?.tokenPool?.first?.label} = {valuePer?.perB}{" "}
-                      {dataPool?.tokenPool?.second?.label}
+                {poolExists && (
+                  <div className="flex w-full items-center justify-between">
+                    <span className="text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
+                      Rate
                     </span>
-                    <span>
-                      1 {dataPool?.tokenPool?.second?.label} = {valuePer?.perA}{" "}
-                      {dataPool?.tokenPool?.first?.label}
-                    </span>
+                    <div className="flex flex-col items-end gap-5  text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
+                      <span>
+                        1 {dataPool?.tokenPool?.first?.label} = {valuePer?.perB}{" "}
+                        {dataPool?.tokenPool?.second?.label}
+                      </span>
+                      <span>
+                        1 {dataPool?.tokenPool?.second?.label} ={" "}
+                        {valuePer?.perA} {dataPool?.tokenPool?.first?.label}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                )}
                 <div className="flex w-full items-center justify-between">
                   <span className="text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
                     Share of Pool
@@ -187,7 +191,7 @@ export function ModalSupplyComfirm({
               </div>
               <Button
                 loading={loading}
-                className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]} ${stylesButton["btn-approve-new"]} ${stylesButton["btn-prview"]}}mt-0 sm:mt-0 lg:mt-[-25px] xl:mt-[-25px]`}
+                className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]} ${stylesButton["btn-approve-new"]} ${stylesButton["btn-prview"]}mt-0 sm:mt-0 lg:mt-[-25px] xl:mt-[-25px]`}
                 onClick={() => clickConfirm()}
               >
                 <span>Confirm</span>
@@ -202,6 +206,7 @@ export function ModalSupplyComfirm({
           tokenParams={tokenParams}
           valueTokenPool={dataTokenPool}
           handleClosePool={handleClosePool}
+          dataPool={dataPool}
         />
       )}
     </>

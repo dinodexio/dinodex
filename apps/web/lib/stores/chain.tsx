@@ -50,12 +50,9 @@ export interface ChainState {
   block?: {
     height: string;
   } & ComputedBlockJSON;
-  // transactions?: ComputedTransactionJSON[];
   data: any;
-  transactions: any;
   error: boolean;
   loadBlock: () => Promise<void>;
-  loadTransactions: () => Promise<void>;
 }
 
 export interface BlockQueryResponse {
@@ -80,13 +77,13 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
     loading: Boolean(false),
     data: null,
     error: Boolean(true),
-    transactions: [],
     async loadBlock() {
       set((state) => {
         state.loading = true;
       });
       // https://graphql.dinodex.io/graphql
-      const response = await fetch("http://localhost:8080/graphql", {
+      console.log("process.env.NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL", process.env.NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL}/graphql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -135,26 +132,6 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
           : undefined;
       });
     },
-    async loadTransactions() {
-      set((state) => {
-        state.loading = true;
-      });
-
-      const response = await fetch("http://localhost:3333/transactions", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = (await response.json()) as TransactionQueryResponse;
-
-      set((state) => {
-        state.loading = false;
-        state.transactions = data?.data;
-        state.error = data?.error;
-      });
-    },
   })),
 );
 
@@ -179,21 +156,3 @@ export const usePollBlockHeight = () => {
   }, []);
 };
 
-export const usePollTransactions = () => {
-  const [tick, setTick] = useState(0);
-  const chain = useChainStore();
-  useEffect(() => {
-    chain.loadTransactions();
-  }, []);
-
-  useEffect(() => {
-    const intervalId = setInterval(
-      () => setTick((tick) => tick + 10),
-      tickInterval,
-    );
-
-    setTick((tick) => tick + 10);
-
-    return () => clearInterval(intervalId);
-  }, []);
-};

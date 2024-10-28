@@ -4,10 +4,12 @@ import { DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import styles from '../../css/pool.module.css'
 import stylesButton from '../../css/button.module.css'
+import { tokens } from "@/tokens";
 
 export interface layoutWaitingAndSuccessProps {
   statusLayout: any;
   tokenParams?: any;
+  dataPool?: any;
   valueTokenPool?: any;
   handleClosePool?: () => void;
   type: string;
@@ -16,6 +18,7 @@ export interface layoutWaitingAndSuccessProps {
 export function LayoutWaitingAndSuccess({
   statusLayout,
   tokenParams,
+  dataPool,
   valueTokenPool,
   handleClosePool,
   type,
@@ -32,7 +35,7 @@ export function LayoutWaitingAndSuccess({
   return (
     <div className={`${styles["modal-waiting"]} h-max w-full`}>
       <div className="relative mb-[15px] flex flex-col items-center justify-center gap-[50px]">
-        <DialogClose className="absolute right-[-6px] top-[-10px]">
+        <DialogClose className="absolute right-[-6px] top-[-10px]" onClick={() => statusLayout?.success && handleClosePool && handleClosePool()}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="18"
@@ -50,16 +53,40 @@ export function LayoutWaitingAndSuccess({
         </DialogClose>
         <div className="relative">
           <div
-            className={`${styles["loading-waiting"]} ${statusLayout.waiting ? "opacity-100" : "opacity-0"}`}
-            style={{ transition: "opacity 0.3s ease" }}
+            className={`relative`}
           >
             <Image
               src={"/icon/loading-waiting.svg"}
               alt="logo"
               width={200}
               height={200}
-              className="h-[150px] w-[150px] sm:h-[150px] sm:w-[150px] lg:h-[200px] lg:w-[200px] xl:h-[200px] xl:w-[200px]"
+              className={`h-[150px] w-[150px] sm:h-[150px] sm:w-[150px] lg:h-[200px] lg:w-[200px] xl:h-[200px] xl:w-[200px] 
+                ${styles["loading-waiting"]} ${statusLayout.waiting ? "opacity-100" : "opacity-0"}`}
+              style={{ transition: "opacity 0.3s ease" }}
             />
+            <div className={`absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] ${statusLayout.waiting ? "opacity-100" : "opacity-0"}`} style={{ transition: "opacity 0.3s ease" }}>
+              <div className={styles['token-pool-logo']}>
+                <div className={styles['token-pool-logo-item-first']}>
+                  <Image
+                    src={tokens[dataPool?.tokenPool?.first?.value]?.logo as string}
+                    width={76}
+                    height={76}
+                    alt=''
+                    className={styles['pool-logo-item']}
+                  />
+                </div>
+                <div className={styles['token-pool-logo-item-second']}>
+                  <Image
+                    src={tokens[dataPool?.tokenPool?.second?.value]?.logo as string}
+                    width={76}
+                    height={76}
+                    alt=''
+                    className={styles['pool-logo-item']}
+                    style={{ position: 'absolute', right: 0 }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
           <div
             className={`absolute top-0 ${statusLayout.success ? "opacity-100" : "opacity-0"}`}
@@ -83,8 +110,8 @@ export function LayoutWaitingAndSuccess({
               Waiting for confirmation
             </span>
             <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-              {textType} {tokenA_amount} {tokenParams?.tokenA?.label} and{" "}
-              {tokenB_amount} {tokenParams?.tokenB?.label}
+              {textType} {tokenA_amount} {tokenParams?.tokenA?.label || tokens[dataPool?.tokenPool?.first?.value]?.ticker} and{" "}
+              {tokenB_amount} {tokenParams?.tokenB?.label || tokens[dataPool?.tokenPool?.second?.value]?.ticker}
             </span>
             <span className="text-[14px] font-[400] text-textBlack opacity-50 sm:text-[14px] lg:text-[15px] xl:text-[15px]">
               Confirm this transaction in your wallet
@@ -111,7 +138,7 @@ export function LayoutWaitingAndSuccess({
               </Button>
             </DialogClose>
             <span className="text-[14px] font-[400] text-borderOrColor sm:text-[14px] lg:text-[15px] xl:text-[15px]">
-              View on Etherscan
+              View on Minascan
             </span>
           </div>
         )}

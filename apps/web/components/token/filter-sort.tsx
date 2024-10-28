@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { FILTER_NETWORK, FILTER_VOL } from "@/constants";
 import useClickOutside from "@/hook/useClickOutside";
-import styles from '../css/tokens.module.css'
+import styles from "../css/tokens.module.css";
 export interface FilterSortProps {
   handleSearch: (value: string) => void;
 }
@@ -87,7 +87,9 @@ export function FilterSort({ handleSearch }: FilterSortProps) {
           setOpenNetWork(false);
         }}
       >
-        <span className={styles["network-content-menu-item-text"]}>{dataVol.label}</span>
+        <span className={styles["network-content-menu-item-text"]}>
+          {dataVol.label}
+        </span>
         <Image
           width={19}
           height={20}
@@ -126,7 +128,9 @@ export function FilterSort({ handleSearch }: FilterSortProps) {
           type="text"
           className={styles["input-search-token"]}
           placeholder="Search Token"
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            handleSearch(e.target.value)
+          }
         />
       </div>
     </div>

@@ -12,7 +12,7 @@ export type Token = {
 
 export type Tokens = Record<string, Token | undefined>;
 
-const LIST_TOKENS: Tokens = {
+export const LIST_TOKENS: Tokens = {
   "0": {
     ticker: "MINA",
     name: "Mina Protocol",

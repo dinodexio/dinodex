@@ -1,16 +1,30 @@
 import {
   convertMethodname,
+  formatNumber,
+  formatPriceUSD,
   formatterInteger,
   passDataTokenByFields,
   truncateAddress,
+  truncateString,
 } from "@/lib/utils";
 import { Table } from "../table/table";
-import { ComputedTransactionJSON, useChainStore } from "@/lib/stores/chain";
+import { ComputedTransactionJSON } from "@/lib/stores/chain";
 import { MethodIdResolver } from "@proto-kit/module";
-import { useEffect, useMemo } from "react";
-import { ADDLIQUIDITY, CREATEPOOL, DRIPBUNDLE, SELLPATH } from "@/constants";
+import { useMemo } from "react";
+import {
+  DRIPBUNDLE,
+  EMPTY_DATA,
+  REMOVELIQUIDITY,
+  SELLPATH,
+  TRANSFER,
+} from "@/constants";
 import { tokens } from "@/tokens";
 import Link from "next/link";
+import {
+  useAggregatorStore,
+  usePollTransactions,
+} from "@/lib/stores/aggregator";
+import Image from "next/image";
 
 export interface TransactionPanelProps {
   valueSearch: string;
@@ -115,23 +129,25 @@ let columTableTransaction = [
       <div className="type-transaction">
         <span className="type-text">{data?.type}</span>
         <div className="transaction-item">
-          <img
-            src={data?.token?.first?.logo}
+          <Image
+            src={data?.token?.first?.logo || "/icon/empty-token.svg"}
             alt="token"
             width="20"
             height="20"
           />
-          <span>{data?.token?.first?.symbol}</span>
+          <span>{truncateString(data?.token?.first?.symbol, 4)}</span>
         </div>
         for
         <div className="transaction-item">
-          <img
-            src={data?.token?.second?.logo}
+          <Image
+            src={data?.token?.second?.logo || "/icon/empty-token.svg"}
             alt="token"
             width="20"
             height="20"
           />
-          <span>{data?.token?.second?.symbol}</span>
+          <span>
+            {truncateString(data?.token?.second?.symbol, 4) || EMPTY_DATA}
+          </span>
         </div>
       </div>
     ),
@@ -142,7 +158,17 @@ let columTableTransaction = [
     key: "usd",
     width: 143,
     render: (data: any) => {
-      return <span>{data?.price || "--"}</span>;
+      return (
+        <span>
+          $
+          {formatNumber(
+            formatPriceUSD(
+              data?.token?.second?.amount,
+              data?.token?.second?.symbol,
+            ),
+          )}
+        </span>
+      );
     },
   },
   {
@@ -153,14 +179,16 @@ let columTableTransaction = [
     render: (data: any) => {
       return (
         <div className="token-item">
-          <span>{formatterInteger(data?.token?.first?.amount)}</span>
-          <img
-            src={data?.token?.first?.logo}
+          <span>
+            {formatNumber(formatterInteger(data?.token?.first?.amount))}
+          </span>
+          <Image
+            src={data?.token?.first?.logo || "/icon/empty-token.svg"}
             alt="token"
             width="20"
             height="20"
           />
-          <span>{data?.token?.first?.symbol}</span>
+          <span>{truncateString(data?.token?.first?.symbol, 4)}</span>
         </div>
       );
     },
@@ -173,14 +201,16 @@ let columTableTransaction = [
     render: (data: any) => {
       return (
         <div className="token-item">
-          <span>${formatterInteger(data?.token?.second?.amount)}</span>
-          <img
-            src={data?.token?.second?.logo}
+          <span>
+            {formatNumber(formatterInteger(data?.token?.second?.amount))}
+          </span>
+          <Image
+            src={data?.token?.second?.logo || "/icon/empty-token.svg"}
             alt="token"
             width="20"
             height="20"
           />
-          <span>{data?.token?.second?.symbol}</span>
+          <span>{truncateString(data?.token?.second?.symbol, 4)}</span>
         </div>
       );
     },
@@ -199,18 +229,16 @@ let columTableTransaction = [
 export function TransactionPanel({
   valueSearch,
   client,
-  transactions,
-  loading,
 }: TransactionPanelProps) {
+  const { transactions, loading } = useAggregatorStore();
+  usePollTransactions();
   // Memoize the transaction processing to avoid re-computation on every render
   const processedTransactions = useMemo(() => {
     if (!transactions) return [];
 
     return transactions
-      .filter(
-        (item) => item?.methodName !== DRIPBUNDLE,
-      )
-      .map((item) => {
+      .filter((item: any) => item?.methodName !== DRIPBUNDLE)
+      .map((item: any) => {
         if (!client) return;
 
         const methodIdResolver = client?.resolveOrFail(
@@ -234,7 +262,16 @@ export function TransactionPanel({
           const [moduleName, methodName] = resolvedMethodDetails;
           let passFields = item?.argsFields;
           if (methodName === SELLPATH) {
-            passFields = item?.argsFields.filter((field) => field !== "99999");
+            let indexRemove = passFields[2] === "99999" ? 2 : 1;
+            passFields = item?.argsFields.filter(
+              (field: any, index: any) => index !== indexRemove,
+            );
+          }
+          if (methodName === REMOVELIQUIDITY) {
+            let indexRemove = 2;
+            passFields = item?.argsFields.filter(
+              (field: any, index: any) => index !== indexRemove,
+            );
           }
           const tmpData = passDataTokenByFields(passFields, tokens);
           return {
@@ -244,7 +281,7 @@ export function TransactionPanel({
             token: tmpData || {},
             address: truncateAddress(item?.sender),
             type: convertMethodname(methodName),
-            price: '',
+            price: "",
             timeStamp: new Date().toLocaleString(),
           };
         }
@@ -255,7 +292,7 @@ export function TransactionPanel({
     if (!valueSearch) return processedTransactions;
 
     const lowerValueSearch = valueSearch.toLowerCase();
-    return processedTransactions.filter((item) => {
+    return processedTransactions.filter((item: any) => {
       const tokenFirstSymbol = item?.token?.first?.symbol?.toLowerCase();
       const tokenSecondSymbol = item?.token?.second?.symbol?.toLowerCase();
       return (
@@ -271,7 +308,8 @@ export function TransactionPanel({
         loading={loading}
         data={
           filteredTransactions?.filter?.(
-            (item) => item?.methodName !== DRIPBUNDLE,
+            (item: any) =>
+              item?.methodName !== DRIPBUNDLE && item?.methodName !== TRANSFER,
           ) || []
         }
         column={columTableTransaction}

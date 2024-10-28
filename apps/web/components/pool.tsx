@@ -12,7 +12,6 @@ export interface PoolProps {
 export function Pool({
   listPool,
   optionPool,
-  walletElement,
 }: PoolProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -27,7 +26,6 @@ export function Pool({
           {/* {optionPool} */}
         </div>
       </div>
-      {walletElement}
     </div>
   );
 }

@@ -25,44 +25,44 @@ export class Faucet extends RuntimeModule {
     await this.drip(
       TokenId.from("0"),
       this.transaction.sender.value,
-      Balance.from(1000n * 10n ** 2n)
+      Balance.from(1000n * 10n ** 9n)
     );
 
     await this.drip(
       TokenId.from("1"),
       this.transaction.sender.value,
-      Balance.from(1000n * 10n ** 2n)
+      Balance.from(1000n * 10n ** 9n)
     );
 
     await this.drip(
       TokenId.from("2"),
       this.transaction.sender.value,
-      Balance.from(1000n * 10n ** 2n)
+      Balance.from(1000n * 10n ** 9n)
     );
     await this.drip(
       TokenId.from("3"),
       this.transaction.sender.value,
-      Balance.from(1000n * 10n ** 2n)
+      Balance.from(1000n * 10n ** 9n)
     );
     await this.drip(
       TokenId.from("4"),
       this.transaction.sender.value,
-      Balance.from(1000n * 10n ** 2n)
+      Balance.from(1000n * 10n ** 9n)
     );
     await this.drip(
       TokenId.from("5"),
       this.transaction.sender.value,
-      Balance.from(1000n * 10n ** 2n)
+      Balance.from(1000n * 10n ** 9n)
     );
     await this.drip(
       TokenId.from("6"),
       this.transaction.sender.value,
-      Balance.from(1000n * 10n ** 2n)
+      Balance.from(1000n * 10n ** 9n)
     );
     await this.drip(
       TokenId.from("7"),
       this.transaction.sender.value,
-      Balance.from(1000n * 10n ** 2n)
+      Balance.from(1000n * 10n ** 9n)
     );
   }
 }

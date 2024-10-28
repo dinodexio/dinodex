@@ -12,6 +12,7 @@ export interface HomeProps {
   poolsTable: JSX.Element;
   transactionTable: JSX.Element;
   filterSort: JSX.Element;
+  walletElement?: JSX.Element;
 }
 
 // Memoize SWITCH_MENU to avoid re-creation on every render
@@ -57,6 +58,8 @@ export function Token({
       setTab("transactions");
     }
   }, [pathname]);
+
+
 
   return (
     <div className="flex items-center justify-center">

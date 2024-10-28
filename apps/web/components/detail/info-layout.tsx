@@ -22,6 +22,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { SwapForm } from "../swap";
+import useCopy from "@/hook/useCopy";
 
 export interface InfoLayoutProps {
   type: string;
@@ -40,6 +41,7 @@ let SWITCH_MENU = [
 ]
 
 export function InfoLayout({ type, params }: InfoLayoutProps) {
+  const [isCopied, copyToClipboard] = useCopy();
   const token = DATA_TOKENS.find(token => token.slug === params.name[0])
   const [tab, setTab] = useState('transaction')
   return (
@@ -110,7 +112,10 @@ export function InfoLayout({ type, params }: InfoLayoutProps) {
           <div className={stylesDetails["swap-container-info"]}>
             <span className={stylesDetails["swap-text"]}>Info</span>
             <div className={stylesDetails["swap-info-content"]}>
-              <div className={stylesDetails["swap-info-item"]} data-address="0xFd08as123u8asy348123FCbb9">
+              <div className={stylesDetails["swap-info-item"]} data-address="0xFd08as123u8asy348123FCbb9" onClick={() => {
+                navigator.clipboard.writeText('0xFd08as123u8asy348123FCbb9')
+                alert('copied!')
+              }}>
                 <Image src="/icon/icon-copy.svg" alt="info" width={18} height={18} />
                 <span className="swap-info-item-text">0xFd08...FCbb9</span>
               </div>
