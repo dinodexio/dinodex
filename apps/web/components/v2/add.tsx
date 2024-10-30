@@ -254,7 +254,7 @@ export function PoolAdd({
           first_token,
           second_token,
           addPrecision(first),
-          addPrecision(second),
+          addPrecision((Number(second) * 1.02).toString()),
         );
       } else {
         await createPool(

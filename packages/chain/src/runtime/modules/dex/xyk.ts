@@ -14,6 +14,7 @@ import { TokenPair } from "./token-pair";
 import { LPTokenId } from "./lp-token-id";
 import { MAX_TOKEN_ID, TokenRegistry } from "./token-registry";
 import { Balances } from "../balances";
+import { mulDiv } from "../libs/MathLibrary";
 
 export const errors = {
   tokensNotDistinct: () => `Tokens must be different`,
@@ -184,9 +185,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
     );
 
     // TODO: why do i need Balance.from on the `amountA` argument???
-    const amountB = Balance.from(tokenAAmount)
-      .mul(reserveB)
-      .div(adjustedReserveA);
+    const amountB = mulDiv(tokenAAmount, reserveB, adjustedReserveA);
     const isAmountBLimitSufficient =
       tokenBAmountLimit.greaterThanOrEqual(amountB);
 
@@ -195,9 +194,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
 
     // TODO: ensure tokens are provided in the right order, not just ordered by the TokenPair
     // otherwise the inputs for the following math will be in the wrong order
-    const lpTokensToMint = lpTokenTotalSupply
-      .mul(tokenAAmount)
-      .div(adjustedReserveA);
+    const lpTokensToMint = mulDiv(lpTokenTotalSupply, tokenAAmount, adjustedReserveA);
 
     assert(poolDoesExists, errors.poolDoesNotExist());
     assert(amountANotZero, errors.amountAIsZero());
@@ -234,12 +231,8 @@ export class XYK extends RuntimeModule<XYKConfig> {
     const reserveA = await this.balances.getBalance(tokenAId, poolKey);
     const reserveB = await this.balances.getBalance(tokenBId, poolKey);
 
-    const tokenAAmount = Balance.from(lpTokenAmount)
-      .mul(reserveA)
-      .div(adjustedLpTokenTotalSupply);
-    const tokenBAmount = Balance.from(lpTokenAmount)
-      .mul(reserveB)
-      .div(adjustedLpTokenTotalSupply);
+    const tokenAAmount = mulDiv(Balance.from(lpTokenAmount), reserveA, adjustedLpTokenTotalSupply);
+    const tokenBAmount = mulDiv(Balance.from(lpTokenAmount), reserveB, adjustedLpTokenTotalSupply);
 
     const isTokenAAmountLimitSufficient =
       tokenAAmountLimit.greaterThanOrEqual(tokenAAmount);
@@ -269,7 +262,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
     reserveOut: Balance,
     amountIn: Balance
   ) {
-    const numerator = amountIn.mul(reserveOut);
+    // const numerator = amountIn.mul(reserveOut);
     const denominator = reserveIn.add(amountIn);
 
     // TODO: extract to safemath
@@ -277,7 +270,8 @@ export class XYK extends RuntimeModule<XYKConfig> {
 
     assert(denominator.equals(adjustedDenominator), "denominator is zero");
 
-    return numerator.div(adjustedDenominator);
+    // return numerator.div(adjustedDenominator);
+    return mulDiv(amountIn, reserveOut, adjustedDenominator);
   }
 
   public async calculateTokenOutAmount(
@@ -317,7 +311,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
     reserveOut: Balance,
     amountOut: Balance
   ) {
-    const numerator = reserveIn.mul(amountOut);
+    // const numerator = reserveIn.mul(amountOut);
     const denominator = reserveOut.sub(amountOut);
 
     // TODO: extract to safemath
@@ -325,7 +319,8 @@ export class XYK extends RuntimeModule<XYKConfig> {
 
     assert(denominator.equals(adjustedDenominator), "denominator is zero");
 
-    return numerator.div(adjustedDenominator);
+    // return numerator.div(adjustedDenominator);
+    return mulDiv(reserveIn, amountOut, adjustedDenominator);
   }
 
   public async sellPath(
@@ -364,7 +359,8 @@ export class XYK extends RuntimeModule<XYKConfig> {
       );
 
       const amoutOutWithoutFee = calculatedAmountOut.sub(
-        calculatedAmountOut.mul(this.config.fee).div(this.config.feeDivider)
+        // calculatedAmountOut.mul(this.config.fee).div(this.config.feeDivider)
+        mulDiv(calculatedAmountOut, UInt64.from(this.config.fee), UInt64.from(this.config.feeDivider))
       );
 
       lastTokenOut = Provable.if(poolExists, TokenId, tokenOut, lastTokenOut);
@@ -375,10 +371,10 @@ export class XYK extends RuntimeModule<XYKConfig> {
 
       amountIn = Balance.from(Provable.if<Balance>(poolExists, Balance, amountIn, Balance.zero));
       
-      if(amountIn.greaterThan(UInt64.from(0))){
-        this.events.emit("swap", new SwapEvent({creator: seller, tokenAId: tokenIn, tokenBId: tokenOut, tokenAAmount: amountIn, tokenBAmount: amountOut}));
-        await this.balances.transfer(tokenIn, sender, lastPoolKey, amountIn); 
-      }
+      // if(amountIn.greaterThan(UInt64.from(0))){
+      this.events.emit("swap", new SwapEvent({creator: seller, tokenAId: tokenIn, tokenBId: tokenOut, tokenAAmount: amountIn, tokenBAmount: Balance.from(Provable.if<Balance>(poolExists, Balance, amountOut, Balance.zero))}));
+      await this.balances.transfer(tokenIn, sender, lastPoolKey, amountIn); 
+      // }
       sender = lastPoolKey;
       amountIn = amountOut;
     }
