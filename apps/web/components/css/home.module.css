@@ -100,8 +100,84 @@
     z-index: 10;
 }
 
+.logo-content>span {
+    font-size: 160px
+}
+
 @media screen and (min-width: 1500px) {
     .land-img {
         width: 100%;
+    }
+}
+
+
+@media (max-width:1024px) {
+    .logo-content>span {
+        font-size: 100px;
+    }
+
+    .dex-content>img {
+        width: 200px;
+        height: 200px;
+    }
+
+    .cactus-content {
+        right: 0;
+        top: -143px
+    }
+
+    .cactus-content>img:first-child,
+    .cactus-content>img:last-child {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+@media (max-width:700px) {
+
+    .header-home {
+        padding: 16px;
+    }
+
+    .content-home {
+        padding-top: 40px;
+    }
+
+    .cloud-content {
+        padding: 0 16px;
+    }
+
+    .cloud-content>img {
+        width: 150px;
+    }
+
+    .logo-content {
+        margin-top: 20px;
+    }
+
+    .logo-content>span {
+        font-size: 60px;
+        height: 90px !important;
+    }
+
+    .dex-content {
+        left: 16px;
+    }
+
+    .dex-content>img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .cactus-content {
+        right: 0;
+        top: -98px;
+        gap: 0;
+    }
+
+    .cactus-content>img {
+        width: 100px !important;
+        height: 100px !important;
+        margin-right: -16px;
     }
 }

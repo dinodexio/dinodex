@@ -1,4 +1,3 @@
-import { PassDataResult } from "@/components/token/transaction-panel";
 import {
   ADDLIQUIDITY,
   CREATEPOOL,
@@ -9,7 +8,6 @@ import {
   TOKEN_PRICES,
   TRANSFER,
 } from "@/constants";
-import { Token, Tokens } from "@/tokens";
 import BigNumber from "bignumber.js";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -33,7 +31,8 @@ export function formatLargeNumber(number: number) {
 
 export function formatterInteger(number: number) {
   // Chuyển số thành chuỗi
-  let numberString = number.toString();
+  if (!number) return EMPTY_DATA;
+  let numberString = number?.toString();
 
   // Tách phần nguyên và phần thập phân (nếu có)
   let parts = numberString.split(".");
@@ -45,7 +44,10 @@ export function formatterInteger(number: number) {
   return parts.join(".");
 }
 
-export function formatNumber(num: number | string): string {
+export function formatNumber(
+  num: number | string,
+  isPrice: boolean = false,
+): string {
   // Convert the input to a number if it's a string
   const value = typeof num === "string" ? parseFloat(num) : num;
 
@@ -59,9 +61,22 @@ export function formatNumber(num: number | string): string {
     return (value / 1e6).toFixed(2) + "M";
   } else if (value >= 1e3) {
     return (value / 1e3).toFixed(2) + "K";
+  } else if (value > 0 && value < 1e-2) {
+    return "< 0.01";
   } else {
-    return value.toString();
+    return value.toFixed(2).toString();
   }
+}
+
+export function formatPersion(num: number | string) {
+  // Convert the input to a number if it's a string
+  const value = typeof num === "string" ? parseFloat(num) : num;
+
+  if (isNaN(value)) {
+    return EMPTY_DATA;
+  }
+
+  return value * 1e9 + "%";
 }
 
 export function truncateAddress(
@@ -115,48 +130,6 @@ export const dataTokenDefault = {
   amount: 0,
 };
 
-// Step 1: Create a function to retrieve token data by ID
-export const getTokenData = (
-  tokenId: string,
-  tokens: Tokens,
-): Token | undefined => {
-  return tokens[tokenId];
-};
-
-// Step 2: Create a function to construct token details with amount
-export const createTokenDetails = (
-  tokenId: string,
-  amount: string,
-  tokens: Tokens,
-): PassDataResult | null => {
-  const token = getTokenData(tokenId, tokens);
-
-  if (!token) return dataTokenDefault;
-  return {
-    logo: token.logo || "",
-    name: token.name || "Empty",
-    symbol: token.ticker,
-    amount: BigNumber(amount)
-      .dividedBy(10 ** 2)
-      .toNumber(), // Convert amount to a number
-  };
-};
-// Step 3: Main function to pass new data
-export const passDataTokenByFields = (
-  argsFields: string[], // Array of token IDs and amounts
-  tokens: Tokens,
-): { first: PassDataResult | null; second: PassDataResult | null } => {
-  if (argsFields.length === 0)
-    return { first: dataTokenDefault, second: dataTokenDefault };
-  const firstToken = createTokenDetails(argsFields[0], argsFields[2], tokens);
-  const secondToken = createTokenDetails(argsFields[1], argsFields[3], tokens);
-
-  return {
-    first: firstToken,
-    second: secondToken,
-  };
-};
-
 export function formatPriceUSD(amount: number | string, ticket: string) {
   switch (ticket) {
     case "BTC":
@@ -192,10 +165,83 @@ export function formatPriceUSD(amount: number | string, ticket: string) {
   }
 }
 
-export function truncateString(str: string, maxLength: number): string {
-  if (str.length > maxLength) {
+export function truncateString(str: string = "", maxLength: number): string {
+  if (str && str?.length > maxLength) {
     return str.slice(0, maxLength) + "...";
   } else {
     return str;
   }
+}
+
+export function convertSmallNumberToPercent(num: number | string) {
+  // Convert the input to a number if it's a string
+  const value = typeof num === "string" ? parseFloat(num) : num;
+  if (isNaN(value)) {
+    return `${EMPTY_DATA} %`;
+  }
+  // Convert the number to a decimal format with higher precision
+  const decimalValue = value * 100;
+
+  // Check if the result is extremely small
+  if (decimalValue < 0.01) {
+    return "< 0.01 %";
+  }
+  // Return the formatted result in percentage notation
+  return decimalValue.toExponential(5) + " %";
+}
+
+export function formatPercentage(input: string | number): string {
+  // Convert BigNumber to a number or parse it if input is a string
+  let value: number;
+
+  if (BigNumber.isBigNumber(input)) {
+    value = input.toNumber();
+  } else if (typeof input === "string") {
+    value = parseFloat(input);
+  } else {
+    value = input;
+  }
+
+  // Check if the parsed value is a valid non-negative number
+  if (isNaN(value) || value === 0) {
+    return "0";
+  }
+
+  // Format values less than 0.01% as "< 0.01%"
+  if (value < 0.01) {
+    return "<0.01";
+  }
+  // Check if the value is an integer
+  if (Number.isInteger(value)) {
+    return value.toString();
+  }
+  // Format and return as percentage
+  return value.toFixed(2);
+}
+
+export const extractTabFromPathname = (path: any) => {
+  if (!path) return "";
+  const parts = path.split("/");
+  // Find a matching value for tokens, pools, or transactions
+  return (
+    parts.find((part: any) =>
+      ["tokens", "pools", "transactions"].includes(part),
+    ) || "tokens"
+  );
+};
+
+export function addPrecision(value: string, precision: number) {
+  // return new BigNumber(value).times(10 ** precision).toFixed(0);
+  // return Math.floor(Number(value)*10**(precision - 2)).toString() + "00";
+  return new BigNumber(value).times(10 ** precision).toFixed(0);
+}
+
+export function removePrecision(
+  value: string,
+  precision: number,
+  decimalPlaces: number = 5,
+) {
+  return decimalPlaces
+    ? new BigNumber(value).div(10 ** precision).toFixed(decimalPlaces)
+    : new BigNumber(value).div(10 ** precision);
 }

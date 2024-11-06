@@ -10,7 +10,7 @@ export default function NotFound() {
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push("/");
-    }, 5000);
+    }, 4000);
     return () => clearTimeout(timer);
   }, [router]);
 

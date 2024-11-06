@@ -15,8 +15,8 @@ import BigNumber from "bignumber.js";
 import { LPTokenId, PoolKey, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
 import {
-  useBalancesStore,
-  useObserveBalance,
+  useBalance,
+  useObserveBalancePool,
   useObserveTotalSupply,
 } from "@/lib/stores/balances";
 import { precision, removeTrailingZeroes } from "@/components/ui/balance";
@@ -95,9 +95,9 @@ export function RemoveLiquidityForm() {
   const pool = useObservePool(poolKey);
 
   // observe balances of the pool & the connected wallet
-  const tokenAReserve = useObserveBalance(fields.tokenA_token, poolKey);
-  const tokenBReserve = useObserveBalance(fields.tokenB_token, poolKey);
-  const userTokenLpBalance = useObserveBalance(
+  const tokenAReserve = useObserveBalancePool(fields.tokenA_token, poolKey);
+  const tokenBReserve = useObserveBalancePool(fields.tokenB_token, poolKey);
+  const userTokenLpBalance = useBalance(
     LPTokenId.fromTokenPair(tokenPair).toString(),
     wallet,
   );

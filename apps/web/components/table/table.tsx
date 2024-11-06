@@ -68,7 +68,7 @@ export function Table({
         {column.map((col) => (
           <td
             key={col.id}
-            className={`${styles["table-td"]}} ${styles[`table-td-${col.key}`]}`}
+            className={`${styles["table-td"]} ${styles[`table-td-${col.key}`]}`}
             data-hide-swap={col.hideSwap || false}
           >
             <div>{col.render(record)}</div>

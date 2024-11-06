@@ -1,14 +1,17 @@
 "use client";
+import { EMPTY_DATA } from "@/constants";
 import { tokens } from "@/tokens";
 import BigNumber from "bignumber.js";
 import { useMemo } from "react";
+import { Skeleton } from "./skeleton";
 
-export const precision = 2;
+export const precision = 9;
 
 export interface BalanceProps {
   balance?: string;
   tokenId?: string;
   type?: "number" | "default"; // Added 'type' parameter to the interface
+  loading?: boolean;
 }
 
 export function removeTrailingZeroes(balance: string) {
@@ -22,6 +25,17 @@ export function removeTrailingZeroes(balance: string) {
 
   return leftovers;
 }
+
+export function formatBigNumber(num: number | string) {
+  // Convert the input to a number if it's a string
+  const value = typeof num === "string" ? parseFloat(num) : num;
+
+  if (isNaN(value)) {
+    return EMPTY_DATA;
+  }
+  return BigNumber(num).dividedBy(10 ** precision);
+}
+
 
 export function Balance({ balance, tokenId, type = "default" }: BalanceProps) {
   const formattedBalance = useMemo(() => {

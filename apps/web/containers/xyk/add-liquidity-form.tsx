@@ -14,8 +14,8 @@ import BigNumber from "bignumber.js";
 import { LPTokenId, PoolKey, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
 import {
-  useBalancesStore,
-  useObserveBalance,
+  useBalance,
+  useObserveBalancePool,
   useObserveTotalSupply,
 } from "@/lib/stores/balances";
 import { precision, removeTrailingZeroes } from "@/components/ui/balance";
@@ -24,11 +24,13 @@ import { usePoolKey } from "@/lib/xyk/usePoolKey";
 import { useSpotPrice } from "@/lib/xyk/useSpotPrice";
 
 export function addPrecision(value: string) {
+  // return new BigNumber(value).times(10 ** precision).toFixed(0);
+  // return Math.floor(Number(value)*10**(precision - 2)).toString() + "00";
   return new BigNumber(value).times(10 ** precision).toFixed(0);
 }
 
-export function removePrecision(value: string) {
-  return new BigNumber(value).div(10 ** precision).toFixed(2);
+export function removePrecision(value: string, decimalPlaces: number = 5) {
+  return new BigNumber(value).div(10 ** precision).toFixed(decimalPlaces);
 }
 
 export function AddLiquidityForm() {
@@ -102,10 +104,10 @@ export function AddLiquidityForm() {
   const pool = useObservePool(poolKey);
 
   // observe balances of the pool & the connected wallet
-  const tokenAReserve = useObserveBalance(fields.tokenA_token, poolKey);
-  const tokenBReserve = useObserveBalance(fields.tokenB_token, poolKey);
-  const userTokenABalance = useObserveBalance(fields.tokenA_token, wallet);
-  const userTokenBBalance = useObserveBalance(fields.tokenB_token, wallet);
+  const tokenAReserve = useObserveBalancePool(fields.tokenA_token, poolKey);
+  const tokenBReserve = useObserveBalancePool(fields.tokenB_token, poolKey);
+  const userTokenABalance = useBalance(fields.tokenA_token, wallet);
+  const userTokenBBalance = useBalance(fields.tokenB_token, wallet);
 
   useEffect(() => {
     if (!userTokenABalance || !userTokenBBalance) return;

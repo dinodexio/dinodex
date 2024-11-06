@@ -4,12 +4,15 @@ import { DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { tokens } from "@/tokens";
 import stylesButton from "../../css/button.module.css";
+import { precision } from "@/components/ui/balance";
+import BigNumber from "bignumber.js";
 
 export interface layoutConfirmProps {
   onClickConFirm: () => void;
   valuePer?: any;
   tokenParams?: any;
   valueTokenPool?: any;
+  handleClosePool?: () => void;
 }
 
 export function LayoutConfirm({
@@ -17,6 +20,7 @@ export function LayoutConfirm({
   valuePer,
   tokenParams,
   valueTokenPool,
+  handleClosePool
 }: layoutConfirmProps) {
   const firstTokenValue = tokenParams?.tokenA?.value || 0;
   const secondTokenValue = tokenParams?.tokenB?.value || 0;
@@ -29,7 +33,9 @@ export function LayoutConfirm({
         <span className="text-[20px] font-[400] text-black sm:text-[20px] lg:text-[24px] xl:text-[24px]">
           You will revieve
         </span>
-        <DialogClose className="absolute right-[-6px] top-[-10px]">
+        <DialogClose className="absolute right-[-6px] top-[-10px]" onClick={() => {
+          handleClosePool && handleClosePool()
+        }}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="18"
@@ -51,7 +57,7 @@ export function LayoutConfirm({
           <div className="flex w-full flex-col gap-[15px] ">
             <div className="flex w-full items-center justify-between ">
               <span className="text-[24px] font-[600] text-textBlack sm:text-[24px] lg:text-[28px] xl:text-[28px]">
-                {Number(valueTokenPool?.tokenA_amount) / 100}
+                {BigNumber(valueTokenPool?.tokenA_amount || 0).dividedBy(10 ** precision).toString()}
               </span>
               <div className="flex items-center gap-[10px]">
                 <Image
@@ -73,7 +79,7 @@ export function LayoutConfirm({
             </div>
             <div className="flex w-full items-center justify-between ">
               <span className="text-[24px] font-[600] text-textBlack sm:text-[24px] lg:text-[28px] xl:text-[28px]">
-                {Number(valueTokenPool?.tokenB_amount) / 100}
+                {BigNumber(valueTokenPool?.tokenB_amount || 0).dividedBy(10 ** precision).toString()}
               </span>
               <div className="flex items-center gap-[10px]">
                 <Image

@@ -1,7 +1,7 @@
 "use client";
 
 // import { SwapForm } from "@/containers/xyk/swap-form";
-import { InfoLayout } from "@/components/detail/info-layout";
+import { InfoLayout } from "@/components/detail/info-token-layout";
 import { ChartToken } from "@/components/token/chart-token";
 
 export default function Page({ params }: { params: { name: string } }) {

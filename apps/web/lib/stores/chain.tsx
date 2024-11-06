@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { useEffect, useState } from "react";
+import { useWalletStore } from "./wallet";
 
 export interface ComputedTransactionJSON {
   argsFields: string[];
@@ -82,14 +83,15 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
         state.loading = true;
       });
       // https://graphql.dinodex.io/graphql
-      console.log("process.env.NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL", process.env.NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL}/graphql`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: `
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PROTOKIT_GRAPHQL_URL}/graphql`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: `
             query GetBlock {
               block {
                 txs {
@@ -117,8 +119,9 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
               }
             }
           `,
-        }),
-      });
+          }),
+        },
+      );
 
       const { data } = (await response.json()) as BlockQueryResponse;
       set((state) => {
@@ -135,14 +138,15 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
   })),
 );
 
-export const tickInterval = 1000;
+export const tickInterval = 3000;
 export const usePollBlockHeight = () => {
   const [tick, setTick] = useState(0);
   const chain = useChainStore();
+  const { wallet } = useWalletStore();
 
   useEffect(() => {
-    chain.loadBlock();
-  }, [tick]);
+    wallet && chain?.loadBlock();
+  }, [tick, wallet]);
 
   useEffect(() => {
     const intervalId = setInterval(
@@ -155,4 +159,3 @@ export const usePollBlockHeight = () => {
     return () => clearInterval(intervalId);
   }, []);
 };
-

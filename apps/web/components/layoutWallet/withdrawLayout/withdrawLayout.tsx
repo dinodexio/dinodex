@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ModalListToken } from "@/components/modalListToken/modalListToken";
 import { useForm } from "react-hook-form";
 import { WithdrawForm } from "./withdraw-form";
 import BigNumber from "bignumber.js";
@@ -11,24 +10,20 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PublicKey } from "o1js";
 import { Form } from "@/components/ui/form";
-import { useWithdraw, useWithdrawalStore } from "@/lib/stores/withdraw";
+import { useWithdraw } from "@/lib/stores/withdraw";
 import { useWalletStore } from "@/lib/stores/wallet";
-import { useObserveBalance } from "@/lib/stores/balances";
+import { useBalance } from "@/lib/stores/balances";
 import { WithdrawConfirm } from "./withdraw-confirm";
 import { TransferWaiting } from "../TransferLayout/transfer-waiting";
+import styles from "../../css/wallet.module.css";
 
 export interface withdrawLayoutProps {
   onClose: () => void;
 }
 
 export function WithdrawLayout({ onClose }: withdrawLayoutProps) {
-  const [token, setToken] = useState({
-    label: "MINA",
-    logo: "/tokens/mina.svg",
-  });
   const [loading, setLoading] = useState(false);
   const walletBalance = useRef("0");
-  const [openModalToken, setOpenModalToken] = useState(false);
   const [statusLayout, setStatusLayout] = useState({
     withdraw: true,
     confirm: false,
@@ -88,7 +83,7 @@ export function WithdrawLayout({ onClose }: withdrawLayoutProps) {
   const withdraw = useWithdraw();
   const fields = form.getValues();
   const wallet = useWalletStore();
-  const balance = useObserveBalance(fields.amount_token, wallet.wallet);
+  const balance = useBalance(fields.amount_token, wallet.wallet);
 
   const handleClose = () => {
     form.reset();
@@ -111,20 +106,6 @@ export function WithdrawLayout({ onClose }: withdrawLayoutProps) {
     ) {
       setStatusLayout(newStatusLayout);
     }
-  };
-
-  const handleOpenSelectToken = () => {
-    setOpenModalToken(true);
-  };
-
-  const handleSetTokenSelected = (newToken: any) => {
-    const inputName = "amount_token";
-    form.setValue(inputName, newToken?.value, {
-      shouldValidate: true,
-      shouldDirty: true,
-      shouldTouch: true,
-    });
-    form.trigger(inputName);
   };
 
   useEffect(() => {
@@ -162,8 +143,7 @@ export function WithdrawLayout({ onClose }: withdrawLayoutProps) {
   return (
     <>
       <div
-        className={`absolute right-[12px] top-[50%] flex translate-y-[-50%] flex-col 
-        gap-[12px] rounded-[16px] border-[2px] bg-bgWhiteColor p-3 `}
+        className={`absolute top-[50%] flex translate-y-[-50%] flex-col rounded-[20px] bg-bgWhiteColor p-3 shadow-popup`}
         style={{
           zIndex: 102,
           width: statusLayout.withdraw ? 310 : statusLayout.confirm ? 325 : 298,
@@ -173,7 +153,7 @@ export function WithdrawLayout({ onClose }: withdrawLayoutProps) {
             : statusLayout.confirm
               ? "18.2px 15.6px 10.4px 15.6px"
               : "18.964px 16.255px",
-          right: statusLayout.withdraw ? 18 : statusLayout.confirm ? 11 : 18,
+          right: statusLayout.withdraw ? 15 : statusLayout.confirm ? 7 : 21,
         }}
       >
         <Form {...form}>
@@ -182,14 +162,13 @@ export function WithdrawLayout({ onClose }: withdrawLayoutProps) {
               <WithdrawForm
                 onClose={handleClose}
                 handleChangeStatusLayout={handleChangeStatusLayout}
-                handleOpenSelectToken={handleOpenSelectToken}
               />
             </>
           )}
           {statusLayout.confirm && (
             <>
               <form onSubmit={form.handleSubmit(onSubmit)}>
-                <WithdrawConfirm onClose={handleClose} loading={loading} />
+                <WithdrawConfirm onClose={handleClose} loading={loading} onSubmit={onSubmit} />
               </form>
             </>
           )}
@@ -204,29 +183,6 @@ export function WithdrawLayout({ onClose }: withdrawLayoutProps) {
           )}
         </Form>
       </div>
-      {openModalToken && (
-        <>
-          <div
-            className="absolute bottom-0 right-0 top-0 h-full w-full rounded-[18px] bg-[rgba(0,0,0,0.4)]"
-            style={{ zIndex: 103 }}
-            onClick={() => setOpenModalToken(false)}
-          />
-          <div
-            className="absolute right-[3px] top-[50%] w-[344px] translate-y-[-50%] rounded-[12px] bg-bgWhiteColor p-4"
-            style={{ zIndex: 104 }}
-          >
-            <ModalListToken
-              {...form.register("amount_token")}
-              tokenSelected={token}
-              onClickToken={(token) => {
-                handleSetTokenSelected?.(token);
-                setOpenModalToken(false);
-              }}
-              dialogClose={false}
-            />
-          </div>
-        </>
-      )}
     </>
   );
 }

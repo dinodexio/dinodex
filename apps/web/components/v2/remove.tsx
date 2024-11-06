@@ -1,8 +1,7 @@
 "use client";
-import { Header } from "../header";
 import { Toaster } from "@/components/ui/toaster";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,23 +12,27 @@ import { tokens } from "@/tokens";
 import { Button } from "../ui/button";
 import { useObservePool, useRemoveLiquidity } from "@/lib/stores/xyk";
 import { usePoolKey } from "@/lib/xyk/usePoolKey";
-import { useObserveBalance, useObservePooled } from "@/lib/stores/balances";
-import { useWalletStore } from "@/lib/stores/wallet";
+import { useObserveBalancePool, useObservePooled } from "@/lib/stores/balances";
 import { LPTokenId, TokenPair } from "chain";
 import { useSpotPrice } from "@/lib/xyk/useSpotPrice";
 import BigNumber from "bignumber.js";
 import { Balance, precision, removeTrailingZeroes } from "../ui/balance";
 import { notFound, useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { Card, CardHeader } from "../ui/card";
 import Link from "next/link";
-import { ModalSupplyComfirm } from "../modalSupplyConfirm/modalSupplyConfirm";
 import { ModalRemovePool } from "../modalRemovePool/modalRemovePool";
 import { PoolPosition } from "./position";
 import { Balances } from "../wallet/wallet";
 import { TokenId } from "@proto-kit/library";
-import stylesButton from '../css/button.module.css'
-import styles from '../css/pool.module.css'
+import stylesButton from "../css/button.module.css";
+import styles from "../css/pool.module.css";
+import stylesModal from "../css/modal.module.css";
+import { Footer } from "../footer";
+import dynamic from "next/dynamic";
+const Header = dynamic(() => import("@/components/header"), {
+  ssr: false,
+});
+
 export interface PoolRemoveProps {
   walletElement?: JSX.Element;
   tokenParams?: any;
@@ -43,64 +46,32 @@ const valueDeposit = [
   { value: 100, label: "Max" },
 ];
 
-const addPrecision = (value: string) =>
-  new BigNumber(value).times(10 ** precision).toString();
-
-const removePrecision = (value: string) =>
-  new BigNumber(value).div(10 ** precision).toString();
-
-export function PoolRemove({
-  tokenParams,
-  balances,
-}: PoolRemoveProps) {
+export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const removeLiquidity = useRemoveLiquidity();
-  const { wallet } = useWalletStore();
-
-  const balanceLPRef = useRef("0");
 
   const [valueRange, setValueRange] = useState(0);
 
-  // const [valueTokenPool, setValueTokenPool] = useState({
-  //   tokenA_amount: null,
-  //   tokenB_amount: null,
-  // });
-
-  const [approve, setApprove] = useState({
-    approve: false,
-    loading: false,
-  });
-
-  const { poolKey, tokenPair } = usePoolKey(
+  const { poolKey } = usePoolKey(
     tokenParams?.tokenA?.value,
     tokenParams?.tokenB?.value,
   );
 
   const pool = useObservePool(poolKey);
 
-  const clickApprove = useCallback(() => {
-    if (approve.approve) return;
-    setApprove((prev) => ({
-      ...prev,
-      loading: true,
-    }));
-
-    setTimeout(() => {
-      setApprove((prev) => ({
-        ...prev,
-        approve: true,
-        loading: false,
-      }));
-    }, 1000);
-  }, [approve.approve]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValueRange(Number(e.target.value));
   };
 
-  const tokenAReserve = useObserveBalance(tokenParams?.tokenA?.value, poolKey);
-  const tokenBReserve = useObserveBalance(tokenParams?.tokenB?.value, poolKey);
+  const tokenAReserve = useObserveBalancePool(
+    tokenParams?.tokenA?.value,
+    poolKey,
+  );
+  const tokenBReserve = useObserveBalancePool(
+    tokenParams?.tokenB?.value,
+    poolKey,
+  );
 
   const tokenB_amount = new BigNumber("1").dividedBy(
     useSpotPrice(tokenAReserve, tokenBReserve),
@@ -179,13 +150,14 @@ export function PoolRemove({
             ? Math.floor(Number(tokenA_amount.toString())).toString()
             : Math.floor(Number(tokenB_amount.toString())).toString(),
         );
+        return true;
       }
+    } catch (error: any) {
+      console.log("error", error);
+      return error;
     } finally {
       setLoading(false);
     }
-    // Number(valueTokenPool?.tokenA_amount) / 100;
-    // resetDataPoolCreate();
-    // router.push("/pool");
   };
 
   useEffect(() => {
@@ -202,7 +174,10 @@ export function PoolRemove({
           <div className="flex basis-11/12 flex-col 2xl:basis-10/12">
             <Header />
             <div className="mx-auto mt-[40px] flex w-full max-w-[1065px] flex-col items-center justify-center gap-[25px] sm:mt-[40px] lg:mt-[100px] xl:mt-[113.74px]">
-              <Card className="mx-auto flex w-full max-w-[605px] flex-col gap-[10px] rounded-[24px] border-none border-textBlack bg-transparent px-0 py-[0] sm:gap-[10px] sm:border-none sm:px-0 sm:py-0 lg:gap-[15px] lg:border-solid lg:px-[15px] lg:py-[25px] xl:gap-[15px] xl:border-solid xl:px-[15px] xl:py-[25px]">
+              <Card
+                className={`mx-auto flex w-full bg-bgWhiteColor max-w-[605px] flex-col gap-[10px] rounded-[24px] border-none px-[8px] py-[8px] sm:gap-[10px] sm:px-[8px] sm:py-[8px] lg:gap-[15px] lg:px-[15px] lg:py-[25px] xl:gap-[15px] xl:px-[15px] xl:py-[25px] ${styles["pool-container"]}`}
+                style={{boxShadow: "0px 2px 8px 0px rgba(0, 0, 0, 0.25)"}}
+              >
                 <CardHeader className="mb-[10px] flex-row items-center justify-between p-0 px-[10px]">
                   <Link href="/pool">
                     {" "}
@@ -214,7 +189,7 @@ export function PoolRemove({
                     />
                   </Link>
                   <span className="text-[24px] font-[600] text-textBlack">
-                  Remove liquidity
+                    Remove liquidity
                   </span>
                   <Image
                     src="/icon/icon-setting.svg"
@@ -225,24 +200,25 @@ export function PoolRemove({
                 </CardHeader>
                 <div className="flex flex-col gap-[15px] p-0">
                   <div
-                    className="rounded-[12px] border border-textBlack px-5 py-6"
+                    className="rounded-[12px] border-none px-5 py-6 shadow-content"
                     style={{ background: "rgba(255, 96, 59, 0.25)" }}
                   >
                     <span
                       className="text-[16px] font-[400] text-textBlack sm:text-[16px] lg:text-[24px] xl:text-[24px]"
                       style={{ lineHeight: "normal" }}
                     >
-                      <strong className="font-[600]">Tip:</strong>Removing pool tokens 
-                      converts your position back into underlying 
-                      tokens at the current rate, proportional to your share of the pool. 
-                      Accrued fees are included in the amounts you receive.
+                      <strong className="font-[600]">Tip:</strong>Removing pool
+                      tokens converts your position back into underlying tokens
+                      at the current rate, proportional to your share of the
+                      pool. Accrued fees are included in the amounts you
+                      receive.
                     </span>
                   </div>
                 </div>
-                <div className="flex w-full flex-col items-start gap-[30px] rounded-[20px] border border-textBlack px-[20px] pb-[20px] pt-[30px]">
+                <div className="flex w-full flex-col items-start gap-[30px] rounded-[20px] border-none shadow-content px-[20px] pb-[20px] pt-[30px]">
                   <div className="flex w-full items-center justify-between">
                     <span className="text-[18px] font-[600] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[20px]">
-                    Withdraw Amounts
+                      Withdraw Amounts
                     </span>
                     {/* <span className="text-[18px] font-[600] text-borderOrColor sm:text-[18px] lg:text-[20px] xl:text-[20px]">
                       Detailed
@@ -258,14 +234,14 @@ export function PoolRemove({
                       max={100}
                       value={valueRange}
                       onChange={handleChange}
-                      className={styles['slider']}
+                      className={styles["slider"]}
                     />
                   </div>
                   <div className="mt-[-10px] flex w-full items-center justify-between sm:mt-[-10px] lg:mt-0 xl:mt-0">
                     {valueDeposit?.map((item: any) => {
                       return (
                         <div
-                          className="w-max cursor-pointer rounded-[8px] border border-textBlack px-[19px] py-[10px] text-[20px] font-[600] text-textBlack hover:bg-[#E8E8E8] sm:w-max sm:px-[19px] sm:py-[10px] sm:text-[20px] lg:w-[105px] lg:px-[28px] lg:py-[18px] lg:text-[24px] xl:w-[105px] xl:px-[28px] xl:py-[18px] xl:text-[24px]"
+                          className="w-max cursor-pointer rounded-[8px] border-none shadow-content px-[19px] py-[10px] text-[20px] font-[600] text-textBlack hover:bg-[#E8E8E8] sm:w-max sm:px-[19px] sm:py-[10px] sm:text-[20px] lg:w-[105px] lg:px-[28px] lg:py-[18px] lg:text-[24px] xl:w-[105px] xl:px-[28px] xl:py-[18px] xl:text-[24px]"
                           style={{ transition: "all 0.3s ease" }}
                           onClick={() => setValueRange(item?.value)}
                           key={item.value}
@@ -285,10 +261,12 @@ export function PoolRemove({
                     style={{ transform: "rotate(-90deg)" }}
                   />
                 </div>
-                <div className="flex w-full flex-col items-start gap-[15px] rounded-[20px] border border-textBlack px-[20px] py-[20px]">
+                <div className="flex w-full flex-col items-start gap-[15px] rounded-[20px] border-none shadow-content px-[20px] py-[20px]">
                   <div className="flex w-full items-center justify-between">
                     <span className="text-[16px] font-[600] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                      {Number(valueTokenPool?.tokenA_amount) / 100}
+                      {BigNumber(valueTokenPool?.tokenA_amount || 0)
+                        .dividedBy(10 ** precision)
+                        .toString()}
                     </span>
                     <div className="flex items-center gap-[5px]">
                       <Image
@@ -305,7 +283,9 @@ export function PoolRemove({
                   </div>
                   <div className="flex w-full items-center justify-between">
                     <span className="text-[16px] font-[600] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                      {Number(valueTokenPool?.tokenB_amount) / 100}
+                      {BigNumber(valueTokenPool?.tokenB_amount || 0)
+                        .dividedBy(10 ** precision)
+                        .toString()}
                     </span>
                     <div className="flex items-center gap-[5px]">
                       <Image
@@ -380,7 +360,7 @@ export function PoolRemove({
                         Number(valueTokenPool?.tokenA_amount) / 100 === 0 &&
                         Number(valueTokenPool?.tokenB_amount) / 100 === 0
                       }
-                      className={`${stylesButton['button-swap']} ${stylesButton['btn-supply-remove']} w-full`}
+                      className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]} w-full`}
                       // onClick={handleRemoveLiquidity}
                     >
                       <span>Remove</span>
@@ -396,10 +376,13 @@ export function PoolRemove({
                 />
               </Card>
             </div>
+            <Footer />
           </div>
         </div>
         <DialogOverlay className="bg-[rgba(0,0,0,0.5)]" />
-        <DialogContent className="modal-container modal-pool w-[99%] max-w-[625px] border-none bg-white px-[20px] pb-[20px] pt-[27px] sm:px-[20px] sm:pt-[27px] lg:px-[30px] lg:pt-[35px] xl:px-[30px] xl:pt-[35px]">
+        <DialogContent
+          className={`${stylesModal["modal-container"]} ${stylesModal["modal-pool"]} w-[99%] max-w-[625px] border-none bg-white px-[20px] pb-[20px] pt-[27px] sm:px-[20px] sm:pt-[27px] lg:px-[30px] lg:pt-[35px] xl:px-[30px] xl:pt-[35px]`}
+        >
           <ModalRemovePool
             onConfirm={handleRemoveLiquidity}
             valueTokenPool={valueTokenPool}

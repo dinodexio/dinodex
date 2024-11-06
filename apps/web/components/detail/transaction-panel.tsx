@@ -1,6 +1,7 @@
 import { formatLargeNumber, formatterInteger } from "@/lib/utils";
 import { Table } from "../table/table";
 import Image from "next/image";
+import styles from '../css/table.module.css'
 
 export interface TransactionPanelProps {
     token: object | undefined
@@ -79,7 +80,7 @@ export function TransactionPanel({ token }: TransactionPanelProps) {
             key: 'Type-transaction',
             width: 90,
             render: (data: any) => {
-                return <span className={`${data?.action === 'sell' ? 'text-red' : 'text-green'} text-action`}>{data?.action} </span>
+                return <span className={`${data?.action === 'sell' ? styles['text-red'] : styles['text-green']} ${styles['text-action']}`}>{data?.action} </span>
             }
         },
         {
@@ -98,7 +99,7 @@ export function TransactionPanel({ token }: TransactionPanelProps) {
             width: 145,
             render: (data: any) => {
                 return (
-                    <div className="token-item">
+                    <div className={styles["token-item"]}>
                         <span>{formatterInteger(data?.token?.value)}</span>
                         <Image src={'/' + data?.token?.logo} alt="token" width={20} height={20} />
                         <span>{data?.token?.symbol}</span>

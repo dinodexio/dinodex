@@ -6,9 +6,10 @@ import useClickOutside from "@/hook/useClickOutside";
 import styles from "../css/tokens.module.css";
 export interface FilterSortProps {
   handleSearch: (value: string) => void;
+  type: string;
 }
 
-export function FilterSort({ handleSearch }: FilterSortProps) {
+export function FilterSort({ handleSearch, type }: FilterSortProps) {
   const [openNetWork, setOpenNetWork] = useState<boolean>(false);
   const [openVol, setOpenVol] = useState<boolean>(false);
   const [openInputSearch, setOpenSearch] = useState<boolean>(false);
@@ -41,7 +42,7 @@ export function FilterSort({ handleSearch }: FilterSortProps) {
 
   return (
     <div className={styles["filter-sort-container"]}>
-      <div
+      {/* <div
         className={styles["network-content"]}
         onClick={() => {
           setOpenNetWork(!openNetWork);
@@ -78,61 +79,65 @@ export function FilterSort({ handleSearch }: FilterSortProps) {
             </div>
           ))}
         </div>
-      </div>
-      <div
-        className={styles["network-content"]}
-        ref={refVol}
-        onClick={() => {
-          setOpenVol(!openVol);
-          setOpenNetWork(false);
-        }}
-      >
-        <span className={styles["network-content-menu-item-text"]}>
-          {dataVol.label}
-        </span>
-        <Image
-          width={19}
-          height={20}
-          src="/icon/drop-down-icon.svg"
-          alt="network"
-        />
-        <div
-          className={`${styles["network-content-menu"]} mt-2 ${openVol ? styles["network-content-menu-show"] : ""}`}
-        >
-          {FILTER_VOL.map((item, index) => (
+      </div> */}
+      {type === 'Transactions' ? null : (
+        <>
+          <div
+            className={styles["network-content"]}
+            ref={refVol}
+            onClick={() => {
+              setOpenVol(!openVol);
+              setOpenNetWork(false);
+            }}
+          >
+            <span className={styles["network-content-menu-item-text"]}>
+              {dataVol.label}
+            </span>
+            <Image
+              width={19}
+              height={20}
+              src="/icon/drop-down-icon.svg"
+              alt="network"
+            />
             <div
-              className={styles["network-content-menu-item"]}
-              key={index}
-              onClick={() => handleClickVol(item)}
-              data-network={item.key}
+              className={`${styles["network-content-menu"]} mt-2 ${openVol ? styles["network-content-menu-show"] : ""}`}
             >
-              <span className={styles["network-content-menu-item-text"]}>
-                {item.label}
-              </span>
-              <img
-                src="/icon/tick-icon.svg"
-                alt="network"
-                style={{ display: item.key === dataVol.key ? "block" : "none" }}
-              />
+              {FILTER_VOL.map((item, index) => (
+                <div
+                  className={styles["network-content-menu-item"]}
+                  key={index}
+                  onClick={() => handleClickVol(item)}
+                  data-network={item.key}
+                >
+                  <span className={styles["network-content-menu-item-text"]}>
+                    {item.label}
+                  </span>
+                  <img
+                    src="/icon/tick-icon.svg"
+                    alt="network"
+                    style={{ display: item.key === dataVol.key ? "block" : "none" }}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
-      <div
-        ref={refSearch}
-        className={`${styles["search-token-container"]} ${openInputSearch ? styles["show-input-search"] : null}`}
-        onClick={() => setOpenSearch(true)}
-      >
-        <Image width={24} height={24} src="/icon/btn-search.svg" alt="search" />
-        <input
-          type="text"
-          className={styles["input-search-token"]}
-          placeholder="Search Token"
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleSearch(e.target.value)
-          }
-        />
-      </div>
+          </div>
+          <div
+            ref={refSearch}
+            className={`${styles["search-token-container"]} ${openInputSearch ? styles["show-input-search"] : null}`}
+            onClick={() => setOpenSearch(true)}
+          >
+            <Image width={24} height={24} src="/icon/btn-search.svg" alt="search" />
+            <input
+              type="text"
+              className={styles["input-search-token"]}
+              placeholder={`Search ${type}`}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleSearch(e.target.value)
+              }
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -5,41 +5,82 @@ import { DialogClose } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { tokens } from "@/tokens";
 import { Balance } from "../ui/balance";
+import styles from "../css/modalPreviewPool.module.css";
 import stylesButton from "../css/button.module.css";
 import { LayoutWaitingAndSuccess } from "../modalRemovePool/layoutModal/layoutWaitingAndSuccess";
+import { formatPercentage } from "@/lib/utils";
+import { useFormContext } from "react-hook-form";
 
 export interface modalSupplyComfirmProps {
-  dataPool?: any;
   valuePer?: any;
   loading?: boolean;
-  onClickAddPool?: () => void;
+  onClickAddPool?: any;
   onClosePool?: () => void;
-  tokenParams?: any;
   poolExists?: boolean;
+  shareOfPool?: JSX.Element;
+  lpAmount?: JSX.Element;
+  tokenIn?: string;
+  tokenOut?: string;
+  tokenIn_token?: string;
+  tokenOut_token?: string;
+  tokenInAmount?: string;
+  tokenOutAmount?: string;
 }
 
 export function ModalSupplyComfirm({
+  shareOfPool,
   poolExists,
-  dataPool,
   valuePer,
   loading,
   onClickAddPool,
   onClosePool,
-  tokenParams,
+  lpAmount,
+  tokenIn,
+  tokenOut,
+  tokenIn_token,
+  tokenOut_token,
+  tokenInAmount,
+  tokenOutAmount,
 }: modalSupplyComfirmProps) {
   const [layoutModalRemovePool, setLayoutModalRemovePool] = React.useState({
     confirm: true,
     waiting: false,
     success: false,
+    error: false,
+    message: "",
   });
 
-  const clickConfirm = () => {
+  const form = useFormContext();
+  const fields = form.getValues();
+
+  const clickConfirm = async () => {
     setLayoutModalRemovePool({
       ...layoutModalRemovePool,
       confirm: false,
       waiting: true,
+      success: false,
+      error: false,
     });
-    onClickAddPool && onClickAddPool();
+    const resultConfirm: any = await form.handleSubmit(onClickAddPool)();
+    if (resultConfirm === true) {
+      setLayoutModalRemovePool({
+        ...layoutModalRemovePool,
+        confirm: false,
+        success: true,
+        error: false,
+        waiting: false,
+      });
+    } else {
+      setLayoutModalRemovePool({
+        ...layoutModalRemovePool,
+        success: false,
+        waiting: false,
+        confirm: false,
+        error: true,
+        message:
+          resultConfirm?.message || "Something went wrong. Please try again",
+      });
+    }
   };
 
   const handleClosePool = () => {
@@ -51,25 +92,26 @@ export function ModalSupplyComfirm({
       setLayoutModalRemovePool({
         ...layoutModalRemovePool,
         waiting: loading ? true : false,
-        success: loading ? false : true,
       });
     }
   }, [loading]);
 
   const dataTokenPool = {
-    tokenA_amount: dataPool?.deposit_amount?.first,
-    tokenB_amount: dataPool?.deposit_amount?.second,
+    tokenA_amount: tokenInAmount,
+    tokenB_amount: tokenOutAmount,
   };
-
   return (
     <>
-      {layoutModalRemovePool.confirm ? (
+      {fields.isComfirmed ? (
         <div className="h-max w-full">
           <div className="relative flex items-center justify-center ">
             <span className="text-[20px] font-[400] text-black sm:text-[20px] lg:text-[24px] xl:text-[24px]">
               You will revieve
             </span>
-            <DialogClose className="absolute right-[-6px] top-[-10px]">
+            <DialogClose
+              className="absolute right-[-6px] top-[-10px]"
+              onClick={() => handleClosePool()}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
@@ -88,29 +130,20 @@ export function ModalSupplyComfirm({
           </div>
           <div className="mt-[33px] flex w-full flex-col items-center justify-center gap-[30px]">
             <div className="flex items-center justify-center sm:items-center lg:items-end xl:items-end">
-              <span
-                className="h-[45px] text-[34px] font-[600] text-black sm:text-[34px] lg:text-[52px] xl:text-[52px]"
-                style={{ lineHeight: "52px", letterSpacing: "-1px" }}
-              >
-                {dataPool?.tokenLP_amount}
-              </span>
+              {lpAmount}
               <div
-                className="content-modal-preview-header-token"
+                className={styles["content-modal-preview-header-token"]}
                 style={{ gap: 0 }}
               >
                 <Image
-                  src={
-                    tokens[dataPool?.tokenPool?.first?.value]?.logo as string
-                  }
+                  src={(tokens[tokenIn_token ?? ""]?.logo as string) || ""}
                   width={28}
                   height={28}
                   className="h-5 w-5 sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
                   alt=""
                 />
                 <Image
-                  src={
-                    tokens[dataPool?.tokenPool?.second?.value]?.logo as string
-                  }
+                  src={(tokens[tokenOut_token ?? ""]?.logo as string) || ""}
                   width={28}
                   height={28}
                   className="h-5 w-5 sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
@@ -121,8 +154,7 @@ export function ModalSupplyComfirm({
             </div>
             <div className="flex w-full flex-col items-start justify-center gap-[15px] sm:gap-[15px] lg:gap-[45px] xl:gap-[45px]">
               <span className="text-[18px] font-[600] text-black sm:text-[18px] lg:text-[28px] xl:text-[28px]">
-                {dataPool?.tokenPool?.first?.label}/
-                {dataPool?.tokenPool?.second?.label} Pool Tokens
+                {tokenIn}/{tokenOut} Pool Tokens
               </span>
               <span className="text-[12px] font-[400] italic text-black opacity-[0.5] sm:text-[12px] lg:text-[15px] xl:text-[15px]">
                 Output is estimated. If the price changes by more than 0.5% your
@@ -131,36 +163,30 @@ export function ModalSupplyComfirm({
               <div className="mt-0 flex w-full flex-col items-start justify-center gap-[20px] sm:mt-0 sm:gap-[20px] lg:mt-[-25px] lg:gap-[30px] xl:mt-[-25px] xl:gap-[30px]">
                 <div className="flex w-full items-center justify-between">
                   <span className="text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                    {dataPool?.tokenPool?.first?.label} Deposited
+                    {tokenIn} Deposited
                   </span>
                   <span className="flex items-center gap-1 text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
                     <Image
-                      src={
-                        tokens[dataPool?.tokenPool?.first?.value]
-                          ?.logo as string
-                      }
+                      src={(tokens[tokenIn_token ?? ""]?.logo as string) || ""}
                       width={28}
                       height={28}
                       alt=""
                     />
-                    {dataPool?.deposit_amount?.first}
+                    {tokenInAmount}
                   </span>
                 </div>
                 <div className="flex w-full items-center justify-between">
                   <span className="text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                    {dataPool?.tokenPool?.second?.label} Deposited
+                    {tokenOut} Deposited
                   </span>
                   <span className="flex items-center gap-1 text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
                     <Image
-                      src={
-                        tokens[dataPool?.tokenPool?.second?.value]
-                          ?.logo as string
-                      }
+                      src={(tokens[tokenOut_token ?? ""]?.logo as string) || ""}
                       width={28}
                       height={28}
                       alt=""
                     />
-                    {dataPool?.deposit_amount?.second}
+                    {tokenOutAmount}
                   </span>
                 </div>
                 {poolExists && (
@@ -170,12 +196,10 @@ export function ModalSupplyComfirm({
                     </span>
                     <div className="flex flex-col items-end gap-5  text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
                       <span>
-                        1 {dataPool?.tokenPool?.first?.label} = {valuePer?.perB}{" "}
-                        {dataPool?.tokenPool?.second?.label}
+                        1 {tokenIn} = {valuePer?.perB} {tokenOut}
                       </span>
                       <span>
-                        1 {dataPool?.tokenPool?.second?.label} ={" "}
-                        {valuePer?.perA} {dataPool?.tokenPool?.first?.label}
+                        1 {tokenOut} = {valuePer?.perA} {tokenIn}
                       </span>
                     </div>
                   </div>
@@ -184,15 +208,14 @@ export function ModalSupplyComfirm({
                   <span className="text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
                     Share of Pool
                   </span>
-                  <span className="flex items-center gap-1 text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                    0.00002051%
-                  </span>
+                  {shareOfPool}
                 </div>
               </div>
               <Button
                 loading={loading}
                 className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]} ${stylesButton["btn-approve-new"]} ${stylesButton["btn-prview"]}mt-0 sm:mt-0 lg:mt-[-25px] xl:mt-[-25px]`}
-                onClick={() => clickConfirm()}
+                onClick={() => form.handleSubmit(onClickAddPool)()}
+                type="submit"
               >
                 <span>Confirm</span>
               </Button>
@@ -202,11 +225,20 @@ export function ModalSupplyComfirm({
       ) : (
         <LayoutWaitingAndSuccess
           type="add"
-          statusLayout={layoutModalRemovePool}
-          tokenParams={tokenParams}
-          valueTokenPool={dataTokenPool}
+          statusLayout={{
+            confirm: fields.isComfirmed,
+            waiting: fields.isWaiting,
+            success: fields.isSuccess,
+            error: fields.isError,
+            message: fields.message,
+          }}
           handleClosePool={handleClosePool}
-          dataPool={dataPool}
+          tokenIn={tokenIn}
+          tokenOut={tokenOut}
+          tokenIn_token={tokenIn_token}
+          tokenOut_token={tokenOut_token}
+          tokenInAmount={tokenInAmount}
+          tokenOutAmount={tokenOutAmount}
         />
       )}
     </>

@@ -1,4 +1,4 @@
-import { useObserveBalance } from '@/lib/stores/balances';
+import { useObserveBalancePool } from '@/lib/stores/balances';
 import { getTokenID } from '@/tokens';
 import { TokenId } from '@proto-kit/library';
 import { PoolKey, TokenPair } from 'chain';
@@ -15,8 +15,8 @@ export const useToggleActiveItem = (item: any) => {
     TokenPair.from(TokenId.from(tokenA), TokenId.from(tokenB)),
   ).toBase58();
 
-  const balanceFirst = useObserveBalance(tokenA, poolKey);
-  const balanceSecond = useObserveBalance(tokenB, poolKey);
+  const balanceFirst = useObserveBalancePool(tokenA, poolKey);
+  const balanceSecond = useObserveBalancePool(tokenB, poolKey);
 
   useEffect(() => {
     const balance = {

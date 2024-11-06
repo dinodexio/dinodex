@@ -5,7 +5,7 @@ import {
   removePrecision,
 } from "@/containers/xyk/add-liquidity-form";
 import { PublicKey } from "o1js";
-import { useObserveBalance, useTransfer } from "@/lib/stores/balances";
+import { useBalance, useTransfer } from "@/lib/stores/balances";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { TransferForm } from "./transfer-form";
 import { useForm } from "react-hook-form";
@@ -14,7 +14,6 @@ import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { TransferConfirm } from "./transfer-confirm";
 import { TransferWaiting } from "./transfer-waiting";
-import { ModalListToken } from "@/components/modalListToken/modalListToken";
 
 export interface transferLayoutProps {
   onClose: () => void;
@@ -22,7 +21,6 @@ export interface transferLayoutProps {
 
 export function TransferLayout({ onClose }: transferLayoutProps) {
   const [loading, setLoading] = useState(false);
-  const [openModalToken, setOpenModalToken] = useState(false);
   const walletBalance = useRef("0");
   const [statusLayout, setStatusLayout] = useState({
     transfer: true,
@@ -83,7 +81,7 @@ export function TransferLayout({ onClose }: transferLayoutProps) {
   const transfer = useTransfer();
   const fields = form.getValues();
   const wallet = useWalletStore();
-  const balance = useObserveBalance(fields.amount_token, wallet.wallet);
+  const balance = useBalance(fields.amount_token, wallet.wallet);
 
   const handleChangeStatusLayout = (newStatusLayout: typeof statusLayout) => {
     if (
@@ -93,20 +91,6 @@ export function TransferLayout({ onClose }: transferLayoutProps) {
     ) {
       setStatusLayout(newStatusLayout);
     }
-  };
-
-  const handleOpenSelectToken = () => {
-    setOpenModalToken(true);
-  };
-
-  const handleSetTokenSelected = (newToken: any) => {
-    const inputName = "amount_token";
-    form.setValue(inputName, newToken?.value, {
-      shouldValidate: true,
-      shouldDirty: true,
-      shouldTouch: true,
-    });
-    form.trigger(inputName);
   };
 
   useEffect(() => {
@@ -143,8 +127,7 @@ export function TransferLayout({ onClose }: transferLayoutProps) {
   return (
     <>
       <div
-        className={`absolute top-[50%] flex translate-y-[-50%] flex-col 
-            gap-[12px] rounded-[16px] border-[2px] bg-bgWhiteColor p-3 `}
+        className={`absolute top-[50%] flex translate-y-[-50%] flex-col rounded-[20px] bg-bgWhiteColor p-3 shadow-popup`}
         style={{
           zIndex: 102,
           width: statusLayout.transfer ? 310 : statusLayout.confirm ? 325 : 298,
@@ -154,7 +137,7 @@ export function TransferLayout({ onClose }: transferLayoutProps) {
             : statusLayout.confirm
               ? "18.2px 15.6px 10.4px 15.6px"
               : "18.964px 16.255px",
-          right: statusLayout.transfer ? 18 : statusLayout.confirm ? 11 : 16,
+          right: statusLayout.transfer ? 15 : statusLayout.confirm ? 7 : 21,
         }}
       >
         <Form {...form}>
@@ -162,14 +145,12 @@ export function TransferLayout({ onClose }: transferLayoutProps) {
             <TransferForm
               onClose={onClose}
               handleChangeStatusLayout={handleChangeStatusLayout}
-              handleSetTokenSelected={handleSetTokenSelected}
-              handleOpenSelectToken={handleOpenSelectToken}
             />
           )}
           {statusLayout.confirm && (
             <>
               <form onSubmit={form.handleSubmit(onSubmit)}>
-                <TransferConfirm onClose={onClose} loading={loading} />
+                <TransferConfirm onClose={onClose} loading={loading} onSubmit={onSubmit}  />
               </form>
             </>
           )}
@@ -185,7 +166,7 @@ export function TransferLayout({ onClose }: transferLayoutProps) {
         </Form>
       </div>
 
-      {openModalToken && (
+      {/* {openModalToken && (
         <>
           <div
             className="absolute bottom-0 right-0 top-0 w-[350px] rounded-[18px] bg-[rgba(0,0,0,0.4)]"
@@ -207,7 +188,7 @@ export function TransferLayout({ onClose }: transferLayoutProps) {
             />
           </div>
         </>
-      )}
+      )} */}
     </>
   );
 }

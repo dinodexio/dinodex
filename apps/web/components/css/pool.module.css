@@ -465,13 +465,13 @@
 .pool-item {
     padding: 15px 20px;
     background: transparent;
-    border: 1px solid var(--black-text-color);
     border-radius: 12px;
     gap: 10px;
     cursor: pointer;
     margin-bottom: 12px;
     height: 55px;
     transition: height 0.3s ease;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
 }
 
 .pool-item-active {
@@ -566,15 +566,15 @@
     cursor: pointer;
 }
 
-.modal-pool{
+.modal-pool {
     border-radius: 27px;
 }
 
-.modal-pool:has(.modal-waiting){
+.modal-pool:has(.modal-waiting) {
     max-width: 550px;
 }
 
-.loading-waiting{
+.loading-waiting {
     animation: spin 1s linear infinite;
 }
 
@@ -606,9 +606,19 @@
     overflow: hidden;
 }
 
-.pool-logo-item{
+.pool-logo-item {
     max-width: 76px !important;
     height: 76px !important;
+}
+
+@media (min-width: 800px) and (max-width: 1367px) {
+    .pool-container {
+        width: min(100%, 600px);
+    }
+
+    .tip-text {
+        font-size: 20px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -691,7 +701,7 @@
     }
 
     .pool-item-active {
-        height: 245px;
+        height: 275px;
     }
 
     .text-or {
@@ -699,12 +709,17 @@
         font-size: 14px;
     }
 
-    .modal-pool{
+    .modal-pool {
         border-radius: 12px;
     }
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }

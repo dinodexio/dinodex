@@ -1,5 +1,5 @@
 export interface USDBalanceProps {
-  balance?: string;
+  balance?: string | number;
   className?: string;
   type?: "default" | "USD";
 }

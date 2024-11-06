@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import "../style.css";
 import styles from "../css/swap.module.css";
+import stylesModal from "../css/modal.module.css";
 import stylesButton from "../css/button.module.css";
 import { SLIPPAGE } from "@/constants";
 import Image from "next/image";
@@ -19,27 +19,48 @@ import {
 import { Button } from "../ui/button";
 import { generatePools, pools, tokens } from "@/tokens";
 import { useWalletStore } from "@/lib/stores/wallet";
-import { useBalancesStore, useObserveBalance } from "@/lib/stores/balances";
-import { dijkstra, PoolKey, prepareGraph, TokenPair } from "chain";
+import { useBalance, useBalancesStore, useObserveBalancePool } from "@/lib/stores/balances";
+import { client, dijkstra, PoolKey, prepareGraph, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
-import { useObservePool, useSellPath, } from "@/lib/stores/xyk";
+import { useObservePool, useSellPath } from "@/lib/stores/xyk";
 import { Balance } from "../ui/balance";
 import { Collapsible, CollapsibleContent } from "../ui/collapsible";
+import { USDBalance } from "../ui/usd-balance";
+import { cn } from "@/lib/utils";
+import useClickOutside from "@/hook/useClickOutside";
 
 export interface SwapProps {
   token: any;
   type: string;
 }
 
-const INIT_SLIPPPAGE = 0.5;
+// Define interfaces for the structures used in state
+interface TokenDetails {
+  name: string | null;
+  symbol: string | null;
+  logo: string | null;
+  value: string | undefined;
+}
+
+interface TokenSwapState {
+  tokenIn: TokenDetails;
+  tokenOut: TokenDetails;
+  route: string[];
+}
+
+interface ValueInputSwapState {
+  tokenIn: string | null;
+  tokenOut: string | null;
+}
+
+const INIT_SLIPPAGE = 0.5;
 
 // const pools = generatePools();
 
 export function Swap({ token, type }: SwapProps) {
   const [loading, setLoading] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const walletBalance = useRef("0");
-  const [tokenSwap, setTokenSwap] = useState<any>({
+  const [tokenSwap, setTokenSwap] = useState<TokenSwapState>({
     tokenIn: {
       name: null,
       symbol: null,
@@ -57,24 +78,26 @@ export function Swap({ token, type }: SwapProps) {
 
   // const {pools} = useXYKStore();
 
-  const [valueInputSwap, setValueInputSwap] = useState<any>({
+  const [valueInputSwap, setValueInputSwap] = useState<ValueInputSwapState>({
     tokenIn: null,
     tokenOut: null,
   });
 
-  const [slippage, setSlippage] = useState<number>(INIT_SLIPPPAGE);
+  const [slippage, setSlippage] = useState<number>(INIT_SLIPPAGE);
+
+  const [inputSlippage, setInputSlippage] = useState<string>("");
 
   const [typeOpenModal, setTypeOpenModal] = useState<string>("tokenIn");
 
+  const [openSetting, setOpenSetting] = useState(false);
+  const [valueSlippage, setValueSlippage] = useState<any>(1.01);
+  const [valueTD, setValueTD] = useState<any>(30);
+
+  const settingRef= useClickOutside<HTMLDivElement>(() => {
+    setOpenSetting(false)
+  })
+
   const renderButtonSwap = useMemo(() => {
-    // console.log(
-    //   "walletBalance",
-    //   walletBalance.current,
-    //   valueInputSwap.tokenIn,
-    //   new BigNumber(valueInputSwap.tokenIn).lte(
-    //     removePrecision(walletBalance.current),
-    //   ),
-    // );
     let text = "Swap";
     let isDisabled = false;
 
@@ -120,11 +143,12 @@ export function Swap({ token, type }: SwapProps) {
   ]);
 
   const wallet = useWalletStore();
-  const balance = useObserveBalance(tokenSwap.tokenIn?.value, wallet.wallet);
-  const balanceOut = useObserveBalance(
+  const balance = useBalance(tokenSwap.tokenIn?.value, wallet.wallet);
+  const balanceOut = useBalance(
     tokenSwap.tokenOut?.value,
     wallet.wallet,
   );
+
   const handleChangeSlippage = (valueSlippage: number) => {
     setSlippage(valueSlippage);
   };
@@ -145,8 +169,8 @@ export function Swap({ token, type }: SwapProps) {
     ).toBase58();
 
     const pool = useObservePool(poolKey);
-    const balanceA = useObserveBalance(tokenA, poolKey);
-    const balanceB = useObserveBalance(tokenB, poolKey);
+    const balanceA = useObserveBalancePool(tokenA, poolKey);
+    const balanceB = useObserveBalancePool(tokenB, poolKey);
 
     return {
       tokenA,
@@ -168,8 +192,28 @@ export function Swap({ token, type }: SwapProps) {
   }, [tokenSwap.tokenIn, tokenSwap.tokenOut]);
 
   const pool = useObservePool(poolKey ?? "0");
-  const tokenAReserve = useObserveBalance(tokenSwap.tokenIn.value, poolKey);
-  const tokenBReserve = useObserveBalance(tokenSwap.tokenOut.value, poolKey);
+  // const tokenAReserve = useObserveBalance(tokenSwap.tokenIn.value, poolKey);
+  // const tokenBReserve = useObserveBalance(tokenSwap.tokenOut.value, poolKey);
+
+  const handleSelectedPool = (token: any) => {
+    const tmpToken = {
+      ...token,
+      name: token?.label,
+      symbol: token?.label,
+      logo: tokens[token?.value]?.logo,
+    };
+    const newTokenSwap = { ...tokenSwap, [typeOpenModal]: tmpToken }
+    setTokenSwap(newTokenSwap);
+
+    // TODO after api pools then remove code
+    if (newTokenSwap.tokenIn.value && newTokenSwap.tokenOut.value) {
+      const poolKey = PoolKey.fromTokenPair(
+        TokenPair.from(TokenId.from(newTokenSwap.tokenIn.value), TokenId.from(newTokenSwap.tokenOut.value)),
+      ).toBase58();
+      balances.loadBalance(client, newTokenSwap.tokenIn.value, poolKey)
+      balances.loadBalance(client, newTokenSwap.tokenOut.value, poolKey)
+    }
+  }
 
   useEffect(() => {
     if (!tokenSwap.tokenIn.value || !tokenSwap.tokenOut.value || pool?.loading)
@@ -196,7 +240,6 @@ export function Swap({ token, type }: SwapProps) {
           ? [tokenSwap.tokenIn.value, ...(distance?.path ?? [])]
           : [];
 
-        console.log("route", route, distance?.path);
         setTokenSwap({
           ...tokenSwap,
           route: route,
@@ -215,8 +258,8 @@ export function Swap({ token, type }: SwapProps) {
   }, [balance]);
 
   const balances = useBalancesStore();
-
   useEffect(() => {
+
     if (
       !tokenSwap.route.length ||
       valueInputSwap.tokenIn === "0" ||
@@ -239,7 +282,6 @@ export function Swap({ token, type }: SwapProps) {
       ).toBase58();
       const tokenInReserve = balances.balances[poolKey]?.[tokenIn];
       const tokenOutReserve = balances.balances[poolKey]?.[tokenOut];
-
       if (
         !tokenOutReserve ||
         !tokenInReserve ||
@@ -250,15 +292,14 @@ export function Swap({ token, type }: SwapProps) {
 
       // calculateAmountOut
 
-      const intermediateAmountOut = new BigNumber(addPrecision(amountIn))
+      const intermediateAmountOut = new BigNumber(addPrecision(amountIn || "0"))
         .multipliedBy(tokenOutReserve)
-        .div(new BigNumber(tokenInReserve).plus(addPrecision(amountIn)));
+        .div(new BigNumber(tokenInReserve).plus(addPrecision(amountIn || "0")));
 
       // console.log(
       //   "intermediateAmountOut",
       //   removePrecision(intermediateAmountOut.toFixed(2)),
       // );
-
       const amountOutWithoutFee = intermediateAmountOut.minus(
         intermediateAmountOut.multipliedBy(3).dividedBy(100000),
       );
@@ -266,19 +307,16 @@ export function Swap({ token, type }: SwapProps) {
       amountOut = amountOutWithoutFee.toFixed(2);
       amountIn = removePrecision(amountOut);
     });
-
     if (new BigNumber(amountOut).isNaN()) return;
     setValueInputSwap({
       ...valueInputSwap,
-      tokenOut: removePrecision(
-        `${Number(amountOut)}`,
-      ),
+      tokenOut: removePrecision(`${Number(amountOut)}`),
     });
   }, [
-    tokenSwap.route,
+    JSON.stringify(tokenSwap.route),
     valueInputSwap.tokenIn,
     // valueInputSwap.tokenOut,
-    balances.balances,
+    JSON.stringify(balances.balances),
   ]);
 
   const unitPrice = useMemo(() => {
@@ -311,21 +349,34 @@ export function Swap({ token, type }: SwapProps) {
     try {
       await sellPath(
         tokenSwap.route,
-        addPrecision(valueInputSwap.tokenIn),
+        addPrecision(valueInputSwap.tokenIn || "0"),
         // TODO add slippage
-        addPrecision(`${Number(valueInputSwap.tokenOut) * (100 - slippage) / 100}`),
-        { ...tokenSwap, ...valueInputSwap }
-      );
+        addPrecision(
+          `${(Number(valueInputSwap.tokenOut) * (100 - slippage)) / 100}`,
+        ),
+        { ...tokenSwap, ...valueInputSwap },
+      ).then(() => {
+        setValueInputSwap({
+          ...valueInputSwap,
+          tokenIn: '0',
+        })
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const changeSwap = () => {
-    // setTokenSwap({
-    //   tokenIn: tokenSwap.tokenOut,
-    //   tokenOut: tokenSwap.tokenIn,
-    // });
+    setTokenSwap((prevTokenSwap) => ({
+      ...prevTokenSwap,
+      tokenIn: prevTokenSwap.tokenOut,
+      tokenOut: prevTokenSwap.tokenIn,
+    }));
+
+    setValueInputSwap((prevValueInputSwap) => ({
+      tokenIn: prevValueInputSwap.tokenOut,
+      tokenOut: prevValueInputSwap.tokenIn,
+    }));
   };
   return (
     <Dialog>
@@ -335,7 +386,54 @@ export function Swap({ token, type }: SwapProps) {
           : ""
           }`}
       >
-        <span className={styles["swap-text"]}>Swap</span>
+        <div className="flex items-center justify-between w-full">
+          <span className={styles["swap-text"]}>Swap</span>
+          <div className="flex items-center gap-1 p-[6px] relative">
+            <span className="text-[18px] font-[400] text-textBlack opacity-60">0.5%</span>
+            <Image src='/images/swap/setting-icon.svg' width={30} height={30} alt="" className="cursor-pointer" onClick={() => setOpenSetting(!openSetting)} />
+            <div ref={settingRef} className={`${type === "tokenDetail" ? styles["popup-setting-token"] : ""} ${styles["popup-setting"]} ${openSetting ? styles["popup-setting-open"] : ""}`}>
+              <span className="text-[28px] font-[500] text-textBlack text-center">Swap setting</span>
+              <div className="flex items-center justify-between w-full">
+                <span className="text-[24px] font-[400] text-textBlack">Max Slippage</span>
+                <div className="flex items-center gap-[12px] rounded-[12px] shadow-content bg-[#EBEBEB] pr-[12px]">
+                  <div className="px-3 py-[6px] flex items-center justify-center shadow-content rounded-[12px] bg-bgWhiteColor text-[20px] font-[400] text-textBlack">Auto</div>
+                  <div className="flex items-center gap-[2px]">
+                    <input
+                      className="bg-transparent h-full padding-0 text-[20px] font-[400] text-textBlack opacity-50 border-none outline-none mr-[2px]"
+                      value={valueSlippage}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^\d*\.?\d*$/.test(value) || value === "") {
+                          setValueSlippage(value);
+                        }
+                      }}
+                      style={{ width: `${(valueSlippage.toString().length) * 10 + 2}px`, maxWidth: "40px" }}
+                    />
+                    <span className="text-[20px] font-[400] text-textBlack opacity-50 ">%</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between w-full">
+                <span className="text-[24px] font-[400] text-textBlack">Transaction deadline</span>
+                <div className="flex items-center gap-[2px] px-[18px] py-[6px] rounded-[18.118px] bg-bgWhiteColor" style={{ boxShadow: '0px 1px 4px 0px rgba(26, 26, 26, 0.30) inset' }}>
+                  <input
+                    className="bg-transparent h-full padding-0 text-[20px] font-[500] text-textBlack border-none outline-none"
+                    value={valueTD}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*\.?\d*$/.test(value) || value === "") {
+                        setValueTD(value);
+                      }
+                    }}
+                    style={{ width: `${(valueTD.toString().length) * 10 + 5}px`, maxWidth: "50px" }}
+                  />
+                  <span className="text-[20px] font-[400] text-textBlack opacity-50">Minutes</span>
+                </div>
+              </div>
+              <div className={stylesButton['button-close-setting-swap']} onClick={() => setOpenSetting(false)}>Close</div>
+            </div>
+          </div>
+        </div>
         <div
           className={`${styles["swap-content"]} ${type === "tokenDetail" ? styles["token-swap-content"] : ""
             }`}
@@ -347,7 +445,7 @@ export function Swap({ token, type }: SwapProps) {
             <div
               className={`${styles["swap-content-item"]} ${styles["swap-item-first"]}`}
             >
-              <span className={styles["swap-item-header"]}>You pay</span>
+              <span className={styles["swap-item-header"]}>Sell</span>
               <div className={styles["line-swap-item"]}></div>
               <div className={styles["swap-item-content"]}>
                 <input
@@ -356,7 +454,7 @@ export function Swap({ token, type }: SwapProps) {
                   autoComplete="false"
                   placeholder="0"
                   id="input-first"
-                  value={valueInputSwap.tokenIn}
+                  value={valueInputSwap.tokenIn || ""}
                   onChange={(e) => handleChangeInput("tokenIn", e)}
                 />
                 <DialogTrigger>
@@ -369,15 +467,15 @@ export function Swap({ token, type }: SwapProps) {
                     {tokenSwap.tokenIn.name ? (
                       <>
                         <Image
-                          src={tokenSwap.tokenIn.logo}
+                          src={tokenSwap.tokenIn.logo || ""}
                           alt="logo"
                           width={24}
                           height={24}
                         />
-                        <span>{tokenSwap.tokenIn.symbol}</span>
+                        <span style={{ fontWeight: 400 }}>{tokenSwap.tokenIn.symbol}</span>
                       </>
                     ) : (
-                      <span>Select</span>
+                      <span>Select a token</span>
                     )}
                     <Image
                       src={`/icon/drop-down-icon.svg`}
@@ -387,10 +485,6 @@ export function Swap({ token, type }: SwapProps) {
                     />
                   </div>
                 </DialogTrigger>
-                {/* <USDBalance className="value-price" balance="" /> */}
-                {/* {valueInputSwap.tokenIn && (
-                  <span className="value-price">$932.85</span>
-                )} */}
               </div>
               <div className={styles["swap-item-footer"]}>
                 <span className={styles["swap-item-footer-text"]}>
@@ -399,12 +493,12 @@ export function Swap({ token, type }: SwapProps) {
               </div>
             </div>
             <div className={styles["swap-button"]} onClick={() => changeSwap()}>
-              <img src="/images/swap/swap-button-icon.svg" alt="swap-button" />
+              <Image width={90} height={90} src="/images/swap/swap-button-icon.svg" alt="swap-button" />
             </div>
             <div
-              className={`${styles["swap-content-item"]} ${styles["swap-item-second"]}}`}
+              className={`${styles["swap-content-item"]} ${styles["swap-item-second"]}`}
             >
-              <span className={styles["swap-item-header"]}>You get</span>
+              <span className={styles["swap-item-header"]}>Buy</span>
               <div className={styles["line-swap-item"]}></div>
               <div className={styles["swap-item-content"]}>
                 <input
@@ -413,7 +507,7 @@ export function Swap({ token, type }: SwapProps) {
                   autoComplete="false"
                   placeholder="0"
                   id="input-second"
-                  value={valueInputSwap.tokenOut}
+                  value={valueInputSwap.tokenOut || ""}
                   disabled
                 //   onChange={(e) => handleChangeInput("tokenOut", e)}
                 />
@@ -427,15 +521,15 @@ export function Swap({ token, type }: SwapProps) {
                     {tokenSwap.tokenOut.name ? (
                       <>
                         <Image
-                          src={tokenSwap.tokenOut.logo}
+                          src={tokenSwap.tokenOut.logo || ""}
                           alt="logo"
                           width={24}
                           height={24}
                         />
-                        <span>{tokenSwap.tokenOut.symbol}</span>
+                        <span style={{ fontWeight: 400 }}>{tokenSwap.tokenOut.symbol}</span>
                       </>
                     ) : (
-                      <span>Select</span>
+                      <span>Select a token</span>
                     )}
                     <Image
                       src={`/icon/drop-down-icon.svg`}
@@ -460,7 +554,7 @@ export function Swap({ token, type }: SwapProps) {
           <Button
             loading={loading}
             disabled={renderButtonSwap.isDisabled}
-            className={stylesButton["button-swap"]}
+            className={`${stylesButton["button-swap"]} ${type === "tokenDetail" && stylesButton["button-swap-token-detail"]}`}
             style={{ marginTop: "-12px" }}
             onClick={() => handleSwap()}
           >
@@ -481,90 +575,45 @@ export function Swap({ token, type }: SwapProps) {
               {item?.label}
             </div>
           ))}
-        </div>
-        <Collapsible onOpenChange={setDetailsOpen}>
-          {/* <div className="mt-4 flex justify-between">
-              <div className="flex items-center">
-                <p className={cn("mr-1.5 text-lg text-textBlack")}>
-                  {unitPriceWrapped ? (
-                    `1 ${unitPriceWrapped.tokenIn} = ${unitPrice} ${unitPriceWrapped.tokenOut}`
-                  ) : (
-                    <></>
-                  )}
-                </p>
-                {unitPriceWrapped && (
-                  <p className={cn("text-lg text-textBlack")}>
-                    (<USDBalance />)
-                  </p>
-                )}
-              </div>
-              <CollapsibleTrigger className="group flex flex-grow items-center text-right text-muted-foreground">
-                <div className="flex flex-grow items-center justify-end">
-                  <p className="text-lg text-textBlack">Show details</p>
-                  {detailsOpen ? (
-                    <ChevronUp className="ml-1 h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="ml-1 h-4 w-4" />
-                  )}
-                </div>
-              </CollapsibleTrigger>
-            </div> */}
-          <CollapsibleContent className="mt-3 grid gap-2">
-            {/* <div className="flex justify-between text-sm">
-                <p className="text-textBlack">Route</p>
-                <div>
-                  {tokenSwap.route && tokenSwap.route.length ? (
-                    <>
-                      {tokenSwap.route.map(
-                        (token: string | number, i: number) => (
-                          <span className="text-textBlack">
-                            {tokens[token]?.ticker}
-                            {tokenSwap.route.length - 1 !== i && (
-                              <span className="mx-1 text-textBlack">
-                                {"->"}
-                              </span>
-                            )}
-                          </span>
-                        ),
-                      )}
-                    </>
-                  ) : (
-                    <span className="text-textBlack">—</span>
-                  )}
-                </div>
-              </div> */}
-            {/* <div className="flex justify-between text-sm">
-            <p className="text-muted-foreground">Spot price</p>
-            <div className="flex">
-              <p className={cn(GeistMono.className)}>1 MINA = 0.8 DAI</p>
-              <p
-                className={
-                  (cn(GeistMono.className), "pl-1.5 text-muted-foreground")
+          <div className={`${styles["slippage-head"]} flex items-center`}>
+            <input
+              className={`${styles["slippage-input-custom"]} outline-none`}
+              placeholder="0.1"
+              value={inputSlippage}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*\.?\d*$/.test(value) || value === "") {
+                  setInputSlippage(value);
+                  setSlippage(Number(value));
                 }
-              >
-                (<USDBalance />)
+              }}
+            />
+            <span
+              className={`ml-[-10px] ${inputSlippage === "" ? "opacity-30" : "opacity-100"}`}
+            >
+              %
+            </span>
+          </div>
+        </div>
+        {/* <div className="flex items-center">
+              <p className={cn("mr-1.5 text-lg text-textBlack")}>
+                {unitPriceWrapped ? (
+                  `1 ${unitPriceWrapped.tokenIn} = ${unitPrice} ${unitPriceWrapped.tokenOut}`
+                ) : (
+                  <></>
+                )}
               </p>
-            </div>
-          </div> */}
-            {/* <div className="flex justify-between text-sm">
-            <p className="text-muted-foreground">Network cost</p>
-            <div>🎉 Free</div>
-          </div> */}
-          </CollapsibleContent>
-        </Collapsible>
+              {unitPriceWrapped && (
+                <p className={cn("text-lg text-textBlack")}>
+                  (<USDBalance />)
+                </p>
+              )}
+            </div> */}
         <DialogOverlay className={styles["bg-overlay"]} />
-        <DialogContent className="modal-container bg-white px-[19.83px] pb-[33.88px] pt-[21.49px]">
+        <DialogContent className={`${stylesModal['modal-container']} bg-white px-[20px] pb-[15px] pt-[20px]`}>
           <ModalListToken
-            tokenSelected={tokenSwap[typeOpenModal]}
-            onClickToken={(token) => {
-              const tmpToken = {
-                ...token,
-                name: token?.label,
-                symbol: token?.label,
-                logo: tokens[token?.value]?.logo,
-              };
-              setTokenSwap({ ...tokenSwap, [typeOpenModal]: tmpToken });
-            }}
+            tokenSelected={tokenSwap[typeOpenModal as keyof TokenSwapState]}
+            onClickToken={handleSelectedPool}
             dialogClose={true}
           />
         </DialogContent>

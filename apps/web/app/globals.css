@@ -114,14 +114,16 @@
     --button-connect-wallet-color: #C5B4E3;
     --button-connect-wallet-hover-color: linear-gradient(180deg, #9FE4C9 0%, #C5B4E3 100%);
     --button-header-hover-color: linear-gradient(90deg, #FF603B 0%, #6A16FF 100%);
-    --button-connected-wallet-color: #9FE4C9;
+    --button-connected-wallet-color: #FFD4C8;
     --bg-overlay-color: rgba(217, 217, 217, 0.48);
     --bg-overlay-black-color: rgba(0, 0, 0, 0.5);
+    --overlay-black-color: rgba(0, 0, 0, 0.4);
     --border-black-color: rgba(0, 0, 0, 0.3);
     --shadow-popup-color: rgba(0, 0, 0, 0.25);
     --bg-pool-color: rgba(255, 255, 255, 0.50);
     --bg-switch-range-color: #EBEBEB;
     --bg-fixed-color: #FCCDC2;
+    --bg-body-color: #FFFBF7;
     --bg-chart-color: #6A16FF
   }
 }
@@ -148,13 +150,6 @@ div[role="menubar"] {
   border-radius: 0;
   border-left: 0;
   border-right: 0;
-}
-
-body {
-  font-family: 'SF Pro Display', sans-serif;
-  color: #000;
-  line-height: normal;
-  /* Use a fallback font */
 }
 
 body::-webkit-scrollbar {

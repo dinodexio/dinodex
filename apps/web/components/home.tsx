@@ -1,14 +1,11 @@
 "use client";
-import { useRouter, usePathname } from "next/navigation";
-import { Header } from "./header";
+import Header from "./header";
 import { Toaster } from "@/components/ui/toaster";
 
 export interface HomeProps {
 }
 
 export function Home({  }: HomeProps) {
-  const router = useRouter();
-  const pathname = usePathname();
   return (
     <div className="flex items-center justify-center">
       <Toaster />

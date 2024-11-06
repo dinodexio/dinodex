@@ -1,6 +1,6 @@
 import { Form } from "@/components/ui/form";
 import { TransferForm as TransferFormComponent } from "@/components/wallet/transfer-form";
-import { useObserveBalance, useTransfer } from "@/lib/stores/balances";
+import { useBalance, useTransfer } from "@/lib/stores/balances";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PublicKey } from "o1js";
 import { useEffect, useRef, useState } from "react";
@@ -69,7 +69,7 @@ export function TransferForm() {
   const transfer = useTransfer();
   const fields = form.getValues();
   const wallet = useWalletStore();
-  const balance = useObserveBalance(fields.amount_token, wallet.wallet);
+  const balance = useBalance(fields.amount_token, wallet.wallet);
 
   useEffect(() => {
     walletBalance.current = balance ?? "0";

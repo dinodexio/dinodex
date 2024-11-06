@@ -4,36 +4,30 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { USDBalance } from "@/components/ui/usd-balance";
-import { ModalListToken } from "@/components/modalListToken/modalListToken";
-import { tokens } from "@/tokens";
 import { useWalletStore } from "@/lib/stores/wallet";
-import { useObserveBalance } from "@/lib/stores/balances";
+import { useBalance } from "@/lib/stores/balances";
 import BigNumber from "bignumber.js";
 import { precision } from "@/components/ui/balance";
-import { amout } from "@/constants";
+import { amout, PRICE_MINA } from "@/constants";
+import { TokenSelector } from "@/components/ui/token-selector";
 
 export interface TransferFormProps {
   onClose?: () => void;
   disabled?: boolean;
   handleChangeStatusLayout?: (value: any) => void;
-  handleSetTokenSelected?: (value: any) => void;
-  handleOpenSelectToken?: () => void;
 }
 
 export function TransferForm({
   onClose,
   handleChangeStatusLayout,
   disabled,
-  handleSetTokenSelected,
-  handleOpenSelectToken,
 }: TransferFormProps) {
   const wallet = useWalletStore();
   const [amountPercent, setAmoutPercent] = useState(null);
-  const [openModalToken, setOpenModalToken] = useState(false);
   const form = useFormContext();
   const error = Object.values(form.formState.errors)[0]?.message?.toString();
   const fields = form.getValues();
-  const balance = useObserveBalance(fields?.amount_token, wallet.wallet);
+  const balance = useBalance(fields?.amount_token, wallet.wallet);
   return (
     <>
       <div className="flex items-center justify-between pb-[11px] pl-[6px] pr-[8px] pt-[7px]">
@@ -49,9 +43,9 @@ export function TransferForm({
           onClick={() => onClose && onClose()}
         />
       </div>
-      <div className="flex flex-col gap-[8px] rounded-[12px] border border-textBlack p-2">
+      <div className="flex flex-col gap-[8px]">
         <div className="flex flex-col gap-[10px]">
-          <div className="rounded-[8px] border border-textBlack p-2">
+          <div className="rounded-[8px] px-[14px] py-2 shadow-content">
             <div className="flex flex-col gap-[4px]">
               <span className="text-[12px] font-[400] text-textBlack opacity-60">
                 Recipient
@@ -62,7 +56,7 @@ export function TransferForm({
                   disabled={disabled}
                   placeholder={"B62.."}
                   className={cn([
-                    "h-auto w-full border-0 bg-bgWhiteColor p-0  text-[16.774px] font-[400] focus-visible:ring-0 focus-visible:ring-offset-0",
+                    "h-auto w-full text-textBlack border-0 bg-bgWhiteColor p-0  text-[14.8px] font-[400] focus-visible:ring-0 focus-visible:ring-offset-0",
                   ])}
                 />
 
@@ -72,69 +66,41 @@ export function TransferForm({
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-between rounded-[8px] border border-textBlack p-2">
-            <div className="flex flex-col gap-[4px]">
-              <span className="text-[12px] font-[400] text-textBlack opacity-60">
-                Amount
-              </span>
-              <Input
-                {...form.register("amountValue")}
-                placeholder="0"
-                className={cn([
-                  "h-auto w-[100px] border-0  bg-bgWhiteColor p-0 text-[16.774px] font-[400] text-textBlack outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
-                ])}
-                onChange={(e) => {
-                  setAmoutPercent(null);
-                  form.setValue("amountValue", e.target.value);
-                  form.trigger("amountValue");
-                }}
-              />
-              <span className="text-[9.202px] font-[500] italic text-textBlack opacity-50">
-                <USDBalance />
-              </span>
-            </div>
-            <div
-              className="flex cursor-pointer items-center gap-[8px] rounded-[8px] border border-textBlack p-2 transition-all duration-300 ease-in-out hover:bg-[#EBEBEB]"
-              onClick={() => handleOpenSelectToken?.()}
-            >
-              {form && !fields.amount_token ? (
-                <>
-                  <span className="text-[14px] font-[500] text-textBlack">
-                    Select Token
-                  </span>
-                  <Image
-                    src={`/icon/drop-down-icon.svg`}
-                    alt="logo"
-                    width={20}
-                    height={20}
+          <div className="flex items-center justify-between rounded-[8px] p-2 shadow-content">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-[4px] items-start">
+                <span className="text-[12px] font-[400] text-textBlack opacity-60">
+                  Amount
+                </span>
+                <div className="flex flex-row items-center justify-center">
+                  <Input
+                    {...form.register("amountValue")}
+                    placeholder="0"
+                    className={cn([
+                      "h-auto border-0 bg-bgWhiteColor p-0 text-[16.774px] font-[400] text-textBlack outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+                    ])}
+                    onChange={(e) => {
+                      setAmoutPercent(null);
+                      form.setValue("amountValue", e.target.value);
+                      form.trigger("amountValue");
+                    }}
                   />
-                </>
-              ) : (
-                <>
-                  <Image
-                    src={tokens[fields.amount_token]?.logo || ""}
-                    width={20}
-                    height={20}
-                    alt=""
+                </div>
+                <span className="text-[9.202px] font-[500] italic text-textBlack opacity-50 mt-[-4px]">
+                  <USDBalance
+                    balance={(parseFloat(fields.amountValue || 0) * PRICE_MINA)?.toFixed(2)}
+                    type="USD"
                   />
-                  <span className="mt-[2px] text-[14px] font-[500] text-textBlack">
-                    {tokens[fields.amount_token]?.ticker}
-                  </span>
-                  <Image
-                    src={`/icon/drop-down-icon.svg`}
-                    alt="logo"
-                    width={20}
-                    height={20}
-                  />
-                </>
-              )}
+                </span>
+              </div>
+              <TokenSelector name={"amount"} />
             </div>
           </div>
           <div className="flex items-center gap-[7.74px]">
             {amout?.map((item: any, index) => {
               return (
                 <div
-                  className={`flex w-[39px] cursor-pointer items-center justify-center rounded-[4.553px] border border-textBlack px-[9px] py-[3px] transition-all duration-300 ease-in-out ${amountPercent === item.value ? "bg-textBlack hover:bg-textBlack" : "bg-white hover:bg-[#EBEBEB]"}`}
+                  className={`flex w-[39px] cursor-pointer items-center justify-center rounded-[4.553px] px-[9.53px] py-[2.73px] transition-all shadow-content duration-300 ease-in-out ${amountPercent === item.value ? "bg-textBlack hover:bg-textBlack" : "bg-white hover:bg-[#EBEBEB]"}`}
                   key={index}
                   onClick={() => {
                     if (fields?.amount_token) {
@@ -146,7 +112,6 @@ export function TransferForm({
                         .times(item.value)
                         .div(100)
                         .toNumber();
-                      console.log("amount", amount);
                       form.setValue("amountValue", amount.toString(), {
                         shouldDirty: true,
                         shouldValidate: true,
@@ -168,7 +133,7 @@ export function TransferForm({
           </div>
         </div>
         <div
-          className="mt-[6px] flex cursor-pointer items-center justify-center rounded-[8px] border border-textBlack bg-white px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#EBEBEB]"
+          className="mt-[6px] flex cursor-pointer items-center justify-center rounded-[8px] shadow-content bg-white px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#EBEBEB]"
           onClick={() => {
             if (!error) {
               handleChangeStatusLayout?.({
@@ -184,29 +149,6 @@ export function TransferForm({
           </span>
         </div>
       </div>
-      {openModalToken && (
-        <>
-          <div
-            className="fixed bottom-0 left-0 right-0 top-0 h-[100vh] w-[350px] bg-[rgba(0,0,0,0.4)]"
-            style={{ zIndex: 103 }}
-            onClick={() => setOpenModalToken(false)}
-          />
-          <div
-            className="fixed right-0 top-[50%] w-[344px] translate-y-[-50%] rounded-[12px] bg-bgWhiteColor p-4"
-            style={{ zIndex: 104 }}
-          >
-            <ModalListToken
-              {...form.register("amount_token")}
-              tokenSelected={null}
-              onClickToken={(token) => {
-                handleSetTokenSelected?.(token);
-                setOpenModalToken(false);
-              }}
-              dialogClose={false}
-            />
-          </div>
-        </>
-      )}
     </>
   );
 }

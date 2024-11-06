@@ -4,7 +4,8 @@ import { PoolRemove as PoolRemoveComponent } from "@/components/v2/remove";
 import { useBalancesStore } from "@/lib/stores/balances";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { findTokenByParams } from "@/tokens";
-import { useMemo } from "react";
+import { notFound } from "next/navigation";
+import { useEffect, useMemo } from "react";
 
 export default function RemovePool({ params }: { params?: any }) {
   const { wallet } = useWalletStore();
@@ -23,6 +24,12 @@ export default function RemovePool({ params }: { params?: any }) {
     }),
     [params],
   );
+
+  useEffect(() => {
+    if (!tokenA || !tokenB) {
+      notFound();
+    }
+  }, [tokenA, tokenB]);
 
   return (
     <>

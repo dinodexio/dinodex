@@ -1,24 +1,18 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Header } from "./header";
-import { SwapForm } from "./xyk/swap-form";
-import { Wallet } from "./wallet/wallet";
+import Header from "./header";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "./ui/button";
-import { ChevronDown, ChevronRight, ChevronUp, Cog } from "lucide-react";
-import { FaucetForm } from "./faucet/faucet-form";
-import { TokenInput } from "./ui/token-input";
+import { ChevronDown, Cog } from "lucide-react";
 import {
   Menubar,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { useState } from "react";

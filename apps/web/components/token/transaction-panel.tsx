@@ -1,22 +1,19 @@
 import {
   convertMethodname,
   formatNumber,
-  formatPriceUSD,
-  formatterInteger,
-  passDataTokenByFields,
   truncateAddress,
   truncateString,
 } from "@/lib/utils";
+import styles from "../css/table.module.css";
 import { Table } from "../table/table";
-import { ComputedTransactionJSON } from "@/lib/stores/chain";
-import { MethodIdResolver } from "@proto-kit/module";
+import { ComputedTransactionJSON, useChainStore } from "@/lib/stores/chain";
 import { useMemo } from "react";
 import {
-  DRIPBUNDLE,
+  ADDLIQUIDITY,
+  BLOCK_TIME,
+  CREATEPOOL,
   EMPTY_DATA,
   REMOVELIQUIDITY,
-  SELLPATH,
-  TRANSFER,
 } from "@/constants";
 import { tokens } from "@/tokens";
 import Link from "next/link";
@@ -25,19 +22,21 @@ import {
   usePollTransactions,
 } from "@/lib/stores/aggregator";
 import Image from "next/image";
+import BigNumber from "bignumber.js";
+import { formatBigNumber, precision } from "../ui/balance";
 
 export interface TransactionPanelProps {
   valueSearch: string;
-  client: any;
-  transactions: ComputedTransactionJSON[];
-  loading: boolean;
+  client?: any;
+  transactions?: ComputedTransactionJSON[];
+  loading?: boolean;
 }
 
 export type PassDataResult = {
   logo: string;
   name: string;
-  symbol: string;
-  amount: number;
+  ticker: string;
+  amount: number | string | BigNumber;
 };
 
 export type PassData = {
@@ -60,9 +59,11 @@ const generateTimeLink = (linkScan: string, value: number, unit: string) => {
       target="_blank"
       rel="noopener noreferrer"
       href={linkScan}
-      className="text-time"
+      className={styles["text-time"]}
     >
-      <span className="text-time">{`${Math.floor(value)}${unit} ago`}</span>
+      <span
+        className={styles["text-time"]}
+      >{`${Math.floor(value)}${unit} ago`}</span>
     </Link>
   );
 };
@@ -126,19 +127,21 @@ let columTableTransaction = [
     key: "type",
     width: 273,
     render: (data: any) => (
-      <div className="type-transaction">
-        <span className="type-text">{data?.type}</span>
-        <div className="transaction-item">
+      <div className={styles["type-transaction"]}>
+        <span className={styles["type-text"]}>
+          {convertMethodname(data?.type)}
+        </span>
+        <div className={styles["transaction-item"]}>
           <Image
             src={data?.token?.first?.logo || "/icon/empty-token.svg"}
             alt="token"
             width="20"
             height="20"
           />
-          <span>{truncateString(data?.token?.first?.symbol, 4)}</span>
+          <span>{truncateString(data?.token?.first?.ticker, 4)}</span>
         </div>
         for
-        <div className="transaction-item">
+        <div className={styles["transaction-item"]}>
           <Image
             src={data?.token?.second?.logo || "/icon/empty-token.svg"}
             alt="token"
@@ -146,7 +149,7 @@ let columTableTransaction = [
             height="20"
           />
           <span>
-            {truncateString(data?.token?.second?.symbol, 4) || EMPTY_DATA}
+            {truncateString(data?.token?.second?.ticker, 4) || EMPTY_DATA}
           </span>
         </div>
       </div>
@@ -158,17 +161,7 @@ let columTableTransaction = [
     key: "usd",
     width: 143,
     render: (data: any) => {
-      return (
-        <span>
-          $
-          {formatNumber(
-            formatPriceUSD(
-              data?.token?.second?.amount,
-              data?.token?.second?.symbol,
-            ),
-          )}
-        </span>
-      );
+      return <span>${data?.priceusd}</span>;
     },
   },
   {
@@ -178,17 +171,15 @@ let columTableTransaction = [
     width: 218,
     render: (data: any) => {
       return (
-        <div className="token-item">
-          <span>
-            {formatNumber(formatterInteger(data?.token?.first?.amount))}
-          </span>
+        <div className={styles["token-item"]}>
+          <span>{formatNumber(data?.token?.first?.amount)}</span>
           <Image
             src={data?.token?.first?.logo || "/icon/empty-token.svg"}
             alt="token"
             width="20"
             height="20"
           />
-          <span>{truncateString(data?.token?.first?.symbol, 4)}</span>
+          <span>{truncateString(data?.token?.first?.ticker, 4)}</span>
         </div>
       );
     },
@@ -200,17 +191,15 @@ let columTableTransaction = [
     width: 218,
     render: (data: any) => {
       return (
-        <div className="token-item">
-          <span>
-            {formatNumber(formatterInteger(data?.token?.second?.amount))}
-          </span>
+        <div className={styles["token-item"]}>
+          <span>{formatNumber(data?.token?.second?.amount)}</span>
           <Image
             src={data?.token?.second?.logo || "/icon/empty-token.svg"}
             alt="token"
             width="20"
             height="20"
           />
-          <span>{truncateString(data?.token?.second?.symbol, 4)}</span>
+          <span>{truncateString(data?.token?.second?.ticker, 4)}</span>
         </div>
       );
     },
@@ -226,94 +215,71 @@ let columTableTransaction = [
   },
 ];
 
-export function TransactionPanel({
-  valueSearch,
-  client,
-}: TransactionPanelProps) {
+export function TransactionPanel({ valueSearch }: TransactionPanelProps) {
   const { transactions, loading } = useAggregatorStore();
   usePollTransactions();
   // Memoize the transaction processing to avoid re-computation on every render
   const processedTransactions = useMemo(() => {
     if (!transactions) return [];
 
-    return transactions
-      .filter((item: any) => item?.methodName !== DRIPBUNDLE)
-      .map((item: any) => {
-        if (!client) return;
-
-        const methodIdResolver = client?.resolveOrFail(
-          "MethodIdResolver",
-          MethodIdResolver,
-        );
-
-        const resolvedMethodDetails = methodIdResolver.getMethodNameFromId(
-          typeof item?.methodId === "string"
-            ? BigInt(item?.methodId)
-            : item?.methodId,
-        );
-
-        if (!resolvedMethodDetails) {
-          console.error("Unable to resolve method details");
-          return {
-            ...item,
-            error: "Unable to resolve method details",
-          };
-        } else {
-          const [moduleName, methodName] = resolvedMethodDetails;
-          let passFields = item?.argsFields;
-          if (methodName === SELLPATH) {
-            let indexRemove = passFields[2] === "99999" ? 2 : 1;
-            passFields = item?.argsFields.filter(
-              (field: any, index: any) => index !== indexRemove,
-            );
-          }
-          if (methodName === REMOVELIQUIDITY) {
-            let indexRemove = 2;
-            passFields = item?.argsFields.filter(
-              (field: any, index: any) => index !== indexRemove,
-            );
-          }
-          const tmpData = passDataTokenByFields(passFields, tokens);
-          return {
-            ...item,
-            moduleName,
-            methodName,
-            token: tmpData || {},
-            address: truncateAddress(item?.sender),
-            type: convertMethodname(methodName),
-            price: "",
-            timeStamp: new Date().toLocaleString(),
-          };
-        }
-      });
-  }, [transactions, client]);
+    return transactions.map((item: any) => {
+      let tokenData: any = {};
+      if (
+        item.type === ADDLIQUIDITY ||
+        item.type === CREATEPOOL ||
+        item.type === REMOVELIQUIDITY
+      ) {
+        tokenData = {
+          first: {
+            ...tokens[item.data.tokenA.id],
+            amount: formatBigNumber(item?.data?.tokenA?.amount),
+          },
+          second: {
+            ...tokens[item.data.tokenB.id],
+            amount: formatBigNumber(item?.data?.tokenB?.amount),
+          },
+        };
+      } else if (item.type === "Swap") {
+        tokenData = {
+          first: {
+            ...tokens[item.data.from.tokenId],
+            amount: formatBigNumber(item?.data?.from?.amount),
+          },
+          second: {
+            ...tokens[item.data.to.tokenId],
+            amount: formatBigNumber(item?.data?.to?.amount),
+          },
+        };
+      }
+      return {
+        ...item,
+        token: tokenData,
+        address: truncateAddress(item?.sender),
+        priceusd: formatNumber(tokenData?.second?.amount?.toString()),
+      };
+    });
+  }, [transactions]);
   // Filter the transactions based on search value
   const filteredTransactions = useMemo(() => {
     if (!valueSearch) return processedTransactions;
 
     const lowerValueSearch = valueSearch.toLowerCase();
     return processedTransactions.filter((item: any) => {
-      const tokenFirstSymbol = item?.token?.first?.symbol?.toLowerCase();
-      const tokenSecondSymbol = item?.token?.second?.symbol?.toLowerCase();
+      const tokenFirstSymbol = item?.token?.first?.ticker?.toLowerCase();
+      const tokenSecondSymbol = item?.token?.second?.ticker?.toLowerCase();
       return (
         tokenFirstSymbol?.includes(lowerValueSearch) ||
         tokenSecondSymbol?.includes(lowerValueSearch)
       );
     });
   }, [processedTransactions, valueSearch]);
-
   return (
     <>
       <Table
         loading={loading}
-        data={
-          filteredTransactions?.filter?.(
-            (item: any) =>
-              item?.methodName !== DRIPBUNDLE && item?.methodName !== TRANSFER,
-          ) || []
-        }
-        column={columTableTransaction}
-        onClickTr={() => {}}
+        data={filteredTransactions}
+        column={useMemo(() => columTableTransaction, [filteredTransactions])}
+        onClickTr={() => { }}
         classTable={""}
       />
     </>

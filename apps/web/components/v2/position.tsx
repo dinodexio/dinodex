@@ -1,12 +1,13 @@
 "use client";
 import Image from "next/image";
-import "../style.css";
+import styles from "../css/pool.module.css";
 import { tokens } from "@/tokens";
 import { useObservePooled } from "@/lib/stores/balances";
 import { LPTokenId, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
 import { Balances } from "../wallet/wallet";
 import { Balance } from "../ui/balance";
+import { useFormContext } from "react-hook-form";
 
 export interface PoolPositionProps {
   dataPool?: any;
@@ -20,40 +21,50 @@ export function PoolPosition({
   dataPool,
   tokenParams,
   balances,
-  paramPooled,
-  paramLPToken,
 }: PoolPositionProps) {
+  const form = useFormContext();
+  const fields = form?.getValues();
   // Extract token data
   const firstTokenValue =
-    dataPool?.tokenPool?.first?.value || tokenParams?.tokenA?.value || 0;
+    fields?.tokenA_token ||
+    dataPool?.tokenPool?.first?.value ||
+    tokenParams?.tokenA?.value ||
+    0;
   const secondTokenValue =
-    dataPool?.tokenPool?.second?.value || tokenParams?.tokenB?.value || 0;
+    fields?.tokenB_token ||
+    dataPool?.tokenPool?.second?.value ||
+    tokenParams?.tokenB?.value ||
+    0;
   const firstTokenLabel =
-    dataPool?.tokenPool?.first?.label || tokenParams?.tokenA?.label || "";
+    tokens[firstTokenValue]?.ticker ||
+    dataPool?.tokenPool?.first?.label ||
+    tokenParams?.tokenA?.label ||
+    "";
   const secondTokenLabel =
-    dataPool?.tokenPool?.second?.label || tokenParams?.tokenB?.label || "";
+    tokens[secondTokenValue]?.ticker ||
+    dataPool?.tokenPool?.second?.label ||
+    tokenParams?.tokenB?.label ||
+    "";
 
   // Get the LP Token ID
-  const lpToken =
-    paramLPToken ??
-    LPTokenId.fromTokenPair(
-      TokenPair.from(
-        TokenId.from(firstTokenValue),
-        TokenId.from(secondTokenValue),
-      ),
-    ).toString();
+  const lpToken = LPTokenId.fromTokenPair(
+    TokenPair.from(
+      TokenId.from(firstTokenValue),
+      TokenId.from(secondTokenValue),
+    ),
+  ).toString();
 
   // Observe pooled data
-  const dataPooled =
-    paramPooled ??
-    useObservePooled(
-      firstTokenLabel,
-      secondTokenLabel,
-      balances?.[lpToken]?.toString(),
-    );
+  const dataPooled = useObservePooled(
+    firstTokenLabel,
+    secondTokenLabel,
+    balances?.[lpToken]?.toString(),
+  );
 
   return (
-    <div className="flex w-full max-w-[605px] flex-col items-start justify-center gap-[10px] rounded-[20px] border border-textBlack p-5 sm:gap-[10px] lg:gap-[15px] xl:gap-[15px]">
+    <div
+      className={`flex w-full max-w-[605px] flex-col items-start justify-center gap-[10px] rounded-[20px] border-none shadow-content p-5 sm:gap-[10px] lg:gap-[15px] xl:gap-[15px] ${styles["pool-container"]}`}
+    >
       <span className="text-[18px] font-[600] text-textBlack sm:text-[18px] lg:text-[22px] xl:text-[22px]">
         Your position
       </span>
@@ -97,7 +108,7 @@ export function PoolPosition({
           {firstTokenLabel}:
         </span>
         <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[20px] xl:text-[20px]">
-          <Balance balance={dataPooled?.first ?? "0"} />
+        <Balance balance={(dataPooled?.first ?? "0").toString()} />
         </span>
       </div>
       <div className="flex w-full items-center justify-between">
@@ -105,7 +116,7 @@ export function PoolPosition({
           {secondTokenLabel}:
         </span>
         <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[20px] xl:text-[20px]">
-          <Balance balance={dataPooled?.second ?? "0"} />
+          <Balance balance={(dataPooled?.second ?? "0").toString()} />
         </span>
       </div>
     </div>

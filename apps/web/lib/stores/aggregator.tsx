@@ -1,11 +1,7 @@
-import { client, PoolKey, TokenPair } from "chain";
 import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { Token, tokens } from "@/tokens";
-import { TokenId } from "@proto-kit/library";
-import { useObserveBalance } from "./balances";
-import BigNumber from "bignumber.js";
 
 export interface ComputedTransactionJSON {
   argsFields: string[];
@@ -76,28 +72,59 @@ export interface BlockQueryResponse {
   };
 }
 
+export interface TokensQueryResponse {
+  data: Array<ComputedTokenJSON>;
+  error: boolean;
+}
+
 export interface TransactionQueryResponse {
   data: ComputedTransactionJSON;
   error: boolean;
 }
 
-export interface PoolsDataJSON {
+export interface TokenDataJSON {
+  index?: string | number;
+  id?: string | number;
+  ticker?: string | number;
+  logo?: string;
+  name?: string;
+  price?: string | number;
+  volume?: string | number;
+  fdv?: string | number;
+}
+
+export interface ComputedTokenJSON {
+  id?: string | number;
+  ticker?: string | number;
+  name?: string;
+  price?: { usd?: string }
+  volume?: string | number;
+  fdv?: string | number;
+}
+
+export interface PoolsDataJSON extends ComputedPoolsJSON {
   tokenselected?: {
-    first: Token,
-    second: Token,
+    first: Token;
+    second: Token;
   };
-  id?: string | number,
+  id?: string | number;
   type?: string;
-  feeTier?: any,
-  tvl?: any,
-  apr?: any,
-  volume1d?: any,
-  volume7d?: any,
+  feeTier?: any;
+  tvl?: any;
+  apr?: any;
+  volume1d?: any;
+  volume7d?: any;
 }
 
 export interface ComputedPoolsJSON {
-  tokenAId: string | number;
-  tokenBId: string | number
+  tokenAId: string;
+  tokenBId: string;
+  balancesA?: string | number;
+  balancesB?: string | number;
+  tvl?: string | number;
+  apr?: string | number;
+  volume_1d?: string | number;
+  volume_7d?: string | number;
 }
 
 export interface PoolsQueryResponse {
@@ -109,57 +136,88 @@ export interface AggregatorState {
   loading: boolean;
   transactions: any;
   pools: Array<PoolsDataJSON>;
+  tokens: Array<TokenDataJSON>
   error: boolean;
+  loadTokens: () => Promise<void>;
   loadPools: () => Promise<void>;
   loadTransactions: () => Promise<void>;
 }
 
-export const useAggregatorStore = create<AggregatorState, [["zustand/immer", never]]>(
+export const useAggregatorStore = create<
+  AggregatorState,
+  [["zustand/immer", never]]
+>(
   immer((set) => ({
     loading: Boolean(false),
     pools: [],
     transactions: [],
+    tokens: [],
     error: false,
+    async loadTokens() {
+      set((state) => {
+        state.loading = true;
+      });
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/tokens`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const data = (await response.json()) as TokensQueryResponse;
+      const newData: any = data.data.map((token: ComputedTokenJSON, index): TokenDataJSON => {
+        return {
+          index: index + 1,
+          id: token.id,
+          ticker: token.ticker,
+          name: token.name,
+          price: token.price?.usd,
+          volume: token.volume,
+          fdv: token.fdv,
+          logo: token.id ? tokens[token.id]?.logo : ''
+        };
+      });
+      set((state) => {
+        state.loading = false;
+        state.tokens = newData;
+        state.error = data?.error;
+      });
+    },
     async loadPools() {
       set((state) => {
         state.loading = true;
       });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/pools`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/pools`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       const data = (await response.json()) as PoolsQueryResponse;
-      const newData: Array<PoolsDataJSON> = data.data.map((pool: any, index) => {
-        const tokenPair = TokenPair.from(TokenId.from(pool.tokenAId), TokenId.from(pool.tokenBId))
-        // const poolKey = PoolKey.fromTokenPair(tokenPair).toBase58()
-        const firstToken = tokens[tokenPair.tokenBId.toString()]
-        const secondToken = tokens[tokenPair.tokenAId.toString()]
+      const newData: any = data.data.map((pool: any, index) => {
+        const firstToken = tokens[pool.tokenAId];
+        const secondToken = tokens[pool.tokenBId];
         return {
+          ...pool,
           id: index + 1, // TODO update id token
           tokenselected: {
-            first: {
-              ticker: firstToken?.ticker || '',
-              name: firstToken?.name || '',
-              logo: firstToken?.logo || '',
-            },
-            second: {
-              ticker: secondToken?.ticker || '',
-              name: secondToken?.name || '',
-              logo: secondToken?.logo || '',
-            },
+            first: firstToken,
+            second: secondToken,
           },
-          type: "LPtoken",
-          feeTier: null,
-          tvl: null,
-          apr: null,
-          volume1d: null,
-          volume7d: null,
-        }
-      })
+          feeTier: pool?.feeTier || null,
+          volume1d: pool?.volume_1d || null,
+          volume7d: pool?.volume_7d || null
+        };
+      });
       set((state) => {
         state.loading = false;
         state.pools = newData;
@@ -171,12 +229,15 @@ export const useAggregatorStore = create<AggregatorState, [["zustand/immer", nev
         state.loading = true;
       });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/transactions`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/txs`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       const data = (await response.json()) as TransactionQueryResponse;
 
@@ -190,11 +251,11 @@ export const useAggregatorStore = create<AggregatorState, [["zustand/immer", nev
 );
 
 export const usePollPools = () => {
-  const aggregator = useAggregatorStore()
+  const aggregator = useAggregatorStore();
   useEffect(() => {
     aggregator.loadPools();
-  }, [])
-}
+  }, []);
+};
 
 export const usePollTransactions = () => {
   const aggregator = useAggregatorStore();
@@ -204,29 +265,32 @@ export const usePollTransactions = () => {
 };
 
 export const useSwapRoutes = () => {
-  const [routes, setRoutes] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+  const [routes, setRoutes] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const getRoutes = async (tokenAId: string, tokenBId: string) => {
     try {
-      setLoading(true)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/routers/?${new URLSearchParams({
-        tokenAId,
-        tokenBId
-      })}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      setLoading(true);
+      const response = await fetch(
+        `http://localhost:3333/routers/?${new URLSearchParams({
+          tokenAId,
+          tokenBId,
+        })}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
-      const data = (await response.json());
-      setLoading(false)
-      setRoutes(data?.data?.vector || [])
-      setError(data?.error)
+      const data = await response.json();
+      setLoading(false);
+      setRoutes(data?.data?.vector || []);
+      setError(data?.error);
     } catch {
-      setRoutes([])
+      setRoutes([]);
     }
-  }
-  return { routes, loading, error, getRoutes }
+  };
+  return { routes, loading, error, getRoutes };
 };

@@ -3,7 +3,7 @@
     text-align: center;
     font-size: 24px;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 600;
     line-height: normal;
     opacity: 0.5;
     cursor: pointer;
@@ -17,6 +17,7 @@
 .menu-token-item-active {
     color: var(--bg-button-active-color);
     opacity: 1;
+    font-weight: 600;
 }
 
 /* menu net work */
@@ -31,12 +32,12 @@
     align-items: center;
     gap: 4px;
     border-radius: 6px;
-    border: 0.5px solid var(--black-text-color);
     background: var(--white-text-color);
     cursor: pointer;
-    height: 32px;
+    height: 30px;
     position: relative;
     width: max-content;
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.25);
 }
 
 .network-content-menu {
@@ -117,14 +118,14 @@
 .search-token-container {
     display: flex;
     height: 30px;
-    padding: 3px;
+    padding: 5px;
     justify-content: center;
     align-items: center;
     border-radius: 6px;
-    border: 0.5px solid var(--black-text-color);
     background: var(--white-text-color);
     transition: all 0.3s ease;
     cursor: pointer;
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.25);
 }
 
 .input-search-token {
@@ -146,7 +147,7 @@
     opacity: 0.3;
 }
 
-.show-input-search{
+.show-input-search {
     border-color: var(--bg-button-active-color);
 }
 
@@ -171,7 +172,8 @@
     align-items: center;
     gap: 2px;
     border-radius: 6px;
-    border: .5px solid var(--black-text-color);
+    background: var(--white-text-color);
+    box-shadow: 0px 2px 8px 0px var(--shadow-popup-color);
     width: max-content;
 }
 
@@ -181,8 +183,6 @@
     justify-content: center;
     align-items: center;
     border-radius: 6px;
-    border-left: .5px solid transparent;
-    border-right: .5px solid transparent;
     color: var(--black-text-color);
     text-align: center;
     font-size: 18px;
@@ -192,7 +192,7 @@
     text-transform: uppercase;
     transition: all .3s ease;
     cursor: pointer;
-    transition: all .3s ease;
+
 }
 
 .filter-time-item:hover {
@@ -202,7 +202,6 @@
 .filter-time-item-active,
 .filter-time-item-active:hover {
     background-color: var(--bg-button-active-color);
-    border-color: var(--black-text-color);
 }
 
 .stats-card {
@@ -237,17 +236,37 @@
     line-height: normal;
 }
 
-.stats-subtext{
+.stats-subtext {
     color: var(--black-text-color);
-text-align: center;
-font-family: "SF Pro Display";
-font-size: 14px;
-font-style: normal;
-font-weight: 400;
-line-height: normal;
-opacity: 0.75;
+    text-align: center;
+    font-family: "SF Pro Display";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    opacity: 0.75;
 }
 
+.box-info,.box-info-vol {
+    position: absolute;
+    display: inline-flex;
+    padding: 4px 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    border-radius: 3px;
+    background: var(--white-text-color);
+    box-shadow: 0px 2px 8px 0px var(--shadow-popup-color);
+    color: var(--black-text-color);
+    text-align: center;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    visibility: hidden;
+    opacity: 0 ;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
 @media (max-width: 965px) {
     .network-content:first-child .network-content-menu {
         right: unset;

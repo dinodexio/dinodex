@@ -1,7 +1,6 @@
 import { useState } from "react";
-import "../../style.css";
-import styles from '../../css/pool.module.css'
-import stylesButton from '../../css/button.module.css'
+import styles from "../../css/pool.module.css";
+import stylesButton from "../../css/button.module.css";
 import Image from "next/image";
 import Link from "next/link";
 import { EMPTY_DATA } from "@/constants";
@@ -9,7 +8,7 @@ import { getTokenByTicker, tokens } from "@/tokens";
 import { Balance } from "../../ui/balance";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Loader } from "@/components/ui/Loader";
-import { useObservePooled } from "@/lib/stores/balances";
+import { useBalancesStore, useObservePooled } from "@/lib/stores/balances";
 import { useRouter } from "next/navigation";
 
 export interface Balances {
@@ -29,6 +28,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
   const router = useRouter();
   const [activeItems, setActiveItems] = useState<any>([]);
   const [valueTicker, setValueTicker] = useState<any>(null);
+  const { setLoadBalances } = useBalancesStore();
 
   const toggleActiveItem = (item: any) => {
     if (activeItems.includes(item?.id)) {
@@ -117,10 +117,10 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
 
   return (
     <>
-      <Card className="border-transparent bg-transparent">
+      <Card className="border-transparent bg-transparent shadow-none">
         <Card
-          className="relative h-max w-full rounded-[12px] border-[1px] border-textBlack bg-transparent px-[18px] pb-5 pt-[18px] sm:h-max lg:h-[139px] xl:h-[139px]"
-          style={{ marginBottom: 25 }}
+          className="relative h-max w-full rounded-[12px] bg-transparent border-none px-[18px] pb-5 pt-[18px] sm:h-max lg:h-[139px] xl:h-[139px] shadow-content"
+          style={{ marginBottom: 25, boxShadow: '0px 2px 4px 0px rgba(0, 0, 0, 0.25)' }}
         >
           <Image
             src={"/images/pool/bg-pool.svg"}
@@ -163,7 +163,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
           </span>
           <div className="flex items-center gap-2">
             <div
-              className={`flex items-center justify-center rounded-[12px] border border-textBlack hover:bg-[#EBEBEB] ${stylesButton["btn-pool"]}`}
+              className={`flex items-center justify-center rounded-[12px] hover:bg-[#EBEBEB] ${stylesButton["btn-pool"]}`}
               onClick={() => handleActionPool("add")}
             >
               <span>Create a Pair</span>
@@ -175,7 +175,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
               <span>Import Pool</span>
             </div> */}
             <div
-              className={`flex items-center justify-center rounded-[12px] border border-textBlack ${stylesButton["button-swap"]} ${stylesButton["btn-pool-active"]}`}
+              className={`flex items-center justify-center rounded-[12px] ${stylesButton["button-swap"]} ${stylesButton["btn-pool-active"]}`}
               onClick={() => handleActionPool("add")}
             >
               <span>Add liquidity</span>
@@ -187,7 +187,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
             <Loader w={6} h={6} />
           </div>
         ) : dataPool?.length === 0 ? (
-          <div className="flex items-center justify-center rounded-[12px] border border-textBlack pb-[12px] pt-[12px] text-[16px] font-[400] text-textBlack sm:pb-[12px] sm:pt-[12px] sm:text-[16px] lg:pb-[15px] lg:pt-[15px] lg:text-[20px] xl:pb-[15px] xl:pt-[15px] xl:text-[20px]">
+          <div className="flex items-center justify-center rounded-[12px] border-none pb-[12px] pt-[12px] text-[16px] font-[400] text-textBlack sm:pb-[12px] sm:pt-[12px] sm:text-[16px] lg:pb-[15px] lg:pt-[15px] lg:text-[20px] xl:pb-[15px] xl:pt-[15px] xl:text-[20px] shadow-content">
             No liquidity found
           </div>
         ) : (
@@ -224,12 +224,15 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
               const poolSecondSymbol = item?.tokenSelectedPool?.second?.symbol;
               return (
                 <Card
-                  className={`${styles['pool-item']} ${isActive ? styles["pool-item-active"] : ""}`}
+                  className={`${styles["pool-item"]} ${isActive ? styles["pool-item-active"] : ""} border-none`}
                   key={index}
                 >
                   <CardHeader
                     className="flex w-full flex-row items-center justify-between p-0"
-                    onClick={() => toggleActiveItem(item)}
+                    onClick={() => {
+                      setLoadBalances(isActive ? false : true);
+                      toggleActiveItem(item);
+                    }}
                   >
                     <div className="flex items-center gap-1">
                       <div className="flex items-center">
@@ -294,7 +297,9 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                         </span>
                         <span className={styles["info-content-value"]}>
                           <Balance
-                            balance={isActive ? String(dataPooled?.first) : undefined}
+                            balance={
+                              isActive ? String(dataPooled?.first) : undefined
+                            }
                           />
                           <Image
                             src={item?.tokenSelectedPool?.first?.logo}
@@ -310,7 +315,9 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                         </span>
                         <span className={styles["info-content-value"]}>
                           <Balance
-                            balance={isActive ? String(dataPooled?.second) : undefined}
+                            balance={
+                              isActive ? String(dataPooled?.second) : undefined
+                            }
                           />
                           <Image
                             src={item?.tokenSelectedPool?.second?.logo}
@@ -333,11 +340,11 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                           Accrued fees
                         </span>
                         <span className={styles["info-content-value"]}>
-                          ~
+                          {"< 0.1%"}
                         </span>
                       </div>
                       <div className="mt-[2px] flex items-center justify-center">
-                        <span className="text-or">
+                        <span className={styles["text-or"]}>
                           View accrued fees and analytics
                           <Image
                             src="/icon/arrow-icon-or.svg"

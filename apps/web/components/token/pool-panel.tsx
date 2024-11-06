@@ -1,14 +1,25 @@
-import { formatLargeNumber } from "@/lib/utils";
+import { convertSmallNumberToPercent, formatLargeNumber, formatNumber, formatPersion } from "@/lib/utils";
 import { Table } from "../table/table";
 import Image from "next/image";
+import styles from '../css/table.module.css'
 import { Balances } from "../pool/v2/list-pool";
 import { EMPTY_DATA } from "@/constants";
 import { useMemo } from "react";
 import { useAggregatorStore, usePollPools } from "@/lib/stores/aggregator";
+import BigNumber from "bignumber.js";
+import { removePrecision } from "@/lib/utils";
+import { precision } from "../ui/balance";
+import { useRouter } from "next/navigation";
+import { PoolKey, TokenPair } from "chain";
+import { TokenId } from "@proto-kit/library";
 
 export interface PoolPanelProps {
   balances?: Balances;
-  valueSearch: string;
+  valueSearch?: string;
+}
+
+function formatNumberPrecisionVol(value: string) {
+  return formatNumber(BigNumber(removePrecision(value, precision)).toNumber())
 }
 
 let columTablePool = [
@@ -28,8 +39,8 @@ let columTablePool = [
     width: 230,
     render: (data: any) => {
       return (
-        <div className="token-info">
-          <div className="token-info-logo">
+        <div className={styles["token-info"]}>
+          <div className={styles["token-info-logo"]}>
             <div className="relative h-6 w-6 overflow-hidden">
               <Image
                 className="absolute left-1/2"
@@ -49,10 +60,10 @@ let columTablePool = [
               />
             </div>
           </div>
-          <span className="token-name-text">
+          <span className={styles["token-name-text"]}>
             {`${data?.tokenselected?.first?.ticker}/${data?.tokenselected?.second?.ticker}`}
           </span>
-          <div className="fee-tier-text-table">
+          <div className={styles["fee-tier-text-table"]}>
             {data?.feeTier || EMPTY_DATA}%
           </div>
         </div>
@@ -65,7 +76,7 @@ let columTablePool = [
     key: "tvl",
     width: 163,
     render: (data: any) => {
-      return <span className="price-text">{formatLargeNumber(data?.tvl)}</span>;
+      return <span className={styles["price-text"]}>{formatNumberPrecisionVol(data?.tvl)}</span>;
     },
   },
   {
@@ -74,7 +85,7 @@ let columTablePool = [
     key: "apr",
     width: 163,
     render: (data: any) => {
-      return <span>{data?.apr || EMPTY_DATA}%</span>;
+      return <span>{convertSmallNumberToPercent(data?.apr)}</span>;
     },
   },
   {
@@ -84,7 +95,7 @@ let columTablePool = [
     width: 163,
     render: (data: any) => {
       return (
-        <span className="price-text">${formatLargeNumber(data?.volume1d)}</span>
+        <span className={styles["price-text"]}>${formatNumberPrecisionVol(data?.volume1d)}</span>
       );
     },
   },
@@ -95,7 +106,7 @@ let columTablePool = [
     width: 163,
     render: (data: any) => {
       return (
-        <span className="price-text">{formatLargeNumber(data?.volume7d)}</span>
+        <span className={styles["price-text"]}>{formatNumberPrecisionVol(data?.volume7d)}</span>
       );
     },
   },
@@ -105,37 +116,43 @@ let columTablePool = [
     key: "volume1d-tvl",
     width: 163,
     render: (data: any) => {
-      return <span className="price-text">{EMPTY_DATA}</span>;
+      return <span className={styles["price-text"]}>{formatNumberPrecisionVol(BigNumber(data?.volume1d || 0).dividedBy(data?.tvl).toString())}</span>;
     },
   },
 ];
 
 export function PoolPanel({ balances, valueSearch }: PoolPanelProps) {
-  const { pools: poolBalances = [] } = useAggregatorStore()
+  const router = useRouter();
+  const { pools: poolBalances = [], loading } = useAggregatorStore()
   usePollPools()
-  let dataPool: any =
-    balances || poolBalances !== null
-      ? [...poolBalances.filter((el) => el !== null)]
-      : [];
 
   const filterDataPool = useMemo(() => {
-    if (valueSearch) {
-      return dataPool.filter((el: any) =>
-        el?.tokenselected?.first?.ticker
-          ?.toLocaleLowerCase()
-          .includes(valueSearch.toLocaleLowerCase()),
+    if (!valueSearch) return poolBalances;
+
+    const lowerValueSearch = valueSearch.toLowerCase();
+    return poolBalances.filter((item: any) => {
+      const tokenFirstSymbol = item?.tokenselected?.first?.ticker?.toLowerCase();
+      const tokenSecondSymbol = item?.tokenselected?.second?.ticker?.toLowerCase();
+      return (
+        tokenFirstSymbol?.includes(lowerValueSearch) ||
+        tokenSecondSymbol?.includes(lowerValueSearch)
       );
-    } else {
-      return dataPool;
-    }
-  }, [valueSearch, dataPool]);
+    });
+  }, [poolBalances, valueSearch]);
   return (
     <>
       <Table
         data={filterDataPool || []}
         column={columTablePool}
-        onClickTr={() => { }}
-        loading={false}
+        onClickTr={(dataPool) => {
+          console.log('dataPool', dataPool)
+          const poolKey = PoolKey.fromTokenPair(
+            TokenPair.from(TokenId.from(dataPool?.tokenAId), TokenId.from(dataPool?.tokenBId)),
+          ).toBase58();
+          console.log('poolKey', poolKey)
+          router.push(`/info/pools/${poolKey}`);
+        }}
+        loading={loading}
       />
     </>
   );

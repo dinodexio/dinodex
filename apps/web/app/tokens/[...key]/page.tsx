@@ -1,8 +1,9 @@
 "use client";
 
 // import { SwapForm } from "@/containers/xyk/swap-form";
-import { InfoLayout } from "@/components/detail/info-layout";
-import { Header } from "@/components/header";
+import { InfoTokenLayout } from "@/components/detail/info-token-layout";
+import { InfoPoolLayout } from "@/components/detail/info-pool-layout";
+import Header from "@/components/header";
 import { ChartToken } from "@/components/token/chart-token";
 import { Toaster } from "@/components/ui/toaster";
 import { DATA_TOKENS } from "@/constants";
@@ -15,9 +16,10 @@ import { useWalletStore } from "@/lib/stores/wallet";
 import { useBalancesStore, useFaucet } from "@/lib/stores/balances";
 import { useClientStore } from "@/lib/stores/client";
 
-export default function Page({ params }: { params: { name: string } }) {
+export default function Page({ params }: { params: { name: string, type:string } }) {
+  console.log("params", params);
   const { block } = useChainStore();
-  const token = DATA_TOKENS.find(token => token.slug === params.name[0])
+  // const token = DATA_TOKENS.find(token => token.slug === params.name[0])
   const {
     wallet,
     isWalletOpen,
@@ -47,19 +49,20 @@ export default function Page({ params }: { params: { name: string } }) {
         <Toaster />
         <div className="flex flex-col w-full px-[16px] pt-[20px] mb-3 xl:px-[41px] xl:pt-8 lg:px-[32px] sm:px-[16px]">
           <Header />
-          <InfoLayout type="token" params={params} />
+          {params?.type === 'tokens' && (<InfoTokenLayout type="token" params={params} />)}
+          {params?.type === 'pools' && (<InfoPoolLayout type="pool" params={params} />)}
           <Footer />
         </div>
         <ScrollToTopButton />
       </div>
       <Wallet
-        loading={loading}
+        // loading={loading}
         blockHeight={block?.height}
         address={wallet}
         balances={ownBalances}
         open={isWalletOpen}
         setIsWalletOpen={setIsWalletOpen}
-        onFaucetDrip={() => client.client && wallet && faucet()}
+        // onFaucetDrip={() => client.client && wallet && faucet()}
       />
     </>
   )

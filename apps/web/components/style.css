@@ -1,4 +1,4 @@
-@import './css/header.css';
+/* @import './css/header.css';
 @import './css/tokens.css';
 @import './css/home.css';
 @import './css/table.css';
@@ -6,7 +6,7 @@
 @import './css/swap.css';
 @import './css/pool.css';
 @import './css/modalListToken.css';
-@import './css/modalPreviewPool.css';
+@import './css/modalPreviewPool.css'; */
 
 .list-token-wallet::-webkit-scrollbar {
     display: none;

@@ -7,21 +7,20 @@ import { PublicKey } from "o1js";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useChainStore } from "./chain";
 import { useWalletStore } from "./wallet";
-import { getTokenID } from '@/tokens';
+import { getTokenID, Tokens } from "@/tokens";
 import { usePoolKey } from "../xyk/usePoolKey";
-import { LPTokenId, TokenPair } from "chain";
+import { LPTokenId } from "chain";
 import BigNumber from "bignumber.js";
 
 export interface BalancesState {
   loading: boolean;
+  isLoadBalances: boolean;
   balances: {
     // address
-    [key: string]:
-    | {
+    [key: string]: {
       // tokenId
       [key: string]: string | undefined;
-    }
-    | undefined;
+    };
   };
   totalSupply: {
     [key: string]: string | undefined;
@@ -31,7 +30,15 @@ export interface BalancesState {
     tokenId: string,
     address: string,
   ) => Promise<void>;
+
+  loadBalances: (
+    client: Client,
+    tokens: Tokens,
+    address?: string,
+  ) => Promise<void>;
+
   clearBalances: (address?: string) => void;
+  setLoadBalances: (value: boolean) => void;
   faucet: (client: Client, address: string) => Promise<PendingTransaction>;
   loadTotalSupply: (client: Client, tokenId: string) => Promise<void>;
   transfer: (
@@ -59,6 +66,7 @@ export const useBalancesStore = create<
   immer((set) => ({
     loading: Boolean(false),
     balances: {},
+    isLoadBalances: false,
     totalSupply: {},
     async loadTotalSupply(client: Client, tokenId: string) {
       set((state) => {
@@ -87,6 +95,21 @@ export const useBalancesStore = create<
         }
       });
     },
+
+    setLoadBalances(value) {
+      set((state) => {
+        state.isLoadBalances = value;
+      });
+    },
+
+    async loadBalances(client: Client, tokens: Tokens, address?: string) {
+      if (!address) return;
+      const processTokens = Object.entries(tokens);
+      for (var i = 0; i < processTokens.length; i++) {
+        const [tokenId] = processTokens[i];
+        await this.loadBalance(client, tokenId, address);
+      }
+    },
     async loadBalance(client: Client, tokenId: string, address: string) {
       set((state) => {
         state.loading = true;
@@ -100,13 +123,18 @@ export const useBalancesStore = create<
       const balance = await client.query.runtime.Balances.balances.get(key);
       set((state) => {
         state.loading = false;
-        state.balances = {
-          ...state.balances,
-          [address]: {
-            ...state.balances[address],
-            [tokenId]: balance?.toString() ?? "0",
-          },
-        };
+        if (!Object.keys(state.balances).includes(address)) {
+          state.balances[address] = {};
+        }
+        state.balances[address][tokenId] = balance?.toString() ?? "0";
+
+        // state.balances = {
+        //   ...state.balances,
+        //   [address]: {
+        //     ...state.balances[address],
+        //     [tokenId]: balance?.toString() ?? "0",
+        //   },
+        // };
       });
     },
     async faucet(client: Client, address: string) {
@@ -151,7 +179,7 @@ export const useBalancesStore = create<
   })),
 );
 
-export const useBalance = (address?: string, tokenId?: string) => {
+export const useBalance = (tokenId?: string, address?: string) => {
   const balances = useBalancesStore();
 
   return useMemo(() => {
@@ -161,17 +189,81 @@ export const useBalance = (address?: string, tokenId?: string) => {
   }, [balances.balances, address, tokenId]);
 };
 
-export const useObserveBalance = (tokenId?: string, address?: string) => {
+// export const useObserveBalance = (tokenId?: string, address?: string) => {
+//   const balances = useBalancesStore();
+//   return useMemo(() => {
+//     if (!address || !tokenId) return;
+
+//     return balances.balances[address]?.[tokenId];
+//   }, [balances.balances, address, tokenId]);
+// };
+
+export const useObserveBalancePool = (tokenId?: string, address?: string) => {
   const client = useClientStore();
   const chain = useChainStore();
   const balances = useBalancesStore();
-  const balance = useBalance(address, tokenId);
+  const balance = useBalance(tokenId, address);
 
   useEffect(() => {
     if (!client.client || !address || !tokenId) return;
 
     balances.loadBalance(client.client, tokenId, address);
   }, [client.client, chain.block?.height, address]);
+
+  return balance;
+};
+
+export const useObserveBalances = (
+  tokens: Tokens,
+  address?: string,
+  type?: string,
+) => {
+  const client = useClientStore();
+  const chain = useChainStore();
+  const balances = useBalancesStore();
+  const balance = useBalance(address);
+  const { isLoadBalances, setLoadBalances } = balances;
+  // useEffect(() => {
+  //   if (!client.client || !address || !tokenId ) return;
+  //   balances.loadBalances(client.client, tokens, address);
+  // }, [client.client,chain.block?.height, address, tokens]);
+
+  // useEffect(() => {
+  //   if (!client.client || !address || !tokenId) return;
+  //   balances.loadBalances(client.client, tokens, address);
+
+  // }, [client.client, chain.block?.height, address, tokens]);
+
+  useEffect(() => {
+    if (!client.client || !address || !tokens) return;
+
+    if (
+      (type !== "swap" && type !== "pool") ||
+      (type === "pool" && isLoadBalances)
+    ) {
+      balances.loadBalances(client.client, tokens, address);
+      return;
+    }
+  }, [client.client, chain.block?.height, address, tokens, isLoadBalances]);
+
+  useEffect(() => {
+    if (!client.client || !address || !tokens) return;
+
+    if (type === "swap" && isLoadBalances) {
+      balances.loadBalances(client.client, tokens, address);
+      setLoadBalances(false);
+      return;
+    }
+  }, [client.client, address, tokens, isLoadBalances]);
+
+  useEffect(() => {
+    if (!client.client || !address || !tokens) return;
+    if (type === "pool" || isLoadBalances) {
+      balances.loadBalances(client.client, tokens, address);
+      setLoadBalances(false);
+      return;
+    }
+  }, [client.client, address, tokens, isLoadBalances]);
 
   return balance;
 };
@@ -191,10 +283,17 @@ export const useObservePooled = (
     [tickerB],
   );
 
-  const calculatePooledToken = (lpBalance: BigNumber.Value, lpTotalSupply: BigNumber.Value, tokenTotalOfPool: BigNumber.Value) => {
-    if ([lpTotalSupply, tokenTotalOfPool].includes(0)) return 0
-    return BigNumber(tokenTotalOfPool).multipliedBy(lpBalance).div(lpTotalSupply).toString()
-  }
+  const calculatePooledToken = (
+    lpBalance: BigNumber.Value,
+    lpTotalSupply: BigNumber.Value,
+    tokenTotalOfPool: BigNumber.Value,
+  ) => {
+    if ([lpTotalSupply, tokenTotalOfPool].includes(0)) return 0;
+    return BigNumber(tokenTotalOfPool)
+      .multipliedBy(lpBalance)
+      .div(lpTotalSupply)
+      .toString();
+  };
 
   // Memoize the pool key and token pair to avoid recalculating when tokenA or tokenB change
   const { tokenPair, poolKey } = usePoolKey(tokenA, tokenB);
@@ -203,8 +302,8 @@ export const useObservePooled = (
   // } = useWalletStore();
 
   // Observe balances for both tokens and the total supply of the liquidity pool token
-  const totalTokenALp = useObserveBalance(tokenA, poolKey);
-  const totalTokenBLp = useObserveBalance(tokenB, poolKey);
+  const totalTokenALp = useObserveBalancePool(tokenA, poolKey);
+  const totalTokenBLp = useObserveBalancePool(tokenB, poolKey);
   const lpTotalSupply = useObserveTotalSupply(
     LPTokenId.fromTokenPair(tokenPair).toString(),
   );
@@ -214,9 +313,17 @@ export const useObservePooled = (
     return ((Number(balance) / Number(lpTotalSupply)) * 100).toFixed(2);
   }, [balance, lpTotalSupply]);
   return {
-    first: calculatePooledToken(balance || 0, lpTotalSupply || 0, totalTokenALp || 0),
-    second: calculatePooledToken(balance || 0, lpTotalSupply || 0, totalTokenBLp || 0),
-    poolOfShare
+    first: calculatePooledToken(
+      balance || 0,
+      lpTotalSupply || 0,
+      totalTokenALp || 0,
+    ),
+    second: calculatePooledToken(
+      balance || 0,
+      lpTotalSupply || 0,
+      totalTokenBLp || 0,
+    ),
+    poolOfShare,
   };
 };
 

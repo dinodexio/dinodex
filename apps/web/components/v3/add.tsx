@@ -1,9 +1,9 @@
 "use client";
-import { Header } from "../header";
+import Header from "../header";
 import { Toaster } from "@/components/ui/toaster";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
-import "../style.css";
+import stylesModal from '../css/modal.module.css'
 import { LIST_FEE_TIER } from "@/constants";
 import {
   Dialog,
@@ -22,7 +22,8 @@ import {
 } from "@/lib/stores/xyk";
 import { usePoolKey } from "@/lib/xyk/usePoolKey";
 import {
-  useObserveBalance,
+  useBalance,
+  useObserveBalancePool,
   useObserveTotalSupply,
 } from "@/lib/stores/balances";
 import { useWalletStore } from "@/lib/stores/wallet";
@@ -35,10 +36,7 @@ import {
 } from "@/containers/xyk/add-liquidity-form";
 import { precision, removeTrailingZeroes } from "../ui/balance";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { Card, CardContent, CardHeader } from "../ui/card";
-import Link from "next/link";
-import { ModalSupplyComfirm } from "../modalSupplyConfirm/modalSupplyConfirm";
+
 export interface PoolAddProps {
   walletElement?: JSX.Element;
 }
@@ -88,19 +86,19 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
   const pool = useObservePool(poolKey);
 
   // observe balances of the pool & the connected wallet
-  const tokenAReserve = useObserveBalance(
+  const tokenAReserve = useObserveBalancePool(
     dataPoolCreate.deposit_amount.first_token,
     poolKey,
   );
-  const tokenBReserve = useObserveBalance(
+  const tokenBReserve = useObserveBalancePool(
     dataPoolCreate.deposit_amount.second_token,
     poolKey,
   );
-  const userTokenABalance = useObserveBalance(
+  const userTokenABalance = useBalance(
     dataPoolCreate.deposit_amount.first_token,
     wallet,
   );
-  const userTokenBBalance = useObserveBalance(
+  const userTokenBBalance = useBalance(
     dataPoolCreate.deposit_amount.second_token,
     wallet,
   );
@@ -438,7 +436,7 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                     </DialogTrigger>
                   </div>
                   <DialogOverlay className="bg-overlay" />
-                  <DialogContent className="modal-container bg-white px-[19.83px] pb-[33.88px] pt-[21.49px]">
+                  <DialogContent className={`bg-white px-[19.83px] pb-[33.88px] pt-[21.49px] ${stylesModal['modal']}`}>
                     <ModalListToken
                       tokenSelected={dataPoolCreate.tokenPool[typeOpenModal]}
                       onClickToken={(token) =>
@@ -719,7 +717,7 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                   </DialogTrigger>
                 )}
                 <DialogOverlay className="overlayPreview" />
-                <DialogContent className="modal-container w-[95%] max-w-[533px] rounded-[27px] bg-white px-[24px] pb-[36px] pt-[28px]">
+                <DialogContent className={`${stylesModal['modal-container']} w-[95%] max-w-[533px] rounded-[27px] bg-white px-[24px] pb-[36px] pt-[28px]`}>
                   <ModalPreviewPool
                     dataPool={dataPoolCreate}
                     onClickAddPool={() => { }}

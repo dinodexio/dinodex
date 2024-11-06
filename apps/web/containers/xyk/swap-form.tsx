@@ -7,13 +7,12 @@ import BigNumber from "bignumber.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { useWalletStore } from "@/lib/stores/wallet";
-import { useBalancesStore, useObserveBalance } from "@/lib/stores/balances";
+import { useBalance, useBalancesStore, useObserveBalancePool } from "@/lib/stores/balances";
 import { PoolKey, TokenPair, dijkstra, prepareGraph } from "chain";
 import { pools } from "@/tokens";
 import { TokenId } from "@proto-kit/library";
 import { useObservePool, useSellPath } from "@/lib/stores/xyk";
 import { useClientStore } from "@/lib/stores/client";
-import { MethodIdResolver } from "@proto-kit/module";
 
 BigNumber.set({ ROUNDING_MODE: BigNumber.ROUND_DOWN });
 
@@ -69,7 +68,7 @@ export function SwapForm() {
 
   const fields = form.getValues();
   const wallet = useWalletStore();
-  const balance = useObserveBalance(fields.tokenIn_token, wallet.wallet);
+  const balance = useBalance(fields.tokenIn_token, wallet.wallet);
 
   const routerPools = pools.map(([tokenA, tokenB]) => {
     const poolKey = PoolKey.fromTokenPair(
@@ -77,8 +76,8 @@ export function SwapForm() {
     ).toBase58();
 
     const pool = useObservePool(poolKey);
-    const balanceA = useObserveBalance(tokenA, poolKey);
-    const balanceB = useObserveBalance(tokenB, poolKey);
+    const balanceA = useObserveBalancePool(tokenA, poolKey);
+    const balanceB = useObserveBalancePool(tokenB, poolKey);
 
     return {
       tokenA,
@@ -100,9 +99,9 @@ export function SwapForm() {
   }, [fields.tokenIn_token, fields.tokenOut_token]);
 
   const pool = useObservePool(poolKey ?? "0");
-  const tokenAReserve = useObserveBalance(fields.tokenIn_token, poolKey);
-  const tokenBReserve = useObserveBalance(fields.tokenOut_token, poolKey);
-  const client = useClientStore();
+  // const tokenAReserve = useObserveBalance(fields.tokenIn_token, poolKey);
+  // const tokenBReserve = useObserveBalance(fields.tokenOut_token, poolKey);
+  // const client = useClientStore();
 
   useEffect(() => {
     if (!fields.tokenIn_token || !fields.tokenOut_token || pool?.loading)
@@ -128,7 +127,6 @@ export function SwapForm() {
           ? [fields.tokenIn_token, ...(distance?.path ?? [])]
           : [];
 
-        console.log("route", route, distance?.path);
         form.setValue("route", route, {
           shouldValidate: true,
         });

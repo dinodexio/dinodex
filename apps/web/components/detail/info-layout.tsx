@@ -44,6 +44,7 @@ export function InfoLayout({ type, params }: InfoLayoutProps) {
   const [isCopied, copyToClipboard] = useCopy();
   const token = DATA_TOKENS.find(token => token.slug === params.name[0])
   const [tab, setTab] = useState('transaction')
+  const [dataHover,setDataHover] = useState<any>({})
   return (
     <>
       <div className="mt-[40px] w-full mx-auto flex flex-col items-center gap-[20px] xl:mt-[63px] xl:gap-[46px] xl:flex-row xl:items-start xl:justify-center lg:gap-[32px] lg:items-start">
@@ -57,13 +58,18 @@ export function InfoLayout({ type, params }: InfoLayoutProps) {
           </div>
           <div className={stylesDetails["token-chart-container"]}>
             <div className={stylesDetails["token-chart-price"]}>
-              <span className={stylesDetails["token-chart-price-text"]}>${token?.price}</span>
+              <span className={stylesDetails["token-chart-price-text"]}>${dataHover.value ? dataHover.value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : token?.price}</span>
               <span className={`${stylesDetails["token-chart-change-text"]} ${stylesDetails["text-red"]}`}>
                 <img src="/images/token/change-down.svg" alt="token-1" />
                 -0.01%
               </span>
             </div>
-            <ChartToken type="token" />
+            <div className={stylesDetails["token-chart-img"]}/>
+            <div className="relative w-full" style={{ zIndex: 100 }}>
+              <ChartToken type="priceToken" onHover={(dataHover) => {
+                setDataHover(dataHover)
+              }}/>
+            </div>
           </div>
           <FilterSort />
           <div className={stylesDetails["stats-token-container"]}>
@@ -87,7 +93,7 @@ export function InfoLayout({ type, params }: InfoLayoutProps) {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-[30px] my-[25px]">
+          <div className="flex items-center gap-[20px] my-[25px]">
             {SWITCH_MENU?.map((item, index) => {
               return (
                 <span
@@ -95,8 +101,9 @@ export function InfoLayout({ type, params }: InfoLayoutProps) {
                   onClick={() => {
                     setTab(item.value);
                   }}
-                  className={`${stylesTokens["menu-token-item"]} ${tab === item.value ? stylesTokens["menu-token-item-active"] : ""}`}
+                  className={`${stylesTokens["menu-token-item"]} ${tab === item.value ? stylesTokens["menu-token-item-active"] : ""} flex items-center gap-[4px]`}
                 >
+                  <div className={`h-[8px] w-[8px] rounded-full transition-all duration-300 ease-linear ${tab === item.value ? "bg-borderOrColor" : "bg-transparent"}`} />
                   {item.label}
                 </span>
               );

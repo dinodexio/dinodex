@@ -2,9 +2,11 @@ import Image from "next/image";
 import React from "react";
 import { DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import styles from '../../css/pool.module.css'
-import stylesButton from '../../css/button.module.css'
+import styles from "../../css/pool.module.css";
+import stylesButton from "../../css/button.module.css";
 import { tokens } from "@/tokens";
+import { precision } from "@/components/ui/balance";
+import BigNumber from "bignumber.js";
 
 export interface layoutWaitingAndSuccessProps {
   statusLayout: any;
@@ -13,29 +15,45 @@ export interface layoutWaitingAndSuccessProps {
   valueTokenPool?: any;
   handleClosePool?: () => void;
   type: string;
+  tokenIn?: string;
+  tokenOut?: string;
+  tokenIn_token?: string;
+  tokenOut_token?: string;
+  tokenInAmount?: string;
+  tokenOutAmount?: string;
 }
 
 export function LayoutWaitingAndSuccess({
   statusLayout,
-  tokenParams,
-  dataPool,
-  valueTokenPool,
   handleClosePool,
   type,
+  tokenIn,
+  tokenOut,
+  tokenIn_token,
+  tokenOut_token,
+  tokenInAmount,
+  tokenOutAmount,
 }: layoutWaitingAndSuccessProps) {
   const tokenA_amount =
     type === "remove"
-      ? Number(valueTokenPool?.tokenA_amount) / 100
-      : valueTokenPool?.tokenA_amount;
+      ? BigNumber(tokenInAmount || 0)
+          .dividedBy(10 ** precision)
+          .toString()
+      : tokenInAmount;
   const tokenB_amount =
     type === "remove"
-      ? Number(valueTokenPool?.tokenB_amount) / 100
-      : valueTokenPool?.tokenB_amount;
+      ? BigNumber(tokenOutAmount || 0)
+          .dividedBy(10 ** precision)
+          .toString()
+      : tokenOutAmount;
   const textType = type === "remove" ? "Removing" : "Deposited";
   return (
     <div className={`${styles["modal-waiting"]} h-max w-full`}>
       <div className="relative mb-[15px] flex flex-col items-center justify-center gap-[50px]">
-        <DialogClose className="absolute right-[-6px] top-[-10px]" onClick={() => statusLayout?.success && handleClosePool && handleClosePool()}>
+        <DialogClose
+          className="absolute right-[-6px] top-[-10px]"
+          onClick={() => handleClosePool && handleClosePool()}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="18"
@@ -52,9 +70,7 @@ export function LayoutWaitingAndSuccess({
           </svg>
         </DialogClose>
         <div className="relative">
-          <div
-            className={`relative`}
-          >
+          <div className={`relative`}>
             <Image
               src={"/icon/loading-waiting.svg"}
               alt="logo"
@@ -64,42 +80,62 @@ export function LayoutWaitingAndSuccess({
                 ${styles["loading-waiting"]} ${statusLayout.waiting ? "opacity-100" : "opacity-0"}`}
               style={{ transition: "opacity 0.3s ease" }}
             />
-            <div className={`absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] ${statusLayout.waiting ? "opacity-100" : "opacity-0"}`} style={{ transition: "opacity 0.3s ease" }}>
-              <div className={styles['token-pool-logo']}>
-                <div className={styles['token-pool-logo-item-first']}>
+            <div
+              className={`absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ${statusLayout.waiting ? "opacity-100" : "opacity-0"}`}
+              style={{ transition: "opacity 0.3s ease" }}
+            >
+              <div className={styles["token-pool-logo"]}>
+                <div className={styles["token-pool-logo-item-first"]}>
                   <Image
-                    src={tokens[dataPool?.tokenPool?.first?.value]?.logo as string}
+                    src={(tokens[tokenIn_token ?? ""]?.logo as string) || ""}
                     width={76}
                     height={76}
-                    alt=''
-                    className={styles['pool-logo-item']}
+                    alt=""
+                    className={styles["pool-logo-item"]}
                   />
                 </div>
-                <div className={styles['token-pool-logo-item-second']}>
+                <div className={styles["token-pool-logo-item-second"]}>
                   <Image
-                    src={tokens[dataPool?.tokenPool?.second?.value]?.logo as string}
+                    src={(tokens[tokenOut_token ?? ""]?.logo as string) || ""}
                     width={76}
                     height={76}
-                    alt=''
-                    className={styles['pool-logo-item']}
-                    style={{ position: 'absolute', right: 0 }}
+                    alt=""
+                    className={styles["pool-logo-item"]}
+                    style={{ position: "absolute", right: 0 }}
                   />
                 </div>
               </div>
             </div>
           </div>
-          <div
-            className={`absolute top-0 ${statusLayout.success ? "opacity-100" : "opacity-0"}`}
-            style={{ transition: "opacity 0.3s ease" }}
-          >
-            <Image
-              src={"/icon/submitted-icon.svg"}
-              alt="logo"
-              width={200}
-              height={200}
-              className="h-[150px] w-[150px] sm:h-[150px] sm:w-[150px] lg:h-[200px] lg:w-[200px] xl:h-[200px] xl:w-[200px]"
-            />
-          </div>
+          {statusLayout.success && (
+            <div
+              className={`absolute top-0 opacity-100`}
+              style={{ transition: "opacity 0.3s ease" }}
+            >
+              <Image
+                src={"/icon/submitted-icon.svg"}
+                alt="logo"
+                width={200}
+                height={200}
+                className="h-[150px] w-[150px] sm:h-[150px] sm:w-[150px] lg:h-[200px] lg:w-[200px] xl:h-[200px] xl:w-[200px]"
+              />
+            </div>
+          )}
+
+          {statusLayout.error && (
+            <div
+              className={`absolute top-0 opacity-100`}
+              style={{ transition: "opacity 0.3s ease" }}
+            >
+              <Image
+                src={"/icon/submitted-icon-failed.svg"}
+                alt="logo"
+                width={200}
+                height={200}
+                className="h-[150px] w-[150px] sm:h-[150px] sm:w-[150px] lg:h-[200px] lg:w-[200px] xl:h-[200px] xl:w-[200px]"
+              />
+            </div>
+          )}
         </div>
         {statusLayout.waiting && (
           <div
@@ -110,8 +146,9 @@ export function LayoutWaitingAndSuccess({
               Waiting for confirmation
             </span>
             <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-              {textType} {tokenA_amount} {tokenParams?.tokenA?.label || tokens[dataPool?.tokenPool?.first?.value]?.ticker} and{" "}
-              {tokenB_amount} {tokenParams?.tokenB?.label || tokens[dataPool?.tokenPool?.second?.value]?.ticker}
+              {textType} {tokenA_amount}{" "}
+              {tokenIn || tokens[tokenIn_token ?? ""]?.ticker} and{" "}
+              {tokenB_amount} {tokenOut || tokens[tokenOut_token ?? ""]?.ticker}
             </span>
             <span className="text-[14px] font-[400] text-textBlack opacity-50 sm:text-[14px] lg:text-[15px] xl:text-[15px]">
               Confirm this transaction in your wallet
@@ -140,6 +177,32 @@ export function LayoutWaitingAndSuccess({
             <span className="text-[14px] font-[400] text-borderOrColor sm:text-[14px] lg:text-[15px] xl:text-[15px]">
               View on Minascan
             </span>
+          </div>
+        )}
+        {statusLayout.error && (
+          <div
+            className={`flex flex-col items-center justify-center gap-[10px] sm:gap-[10px] lg:gap-[15px] xl:gap-[15px] ${statusLayout.error ? "visible opacity-100" : "invisible opacity-0"}`}
+            style={{ transition: "all 0.3s ease" }}
+          >
+            <span className="text-[22px] font-[600] text-textBlack sm:text-[22px] lg:text-[28px] xl:text-[28px]">
+              {statusLayout?.message
+                ?.toString()
+                ?.toLowerCase()
+                .replace(/(?:^|\s)\S/g, function (a: string) {
+                  return a.toUpperCase();
+                }) || "Transaction failed"}
+            </span>
+            <DialogClose className="w-full">
+              <Button
+                loading={false}
+                type={"submit"}
+                className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]}`}
+                style={{ width: "100%" }}
+                onClick={() => handleClosePool && handleClosePool()}
+              >
+                <span>Close</span>
+              </Button>
+            </DialogClose>
           </div>
         )}
       </div>

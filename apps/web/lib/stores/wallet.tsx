@@ -12,6 +12,7 @@ import { useChainStore } from "./chain";
 import { Bool, Field, PublicKey, Signature, UInt64 } from "o1js";
 import { tokens } from "@/tokens";
 import Image from "next/image";
+import { useBalancesStore } from "./balances";
 
 export interface WalletState {
   wallet?: string;
@@ -21,6 +22,7 @@ export interface WalletState {
   setIsWalletOpen: (isWalletOpen: boolean) => void;
   initializeWallet: () => Promise<void>;
   connectWallet: () => Promise<void>;
+  disconnectWallet: () => Promise<void>;
   observeWalletChange: () => void;
   pendingTransactions: PendingTransaction[];
   addPendingTransaction: (
@@ -40,6 +42,12 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
       }
 
       try {
+        // Kiểm tra xem có lưu trạng thái ngắt kết nối trong localStorage không
+        const isDisconnected = localStorage.getItem("isWalletDisconnected");
+        if (isDisconnected === "true") {
+          console.log("Wallet is disconnected, skipping event listeners");
+          return;
+        }
         // Get the list of accounts
         const accounts = await mina.getAccounts();
         console.log("accountInfo", accounts);
@@ -77,12 +85,25 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
       if (typeof mina === "undefined") {
         throw new Error("Auro wallet not installed");
       }
+      localStorage.setItem("isWalletDisconnected", "false");
 
       const [wallet] = await mina.requestAccounts();
 
       set((state) => {
         state.wallet = wallet;
       });
+    },
+
+    async disconnectWallet() {
+      set((state) => {
+        state.wallet = "";
+        state.isWalletOpen = false;
+      });
+      // Lưu trạng thái ngắt kết nối trong localStorage
+      localStorage.setItem("isWalletDisconnected", "true");
+
+      // Gọi removeEventListeners để gỡ bỏ các sự kiện đã thêm
+      removeEventListeners();
     },
 
     isWalletOpen: false,
@@ -124,9 +145,17 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
   })),
 );
 
+function removeEventListeners() {
+  if (typeof mina !== "undefined") {
+    // Xóa các trình nghe sự kiện như accountsChanged
+    mina.on("accountsChanged", () => {}); // Hàm không có tác dụng để xóa trình nghe
+  }
+}
+
 export const useNotifyTransactions = () => {
   const wallet = useWalletStore();
   const chain = useChainStore();
+  const { setLoadBalances } = useBalancesStore();
   const { toast } = useToast();
   const client = useClientStore();
   const previousPendingTransactions = usePrevious(wallet.pendingTransactions);
@@ -157,7 +186,7 @@ export const useNotifyTransactions = () => {
       if (!resolvedMethodDetails)
         throw new Error("Unable to resolve method details");
 
-      const [moduleName, methodName] = resolvedMethodDetails;
+      // const [moduleName, methodName] = resolvedMethodDetails;
 
       const hash = truncateMiddle(transaction.hash().toString(), 15, 15, "...");
       // : ${moduleName}.${methodName}
@@ -210,11 +239,6 @@ export const useNotifyTransactions = () => {
 
       function description() {
         const { dataTransaction } = wallet;
-        console.log("dataTransaction", dataTransaction);
-        const tokensTicker = dataTransaction?.route
-          ?.map((id: string | number) => tokens[id]?.ticker)
-          ?.filter((ticker: undefined) => ticker !== undefined) as string[];
-
         const urlTransaction = `https://minascan.io/mainnet/tx/${transaction.sender.toBase58()}`;
 
         switch (status) {
@@ -238,8 +262,10 @@ export const useNotifyTransactions = () => {
                 )}
                 {type === "Swap" && (
                   <p className="text-[20px] text-textBlack opacity-50 sm:text-[12px] lg:text-[20px] xl:text-[20px]">
-                    {type} {dataTransaction?.tokenIn} {tokensTicker[0] || ""}{" "}
-                    for {dataTransaction?.tokenOut} {tokensTicker[1] || ""}
+                    {type} {dataTransaction?.tokenIn_amount}{" "}
+                    {tokens[dataTransaction?.tokenIn_token]?.ticker || ""} for{" "}
+                    {dataTransaction?.tokenOut_amount}{" "}
+                    {tokens[dataTransaction?.tokenOut_token]?.ticker || ""}
                   </p>
                 )}
                 <div className="flex items-center gap-[4px]">
@@ -269,6 +295,7 @@ export const useNotifyTransactions = () => {
               </div>
             );
           case "SUCCESS":
+            setLoadBalances(true);
             return (
               <div className="flex flex-col items-start gap-[10px]">
                 <span className="flex items-center gap-[4px] text-[26px] font-[500] text-textBlack sm:text-[18px] lg:text-[26px] xl:text-[26px]">
@@ -288,8 +315,10 @@ export const useNotifyTransactions = () => {
                 )}
                 {type === "Swap" && (
                   <p className="text-[20px] font-[400] text-textBlack opacity-50 sm:text-[12px] lg:text-[20px] xl:text-[20px]">
-                    {type} {dataTransaction?.tokenIn} {tokensTicker[0] || ""}{" "}
-                    for {dataTransaction?.tokenOut} {tokensTicker[1] || ""}
+                    {type} {dataTransaction?.tokenIn_amount}{" "}
+                    {tokens[dataTransaction?.tokenIn_token]?.ticker || ""} for{" "}
+                    {dataTransaction?.tokenOut_amount}{" "}
+                    {tokens[dataTransaction?.tokenOut_token]?.ticker || ""}
                   </p>
                 )}
                 <div className="flex items-center gap-[4px]">
@@ -338,8 +367,10 @@ export const useNotifyTransactions = () => {
                 )}
                 {type === "Swap" && (
                   <p className="text-[20px] font-[400] text-textBlack opacity-50 sm:text-[12px] lg:text-[20px] xl:text-[20px]">
-                    {type} {dataTransaction?.tokenIn} {tokensTicker[0] || ""}{" "}
-                    for {dataTransaction?.tokenOut} {tokensTicker[1] || ""}
+                    {type} {dataTransaction?.tokenIn_amount}{" "}
+                    {tokens[dataTransaction?.tokenIn_token]?.ticker || ""} for{" "}
+                    {dataTransaction?.tokenOut_amount}{" "}
+                    {tokens[dataTransaction?.tokenOut_token]?.ticker || ""}
                   </p>
                 )}
                 <div className="flex items-center gap-[4px]">

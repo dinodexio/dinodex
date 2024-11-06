@@ -103,6 +103,10 @@ module.exports = {
       letterSpacing: {
         "balance-separator": "-0.1rem",
       },
+      boxShadow: {
+        'popup': '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
+        'content': '0px 2px 8px 0px rgba(0, 0, 0, 0.25)',
+      }
     },
   },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],

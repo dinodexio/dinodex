@@ -11,9 +11,10 @@ import { PRICE_MINA } from "@/constants";
 export interface TransferConfirmProps {
   loading: boolean;
   onClose?: () => void;
+  onSubmit: any
 }
 
-export function WithdrawConfirm({ loading, onClose }: TransferConfirmProps) {
+export function WithdrawConfirm({ loading, onClose, onSubmit }: TransferConfirmProps) {
   const form = useFormContext();
   const fields = form.getValues();
   return (
@@ -53,6 +54,13 @@ export function WithdrawConfirm({ loading, onClose }: TransferConfirmProps) {
               </div>
             </div>
           </div>
+          <span className="text-[9.202px] font-[500] italic text-textBlack opacity-50 mt-[-7px]">
+            <USDBalance
+              balance={(0.01 * fields.amountValue * PRICE_MINA)
+                .toFixed(2)
+                .toString()}
+              type="USD"
+            /></span>
           <div className="flex items-center justify-between">
             <span className="text-[14.56px] font-[600] text-textBlack">
               Receipent
@@ -100,7 +108,7 @@ export function WithdrawConfirm({ loading, onClose }: TransferConfirmProps) {
           <Button
             className={`${stylesButton["button-swap"]} ${stylesButton["button-withdraw"]} *:w-full`}
             loading={loading}
-            type={"submit"}
+            onClick={form.handleSubmit(onSubmit)}
           >
             <span>Confirm</span>
           </Button>

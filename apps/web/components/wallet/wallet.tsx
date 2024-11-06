@@ -1,9 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
-import {
-  Loader2Icon,
-} from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Balance, precision } from "../ui/balance";
 import { USDBalance } from "../ui/usd-balance";
@@ -12,7 +10,6 @@ import truncateMiddle from "truncate-middle";
 import { tokens } from "@/tokens";
 import useClickOutside from "@/hook/useClickOutside";
 import Image from "next/image";
-import "../style.css";
 import stylesButton from "../css/button.module.css";
 import {
   MENU_WALLET,
@@ -26,7 +23,10 @@ import { DepositLayout } from "../layoutWallet/depositLayout";
 import { WithdrawLayout } from "../layoutWallet/withdrawLayout/withdrawLayout";
 import { TransferLayout } from "../layoutWallet/TransferLayout/TransferLayout";
 import BigNumber from "bignumber.js";
-import { useRouter } from "next/navigation";
+import { ChangeWalletLayout } from "../layoutWallet/changeWalletLayout";
+import { useClientStore } from "@/lib/stores/client";
+import { useBalancesStore, useFaucet } from "@/lib/stores/balances";
+import Link from "next/link";
 
 export interface Balances {
   [tokenId: string]: string | any;
@@ -36,11 +36,10 @@ export interface WalletProps {
   address?: string;
   blockHeight?: string;
   balances?: Balances;
-  loading: boolean;
+  loadingBalances?: boolean;
   open: boolean;
-  setIsWalletOpen: (open: boolean) => void;
+  setIsWalletOpen?: (open: boolean) => void;
   onConnectWallet?: () => void;
-  onFaucetDrip: () => void;
   forceIsWalletOpen?: boolean;
 }
 
@@ -54,23 +53,23 @@ export function Wallet({
   address,
   blockHeight,
   balances,
-  loading,
+  loadingBalances,
   open,
   setIsWalletOpen,
   onConnectWallet,
   forceIsWalletOpen,
-  onFaucetDrip,
 }: WalletProps) {
+  const { client } = useClientStore();
   const [menuItemActive, setMenuItemActive] = useState("");
   const [listDataWallet, setListDataWallet] = useState("token");
-  const route = useRouter()
-  const [showInfoWallet, setShowInfoWallet] = useState(false)
+  // const route = useRouter()
+  const [showInfoWallet, setShowInfoWallet] = useState(false);
   // const [isWalletDoneTransitioning, setIsWalletDoneTransitioning] =
   //   useState(true);
   // const [shouldDelayChevrons, setShouldDelayChevrons] = useState(false);
 
   const refDrawer = useClickOutside<HTMLDivElement>(() => {
-    setIsWalletOpen(false);
+    setIsWalletOpen && setIsWalletOpen(false);
   });
 
   // useEffect(() => {
@@ -85,13 +84,17 @@ export function Wallet({
   //   }, 10);
   // }, [forceIsWalletOpen]);
 
-  // console.log('balances', balances)
+  // Object.keys(tokens).forEach((tokenId) => {
+  //   useObserveBalance(tokenId, address);
+  // });
 
   useEffect(() => {
     if (!open) {
       setMenuItemActive("");
     }
   }, [open]);
+
+  const faucet = useFaucet();
 
   return (
     <div className="group">
@@ -140,26 +143,28 @@ export function Wallet({
           </p>
         </Button>
       </div> */}
-      <div className={`fixed right-0 top-0 w-[400px] h-[100vh] transition-all duration-300 ease-in-out ${open ? "opacity-100 visible" : "opacity-0 invisible"}`}
-        style={{ background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.00) 0%, #898989 100%)', zIndex: 99 }} />
+      <div className={`fixed right-0 top-[100px] left-[0] bottom-0 ${open ? "opacity-100 visible" : "opacity-0 invisible"}`} style={{zIndex:100}} onClick={() => setIsWalletOpen && setIsWalletOpen(false)}/>
+      <div className={`fixed right-0 top-0 w-[95%] max-w-[400px] h-[100vh] transition-all duration-300 ease-in-out ${open ? "opacity-100 visible" : "opacity-0 invisible"}`}
+        style={{ background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.00) 0%, #898989 100%)', zIndex: 101 }} />
 
       <div
-        ref={refDrawer}
+        // ref={refDrawer}
         // onMouseLeave={() => setShouldDelayChevrons(false)}
         // onMouseEnter={() => setShouldDelayChevrons(true)}
         className={cn([
-          "fixed -right-[350px] top-[30px] z-50 flex w-[350px] flex-col rounded-[18px] pb-[18px] pl-[20px] pr-[20px] pt-[30px] transition-all duration-300 ease-in-out",
+          `fixed -right-[350px] top-[15px] z-50 flex w-[350px] flex-col rounded-[18px] pb-[18px] pl-[20px] pr-[20px] pt-[30px] transition-all duration-300 ease-in-out sm:top-[15px] lg:top-[30px] xl:top-[30px] ${styles["wallet-container"]}`,
           {
-            "right-[30px] z-[1000] bg-bgWhiteColor": open,
+            "right-[15px] z-[1000] bg-bgWhiteColor sm:right-[15px] lg:right-[30px] xl:right-[30px]":
+              open,
           },
         ])}
-        style={{ height: "calc(100vh - (60px))", zIndex: 100 }}
+        style={{zIndex: 102 }}
       >
         <div
           className={cn(
-            "absolute right-0 flex top-0 h-full w-full flex-col rounded-[18px] items-center justify-center bg-bgWhiteColor opacity-90",
+            "absolute right-0 top-0 flex h-full w-full flex-col items-center justify-center rounded-[18px] bg-bgWhiteColor opacity-90",
             {
-              hidden: !loading,
+              hidden: true,
             },
           )}
           style={{ zIndex: 1000 }}
@@ -168,7 +173,7 @@ export function Wallet({
         </div>
         <div
           className={cn("flex h-full flex-col transition-all duration-100", {
-            "blur-md": loading,
+            "blur-md": false,
           })}
         >
           <div className="flex items-center justify-between">
@@ -179,24 +184,37 @@ export function Wallet({
                 width={30}
                 height={30}
               />
-              <span className="text-[20px] font-[500] text-textBlack">MINA</span>
+              <span className="text-[20px] font-[500] text-textBlack">
+                MINA
+              </span>
             </div>
             <Image
               src="/icon/Close-icon.svg"
               alt="logo"
               width={30}
               height={30}
-              className="cursor-pointer mt-[-15px]"
-              onClick={() => setIsWalletOpen(false)}
+              className="mt-[-15px] cursor-pointer"
+              onClick={() => setIsWalletOpen && setIsWalletOpen(false)}
             />
           </div>
           <div className="mt-[15px] flex flex-col gap-[20px]">
-            <div className="flex flex-col gap-[8px] items-start">
+            <div className="flex flex-col items-start gap-[8px]">
               <div className="flex items-center gap-[4px]">
                 <span className="text-[18px] font-[300] tracking-[1px] text-textBlack">
                   Connected
                 </span>
-                <div className="w-[12px] h-[12px] rounded-[12px] bg-[#0A6] mt-[2px]" />
+                <div className="mt-[2px] h-[12px] w-[12px] rounded-[12px] bg-[#0A6]" />
+                <div
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setMenuItemActive(WALLET_NEMU_ACTIVE.change)}
+                >
+                  <Image
+                    src={"/icon/change-wallet-icon.svg"}
+                    alt="logo"
+                    width={15}
+                    height={15}
+                  />
+                </div>
               </div>
               <div className="flex items-center gap-[4px]">
                 <p className="text-[20px] font-[500] text-textBlack">
@@ -221,7 +239,11 @@ export function Wallet({
                   Current balance
                 </span>
                 <Image
-                  src={showInfoWallet ? "/icon/show-balance-icon.svg" : "/icon/hide-balance-icon.svg"}
+                  src={
+                    showInfoWallet
+                      ? "/icon/show-balance-icon.svg"
+                      : "/icon/hide-balance-icon.svg"
+                  }
                   alt="logo"
                   width={16}
                   height={16}
@@ -230,18 +252,30 @@ export function Wallet({
                 />
               </div>
               <div className="h-[43px]">
-                <span className="text-[36px] font-[500] text-textBlack">
-                  {showInfoWallet ? <Balance balance={balances?.["0"] ?? "0"} tokenId="0" /> : "*****"}
+                <span className="text-[32px] font-[500] text-textBlack">
+                  {showInfoWallet ? (
+                    <Balance balance={balances?.["0"] ?? "0"} tokenId="0" />
+                  ) : (
+                    "*****"
+                  )}
                 </span>
               </div>
               <span className="text-[18px] font-[300] tracking-[1px] text-textBlack">
-                {showInfoWallet ? <USDBalance
-                  balance={BigNumber(balances?.["0"] * PRICE_MINA * PRICE_USD)
-                    .div(10 ** precision)
-                    .toFixed(2)
-                    .toString()}
-                  type="USD"
-                /> : "~$*****"}
+                {showInfoWallet ? (
+                  <USDBalance
+                    balance={
+                      balances
+                        ? BigNumber(balances?.["0"] * PRICE_MINA * PRICE_USD)
+                            .div(10 ** precision)
+                            .toFixed(2)
+                            .toString()
+                        : "0"
+                    }
+                    type="USD"
+                  />
+                ) : (
+                  "~$*****"
+                )}
               </span>
             </div>
           </div>
@@ -313,7 +347,7 @@ export function Wallet({
               className="list-token-wallet mb-[20px] mt-[18px] grid gap-[15px] overflow-y-scroll"
               style={{
                 maxHeight:
-                  "calc(100vh - (60px + 80px + 174px + 25px + 30px + 21px + 200px + 87px))",
+                  "calc(100vh - (60px + 80px + 174px + 25px + 30px + 21px + 200px + 87px + 48px))",
               }}
             >
               {listDataWallet === "token" && (
@@ -331,13 +365,16 @@ export function Wallet({
                         key={tokenId}
                       >
                         <div className="flex items-center">
-                          <img className="mr-[10px] h-8 w-8" src={token.logo} />
+                          <img
+                            className="mr-[10px] h-8 w-8"
+                            src={token?.logo}
+                          />
                           <div>
                             <p className="text-[16px] font-[500] text-textBlack">
-                              {token.ticker}
+                              {token?.ticker}
                             </p>
                             <p className="text-[12px] font-[300] tracking-[1px] text-textBlack">
-                              {token.name}
+                              {token?.name}
                             </p>
                           </div>
                         </div>
@@ -378,7 +415,7 @@ export function Wallet({
                         />
                         <div className="flex flex-col gap-[2px]">
                           <span
-                            className={`text-[16px] font-[500] capitalize ${styles[item.type + `-text`]}`}
+                            className={`text-[16px] font-[500] capitalize text-textBlack ${styles[item.type + `-text`]}`}
                           >
                             {item.type === WALLET_NEMU_ACTIVE.withdraw
                               ? "Withdrawal"
@@ -395,7 +432,7 @@ export function Wallet({
                       </div>
                       <div className="flex flex-col gap-[2px]">
                         <span
-                          className={`flex items-center justify-end text-[16px] font-[500] capitalize`}
+                          className={`flex items-center justify-end text-textBlack text-[16px] font-[500] capitalize`}
                         >
                           {Number(item.price).toFixed(2)} {item.token.label}
                         </span>
@@ -403,7 +440,10 @@ export function Wallet({
                           className="cursor-pointer text-[12px] font-[300] italic text-borderOrColor"
                           style={{ textDecoration: "underline" }}
                           onClick={() => {
-                            window.open(`https://minascan.io/mainnet/account/${item.address}/txs`, "_blank");
+                            window.open(
+                              `https://minascan.io/mainnet/account/${item.address}/txs`,
+                              "_blank",
+                            );
                           }}
                         >
                           View on Minascan
@@ -414,8 +454,8 @@ export function Wallet({
                 </>
               )}
             </div>
-            {listDataWallet === 'token' && (
-              <span className="text-borderOrColor text-[16px] font-[500] hover:underline cursor-pointer w-full flex items-center justify-center">
+            {listDataWallet === "token" && (
+              <span className="flex w-full cursor-pointer items-center justify-center text-[16px] font-[500] text-borderOrColor hover:underline">
                 + Import token
               </span>
             )}
@@ -423,7 +463,7 @@ export function Wallet({
           <div className="flex flex-col gap-[15px]">
             <Button
               className={`${stylesButton["button-swap"]} ${stylesButton["button-wallet"]} *:w-full`}
-              onClick={onFaucetDrip}
+              onClick={() => client && address && faucet()}
             >
               {/* <span>
                 <PiggyBank className="mr-2 h-4 w-4" />
@@ -439,7 +479,7 @@ export function Wallet({
                   Localnet
                 </p>
               </div>
-              <div className="flex items-center justify-center gap-[8.8px] mr-[-12px]">
+              <div className="mr-[-12px] flex items-center justify-center gap-[8.8px]">
                 <Image
                   src={"/images/social/git.svg"}
                   alt="logo"
@@ -447,13 +487,17 @@ export function Wallet({
                   height={22}
                   style={{ cursor: "pointer" }}
                 />
-                <Image
-                  src={"/images/social/x.svg"}
-                  alt="logo"
-                  width={22}
-                  height={22}
-                  style={{ cursor: "pointer" }}
-                />
+                <Link href="https://x.com/realDinoDex" target="_blank">
+                  {" "}
+                  <Image
+                    src={"/images/social/x.svg"}
+                    alt="logo"
+                    width={22}
+                    height={22}
+                    style={{ cursor: "pointer" }}
+                  />
+                </Link>
+
                 <Image
                   src={"/images/social/discord.svg"}
                   alt="logo"
@@ -462,8 +506,11 @@ export function Wallet({
                   style={{ cursor: "pointer" }}
                 />
               </div>
-              <div className="flex flex-col gap-[2px] items-end">
-                <p className="text-[12px] font-[300] tracking-[1px] text-textBlack" style={{ letterSpacing: "0.3px" }}>
+              <div className="flex flex-col items-end gap-[2px]">
+                <p
+                  className="text-[12px] font-[300] tracking-[1px] text-textBlack"
+                  style={{ letterSpacing: "0.3px" }}
+                >
                   Current block
                 </p>
                 <p className="text-[16px] font-[500] text-textBlack">
@@ -475,7 +522,7 @@ export function Wallet({
         </div>
         <div>
           <div
-            className={`absolute bottom-0 right-0 top-0 w-full h-full rounded-[18px]
+            className={`absolute bottom-0 right-0 top-0 h-full w-full rounded-[18px]
                         ${styles["overlay-wallet"]} ${menuItemActive !== "" && open ? styles["show-overlay-wallet"] : ""}`}
             style={{ zIndex: 101 }}
             onClick={() => setMenuItemActive("")}
@@ -488,6 +535,12 @@ export function Wallet({
           )}
           {menuItemActive === WALLET_NEMU_ACTIVE.transfer && open && (
             <TransferLayout onClose={() => setMenuItemActive("")} />
+          )}
+          {menuItemActive === WALLET_NEMU_ACTIVE.change && open && (
+            <ChangeWalletLayout
+              onClose={() => setMenuItemActive("")}
+              address={address || ""}
+            />
           )}
         </div>
       </div>

@@ -77,7 +77,7 @@ export function FilterSort({ }: FilterSortProps) {
                 ))}
             </div>
             <div className={styles["filter-sort-container"]}>
-                <div className={styles["network-content"]} onClick={() => {
+                {/* <div className={styles["network-content"]} onClick={() => {
                     setOpenNetWork(!openNetWork)
                 }} ref={refNetWork}>
                     <Image width={20} height={20} src={dataNetWork ? dataNetWork.logo : "/icon/network-icon.svg"} alt="network" />
@@ -93,7 +93,7 @@ export function FilterSort({ }: FilterSortProps) {
                             </div>
                         ))}
                     </div>
-                </div>
+                </div> */}
                 <div className={styles["network-content"]} onClick={() => {
                     setOpenNetWork(false)
                     setOpenFiltersChart(!openFiltersChart)

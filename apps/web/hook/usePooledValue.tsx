@@ -1,4 +1,4 @@
-import { useObserveBalance } from "@/lib/stores/balances";
+import { useObserveBalancePool } from "@/lib/stores/balances";
 import { getTokenID } from "@/tokens";
 import { TokenId } from "@proto-kit/library";
 import { PoolKey, TokenPair } from "chain";
@@ -13,8 +13,8 @@ export function usePooledValue(item: any) {
   ).toBase58();
 
   const balance = useMemo(() => ({
-    first: useObserveBalance(tokenA, poolKey),
-    second: useObserveBalance(tokenB, poolKey),
+    first: useObserveBalancePool(tokenA, poolKey),
+    second: useObserveBalancePool(tokenB, poolKey),
   }), [tokenA, tokenB, poolKey]);
 
   return balance;

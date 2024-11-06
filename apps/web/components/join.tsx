@@ -21,11 +21,11 @@
 // }
 
 "use client";
-import { Header } from "./header";
+import Header from "./header";
 import { Toaster } from "@/components/ui/toaster";
 import Image from "next/image";
 import { useState } from "react";
-import './style.css'
+import styles from './css/modal.module.css'
 import { LIST_FEE_TIER } from "@/constants";
 import {
   Dialog,
@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog"
 import { ModalListToken } from "./modalListToken/modalListToken";
 import { ModalPreviewPool } from "./modalPreviewPool/modalPreviewPool";
+import { Footer } from "./footer";
 export interface PoolJoinProps { }
 
 export function PoolJoin({ }: PoolJoinProps) {
@@ -165,7 +166,7 @@ export function PoolJoin({ }: PoolJoinProps) {
                   </DialogTrigger>
                 </div>
                 <DialogOverlay className="bg-overlay" />
-                <DialogContent className="px-[19.83px] pt-[21.49px] pb-[33.88px] bg-white modal-container">
+                <DialogContent className={`px-[19.83px] pt-[21.49px] pb-[33.88px] bg-white ${styles['modal-container']}`}>
                   <ModalListToken
                     tokenSelected={dataPoolCreate.tokenPool[typeOpenModal]}
                     onClickToken={(token) => setDataPoolCreate({
@@ -311,6 +312,7 @@ export function PoolJoin({ }: PoolJoinProps) {
             </Dialog>
           </div>
         </div>
+        <Footer />
       </div >
       {(!dataPoolCreate.tokenPool.first || !dataPoolCreate.tokenPool.second) ? (
         <div className="popup-hide"><Image src="/icon/icon-hide-pool.svg" width={30} height={30} alt="icon-hide-pool" /> <span className="text-black text-[16px]">Your Position will appear here</span></div>

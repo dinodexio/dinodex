@@ -3,7 +3,7 @@
     overflow-x: scroll;
     margin-bottom: 20px;
     background-color: #FFF;
-    border: 1px solid var(--black-text-color);
+    box-shadow: 0px 2px 4px 0px var(--shadow-popup-color);
     border-radius: 12px;
 }
 
@@ -414,7 +414,7 @@
 }
 
 .table-tr:hover{
-    background: var(--bg-switch-range-color);
+    background: #EEE;
 }
 
 /* table token */

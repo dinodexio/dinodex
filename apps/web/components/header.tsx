@@ -1,22 +1,18 @@
 import Link from "next/link";
 import "./style.css";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import useClickOutside from "@/hook/useClickOutside";
-import { useClientStore } from "@/lib/stores/client";
 import { useNotifyTransactions, useWalletStore } from "@/lib/stores/wallet";
 import { truncateAddress } from "@/lib/utils";
 import stylesButton from "./css/button.module.css";
 import stylesHeader from "./css/header.module.css";
 import { Wallet } from "./wallet/wallet";
-import {
-  useBalancesStore,
-  useFaucet,
-  useObserveBalance,
-} from "@/lib/stores/balances";
+import { useBalancesStore, useObserveBalances } from "@/lib/stores/balances";
 import { useChainStore, usePollBlockHeight } from "@/lib/stores/chain";
 import { tokens } from "@/tokens";
-export function Header() {
+import { useClientStore } from "@/lib/stores/client";
+export default function Header({ type }: { type?: string }) {
   const {
     connectWallet,
     wallet,
@@ -25,8 +21,8 @@ export function Header() {
     isWalletOpen,
     setIsWalletOpen,
   } = useWalletStore();
-  const client = useClientStore();
-
+  const { start, client } = useClientStore();
+  const { setLoadBalances } = useBalancesStore();
   const {
     balances,
     loading: balancesLoading,
@@ -39,24 +35,25 @@ export function Header() {
   useEffect(() => {
     wallet && clearBalances(wallet);
   }, [wallet]);
-
-  Object.keys(tokens).forEach((tokenId) => {
-    useObserveBalance(tokenId, wallet);
-  });
+  useObserveBalances(tokens, wallet, type);
 
   useEffect(() => {
-    client.start();
+    !client && start();
     observeWalletChange();
     initializeWallet();
   }, []);
+
+  useEffect(() => {
+    if (isWalletOpen) {
+      setLoadBalances(isWalletOpen);
+    }
+  }, [isWalletOpen]);
 
   const ownBalances = wallet ? balances[wallet] : {};
 
   const loading =
     balancesLoading && !!(wallet && balances[wallet]?.["0"] === undefined);
 
-  const faucet = useFaucet();
-  // const client = useClientStore();
   const [showMenuMobile, setShowMenuMobile] = useState<boolean>(false);
   let dataHeader = [
     {
@@ -77,7 +74,7 @@ export function Header() {
     {
       value: "tokens",
       label: "Info",
-      path: "/tokens",
+      path: "/info/tokens",
     },
   ];
 
@@ -112,7 +109,7 @@ export function Header() {
                       : path === "pools" ||
                           path === "tokens" ||
                           path === "transactions" ||
-                          path.includes("tokens")
+                          path.includes("info")
                         ? stylesButton["button-header-active"]
                         : ""
                   }`}
@@ -161,7 +158,7 @@ export function Header() {
                   );
                 })}
                 <div className={stylesHeader["content-social-menu-mobile"]}>
-                  <a href="https://twitter.com/dinodex" target="_blank">
+                  <a href="https://x.com/realDinoDex" target="_blank">
                     <Image
                       src={"/images/social/git.svg"}
                       width={28}
@@ -169,7 +166,7 @@ export function Header() {
                       height={28}
                     />
                   </a>
-                  <a href="https://t.me/dinodex" target="_blank">
+                  <a href="" target="_blank">
                     <Image
                       src={"/images/social/x.svg"}
                       width={28}
@@ -177,7 +174,7 @@ export function Header() {
                       height={28}
                     />
                   </a>
-                  <a href="https://discord.com/invite/9nXbJX5" target="_blank">
+                  <a href="" target="_blank">
                     <Image
                       src={"/images/social/discord.svg"}
                       width={28}
@@ -200,14 +197,13 @@ export function Header() {
         </div>
       </div>
       <Wallet
-        loading={loading}
+        loadingBalances={loading}
         blockHeight={block?.height}
         address={wallet}
         balances={ownBalances}
         open={isWalletOpen}
         setIsWalletOpen={setIsWalletOpen}
         forceIsWalletOpen={!!wallet}
-        onFaucetDrip={() => client.client && wallet && faucet()}
       />
     </>
   );
