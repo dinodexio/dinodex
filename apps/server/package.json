@@ -4,23 +4,27 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "start": "node --experimental-specifier-resolution=node main.js",
-    "dev": "node --experimental-specifier-resolution=node main.js",
+    "start": "node --experimental-specifier-resolution=node index.js",
+    "dev": "nodemon --experimental-specifier-resolution=node --inspect index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "async-mutex": "^0.5.0",
+    "bignumber.js": "^9.1.2",
     "chain": "workspace:*",
     "cors": "^2.8.5",
     "express": "^4.21.0",
     "graphql": "^16.9.0",
     "graphql-request": "^7.1.0",
+    "mongodb": "^6.10.0",
+    "o1js": "1.6.0",
     "pg": "^8.13.0"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/pg": "^8.11.10",
     "nodemon": "^3.1.4"
   },
   "peerDependencies": {

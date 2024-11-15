@@ -1,0 +1,42 @@
+services:
+  mongo1:
+    image: mongo:latest
+    container_name: mongo1
+    volumes:
+      - /mnt/mongo1:/data/db
+      - ./mongo-keyfile:/data/configdb/mongo-keyfile
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 9eALQ1w0e2gUfpg
+      GLIBC_TUNABLES: glibc.pthread.rseq=0
+    command: ["--replSet", "rs0", "--keyFile", "/data/configdb/mongo-keyfile"]
+
+  mongo2:
+    image: mongo:latest
+    container_name: mongo2
+    volumes:
+      - /mnt/mongo2:/data/db
+      - ./mongo-keyfile:/data/configdb/mongo-keyfile
+    ports:
+      - 27018:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 9eALQ1w0e2gUfpg
+      GLIBC_TUNABLES: glibc.pthread.rseq=0
+    command: ["--replSet", "rs0", "--keyFile", "/data/configdb/mongo-keyfile"]
+
+  mongo3:
+    image: mongo:latest
+    container_name: mongo3
+    volumes:
+      - /mnt/mongo3:/data/db
+      - ./mongo-keyfile:/data/configdb/mongo-keyfile
+    ports:
+      - 27019:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 9eALQ1w0e2gUfpg
+      GLIBC_TUNABLES: glibc.pthread.rseq=0
+    command: ["--replSet", "rs0", "--keyFile", "/data/configdb/mongo-keyfile"]
