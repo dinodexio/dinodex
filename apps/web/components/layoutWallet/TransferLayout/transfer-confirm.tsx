@@ -2,19 +2,25 @@ import { useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import stylesButton from "../../css/button.module.css";
-import { truncateAddress } from "@/lib/utils";
+import { formatPriceUSD, truncateAddress, truncateString } from "@/lib/utils";
 import { USDBalance } from "@/components/ui/usd-balance";
 import { tokens } from "@/tokens";
-import { Balance } from "@/components/ui/balance";
-import { PRICE_MINA } from "@/constants";
+import { Balance, precision } from "@/components/ui/balance";
+import { EMPTY_DATA, PRICE_MINA } from "@/constants";
 
 export interface TransferConfirmProps {
   loading: boolean;
   onClose?: () => void;
   onSubmit?: any;
+  isConfirm?: boolean;
 }
 
-export function TransferConfirm({ loading, onClose, onSubmit }: TransferConfirmProps) {
+export function TransferConfirm({
+  loading,
+  onClose,
+  onSubmit,
+  isConfirm,
+}: TransferConfirmProps) {
   const form = useFormContext();
   const fields = form.getValues();
   return (
@@ -56,9 +62,10 @@ export function TransferConfirm({ loading, onClose, onSubmit }: TransferConfirmP
           </div>
           <span className="mt-[-8px] text-[9.202px] font-[500] italic text-textBlack opacity-[0.5]">
             <USDBalance
-              balance={(0.01 * fields.amountValue * PRICE_MINA)
-                .toFixed(2)
-                .toString()}
+              balance={formatPriceUSD(
+                fields.amountValue,
+                tokens[fields.amount_token]?.ticker ?? "",
+              )}
               type="USD"
             />
           </span>
@@ -81,7 +88,11 @@ export function TransferConfirm({ loading, onClose, onSubmit }: TransferConfirmP
                 Price
               </span>
               <span className="text-[10.484px] font-[500] text-textBlack">
-                1 MINA = <Balance balance={undefined} /> USDC
+                1 MINA ={" "}
+                <USDBalance
+                  balance={formatPriceUSD(1, "MINA")}
+                />{" "}
+                USDC
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -90,14 +101,15 @@ export function TransferConfirm({ loading, onClose, onSubmit }: TransferConfirmP
               </span>
               <div className="flex items-center gap-[2px]">
                 <span className="text-[10.484px] font-[500] text-textBlack">
-                  <Balance balance={(0.01 * fields.amountValue).toString()} />{" "}
+                  {truncateString(
+                    Number(0.01 * fields.amountValue).toString(),
+                    precision,
+                  ) || EMPTY_DATA}{" "}
                   MINA
                 </span>
                 <span className="text-[10.484px] font-[500] text-textBlack opacity-60">
                   <USDBalance
-                    balance={(0.01 * fields.amountValue * PRICE_MINA)
-                      .toFixed(2)
-                      .toString()}
+                    balance={formatPriceUSD(0.01 * fields.amountValue, "MINA")}
                     type="USD"
                   />
                 </span>
@@ -107,7 +119,7 @@ export function TransferConfirm({ loading, onClose, onSubmit }: TransferConfirmP
           <Button
             className={`${stylesButton["button-swap"]} ${stylesButton["button-withdraw"]} *:w-full`}
             loading={loading}
-            disabled={!form.formState.isValid}
+            disabled={!isConfirm}
             onClick={form.handleSubmit(onSubmit)}
           >
             <span>Confirm</span>

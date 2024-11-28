@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        @font-face {
+            font-family: "PPMondwest";
+            src: url("fonts/PPMondwest-Regular.otf") format("opentype");
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
+    <title>DinoDEX</title>
+    <link rel="stylesheet" href="./styles.css">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhfcpP8nRxH+9v58ZL++tL2UbH4KxLvAW5HC1UdjC4DyTocmkFKhfXJRi/7KZfL" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-5o3WWfgjOF8fAvcqEjhMlOv4d6FnL5yIEsDTGRcIRvFNR5kdr1IudfEKK5iM1S8y"
+        crossorigin="anonymous"></script>
+</head>
+
+
+<body class="home-b">
+    <div class="bg-body">
+        <img src='./../assets/images/home/bg-web.png' />
+    </div>
+    <div class="content-home-b">
+        <div class="cloud-content">
+            <img src="assets/images/home/cloud-1.svg" alt="cloud">
+        </div>
+        <div class="content-social" style="z-index: 10;">
+            <a href="https://github.com" target="_blank">
+                <img src="assets/images/social/git.svg" alt="github">
+            </a>
+            <a href="https://x.com" target="_blank">
+                <img src="assets/images/social/x.svg" alt="twitter">
+            </a>
+            <a href="https://discord.com" target="_blank">
+                <img src="assets/images/social/discord.svg" alt="discord">
+            </a>
+        </div>
+        <div class="logo-content logo-content-b" style="position: relative;">
+            <span
+                style="font-family: PPMondwest; font-size: 160px; color: var(--black-text-color); height: 175px; display: flex; align-items: center; margin-bottom: 62px;">DinoDEX</span>
+            <button class="button-home" style="width: 573px; height: 70px; font-size: 30.353px;">
+                <span>Get Started</span>
+            </button>
+            <div class="cloud-content-b">
+                <img src="assets/images/home/cloud-2.svg" alt="cloud">
+            </div>
+        </div>
+        <div class="game-content">
+            <img src="assets/images/home/land.svg" alt="game" class="land-img">
+            <div class="dex-content">
+                <img src="assets/images/home/dex.svg" alt="dex">
+            </div>
+            <div class="cactus-content-b">
+                <img src="assets/images/home/cactus-left.svg" alt="cactus">
+                <img src="assets/images/home/cactus-center.svg" alt="cactus">
+                <img src="assets/images/home/cactus-right.svg" alt="cactus">
+            </div>
+            <div class="content-token">
+                <img src="assets/images/home/token-home.svg" alt="token">
+            </div>
+        </div>
+    </div>
+    <script>
+      const element = document.querySelector('body');
+      const svgPath = 'assets/images/home/logo_icon_28x28.svg';
+      const cursorUrl = `url(${svgPath}), auto`;
+      element.style.cursor = cursorUrl;
+    </script>
+</body>
+
+</html>

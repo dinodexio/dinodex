@@ -1,0 +1,83 @@
+.home-b{
+    position: relative;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+.content-home-b {
+    margin-top: 226px;
+    padding: 0;
+}
+
+.cloud-content {
+    padding: 0px 37px 0 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-content {
+    display: flex;
+    justify-content: center
+}
+
+.logo-content-b{
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: -45px;
+}
+
+.game-content {
+    position: fixed;
+    bottom: 76px;
+    left: 0;
+    width: 100%;
+}
+
+.dex-content {
+    position: absolute;
+    bottom: 16px;
+    left: 129px;
+}
+
+.cactus-content-b {
+    position: absolute;
+    top: -182px;
+    right: 50%;
+    transform: translateX(50%);
+}
+
+.content-social {
+    display: flex;
+    justify-content: center;
+    gap: 17px;
+    position: absolute;
+    top: -20px;
+    right: 50%;
+    transform: translateX(50%);
+}
+
+.cloud-content-b{
+    position: absolute;
+    position: absolute;
+    bottom: 8px;
+    right: 37px;
+}
+
+.content-token{
+    position: absolute;
+    right: 168.5px;
+    top: -42px;
+}
+
+@media screen and (min-width: 1500px) {
+    .land-img {
+        width: 100%;
+    }
+}
+@media screen and (min-height: 900px) {
+    .content-home-b{
+        margin-top: calc(100vh / 5);
+    }
+}

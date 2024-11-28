@@ -2,11 +2,8 @@
 import React, { useEffect } from 'react';
 import { DoubleAreaChart } from './chart';
 import { DATA_DUMMY_CHART } from '@/constants';
-import styles from '../css/tokens.module.css'
-
-export interface ChartDouAreaProps {
-    onHover?: (dataHover: any) => void
-}
+import styles from '../css/tokens.module.css';
+import { ChartDouAreaProps } from '@/types';
 
 const ChartDouArea = ({
     onHover
@@ -39,7 +36,6 @@ const ChartDouArea = ({
                 colors: ['#792FFD', '#45C793'],
                 colorArea: ['rgba(225, 217, 240, 0.5)', 'rgba(230, 247, 240, 0.5)'],
                 onHover: (x: number, dataHover: any) => {
-                    // console.log('Hover x position:', x);
                     let boxInfo = document.getElementById('box-chart-dou-area');
                     if (boxInfo) {
                         boxInfo.style.left = (x - 40) + 'px';

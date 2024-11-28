@@ -1,7 +1,7 @@
 import { Form } from "@/components/ui/form";
 import { AddLiquidityForm as AddLiquidityFormComponent } from "@/components/xyk/add-liquidity-form";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -12,7 +12,7 @@ import {
 } from "@/lib/stores/xyk";
 import BigNumber from "bignumber.js";
 import { LPTokenId, PoolKey, TokenPair } from "chain";
-import { TokenId } from "@proto-kit/library";
+// import { TokenId } from "@proto-kit/library";
 import {
   useBalance,
   useObserveBalancePool,
@@ -22,6 +22,8 @@ import { precision, removeTrailingZeroes } from "@/components/ui/balance";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { usePoolKey } from "@/lib/xyk/usePoolKey";
 import { useSpotPrice } from "@/lib/xyk/useSpotPrice";
+import { dataSubmitProps } from "@/types";
+import { tokens } from "@/tokens";
 
 export function addPrecision(value: string) {
   // return new BigNumber(value).times(10 ** precision).toFixed(0);
@@ -30,7 +32,15 @@ export function addPrecision(value: string) {
 }
 
 export function removePrecision(value: string, decimalPlaces: number = 5) {
-  return new BigNumber(value).div(10 ** precision).toFixed(decimalPlaces);
+  const formattedValue = new BigNumber(value).div(10 ** precision);
+
+  // Check if formatted value is smaller than the precision set
+  if (formattedValue.isLessThan(BigNumber(`1e-${decimalPlaces}`))) {
+    return formattedValue.toString(); // Enforce fixed decimal places
+  } else {
+    return formattedValue.toFixed(decimalPlaces); // Return full string if precision is larger
+  }
+  // return new BigNumber(value).div(10 ** precision).toFixed(decimalPlaces);
 }
 
 export function AddLiquidityForm() {
@@ -157,6 +167,14 @@ export function AddLiquidityForm() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
+    const data: dataSubmitProps = {
+      logoA: tokens[values.tokenA_token]?.logo,
+      logoB: tokens[values.tokenB_token]?.logo,
+      tickerA: tokens[values.tokenA_token]?.ticker,
+      tickerB: tokens[values.tokenB_token]?.ticker,
+      amountA: values.tokenA_amount,
+      amountB: values.tokenB_amount,
+    };
     try {
       if (pool?.exists) {
         await addLiquidity(
@@ -164,6 +182,7 @@ export function AddLiquidityForm() {
           values.tokenB_token,
           addPrecision(values.tokenA_amount),
           addPrecision(values.tokenB_amount),
+          data,
         );
       } else {
         await createPool(
@@ -171,6 +190,7 @@ export function AddLiquidityForm() {
           values.tokenB_token,
           addPrecision(values.tokenA_amount),
           addPrecision(values.tokenB_amount),
+          data,
         );
       }
     } finally {

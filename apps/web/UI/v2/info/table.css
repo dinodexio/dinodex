@@ -1,0 +1,556 @@
+.table-container {
+    width:min(100%, 1150px);
+    overflow-x: scroll;
+    margin-bottom: 20px;
+    background-color: #FFF;
+    box-shadow: 0px 2px 4px 0px var(--shadow-popup-color);
+    border-radius: 12px;
+}
+
+.table-layout{
+    width: min(100%,734px)
+}
+
+
+.table-td,.table-tr,.table-tr-header{
+    padding: 0
+}
+
+.container-table {
+    width: 1146px;
+    border-spacing: 0;
+    border-radius: 12px;
+    border-collapse:unset
+}
+
+.table-layout > .container-table {
+    max-width: 734px;
+}
+
+.table-container::-webkit-scrollbar{
+    display: none;
+}
+
+.table-head-row {
+    width: 100%;
+    height: 64px;
+    background: #E8E8E8;
+}
+
+.table-head-row th:first-child {
+
+    padding-left: 23px;
+    border-top-left-radius: 12px;
+    overflow: hidden;
+}
+
+.table-head-row th:last-child {
+    border-top-right-radius: 12px;
+}
+
+.text-header {
+    color: var(--black-text-color);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    opacity: 0.4;
+}
+
+.text-header-token-name,.text-header-type {
+    text-align: start;
+}
+
+.text-header-price,
+.text-header-change1h,
+.text-header-change1d,
+.text-header-fdv,
+.text-header-volume,
+.text-header-apr,
+.text-header-volume1d,
+.text-header-volume7d,
+.text-header-volume1d-tvl,
+.text-header-tvl {
+    text-align: end;
+    padding-right: 50px;
+}
+
+.table-tr {
+    border: 1px solid var(--black-text-color);
+    height: 56px;
+    color: var(--black-text-color);
+    text-align: center;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.table-td-numberic {
+    text-align: center;
+    position: relative;
+    padding-left: 23px;
+    border-bottom: 1px solid var(--border-black-color);
+}
+
+.table-td-numberic::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 23px;
+    height: 3px;
+    background: #FFF;
+}
+
+.text-header-numberic,
+.text-header-numberic-pool {
+    text-align: center;
+}
+
+.table-td-numberic-pool {
+    padding-left: 23px;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid var(--border-black-color); 
+}
+
+
+.table-tr:last-child .table-td-numberic-pool {
+    border: 0;
+}
+.table-td-numberic-pool::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 23px;
+    height: 3px;
+    background: #FFF;
+}
+
+.table-tr:first-child .table-td-numberic-pool::before,
+.table-tr:first-child .table-td-numberic::before,
+.table-tr:first-child .table-td-chart::before {
+    display: none;
+}
+
+.table-tr:last-child .table-td-numberic {
+    border-bottom-left-radius: 12px;
+}
+
+.table-tr:last-child .table-td-numberic-pool {
+    border-bottom-left-radius: 12px;
+    border-color: var(--black-text-color);
+}
+
+.table-tr:last-child .table-td-chart {
+    border-bottom-right-radius: 12px;
+}
+
+.table-td-token-name {
+    text-align: start;
+    border-bottom: 1px solid var(--border-black-color);
+}
+
+.token-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.token-name-text {
+    text-transform: capitalize;
+}
+
+.token-symbol-text {
+    text-transform: uppercase;
+    font-weight: 500;
+    opacity: 0.5;
+}
+
+.table-td-price,
+.table-td-change1h,
+.table-td-change1d,
+.table-td-fdv,
+.table-td-volume,
+.table-td-chart,
+.table-td-apr,
+.table-td-volume1d,
+.table-td-volume7d,
+.table-td-volume1d-tvl,
+.table-td-tvl {
+    text-align: end;
+    padding-right: 50px;
+    border-bottom: 1px solid var(--border-black-color);
+}
+
+.table-td-volume1d-tvl,.text-header-volume1d-tvl {
+    padding-right: 33px;
+    position: relative;
+}
+
+
+.table-td-volume1d-tvl::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: 0;
+    width: 33px;
+    height: 3px;
+    background: var(--white-text-color);
+}
+
+.table-tr:first-child .table-td-volume1d-tvl::before {
+    display: none;
+}
+
+
+.table-td-chart {
+    padding-right: 23px;
+}
+
+.table-td-chart {
+    position: relative;
+}
+
+.table-td-chart::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: 0;
+    width: 23px;
+    height: 3px;
+    background: var(--white-text-color);
+}
+
+.table-tr:last-child .table-td-price,
+.table-tr:last-child .table-td-numberic,
+.table-tr:last-child .table-td-token-name,
+.table-tr:last-child .table-td-change1h,
+.table-tr:last-child .table-td-change1d,
+.table-tr:last-child .table-td-fdv,
+.table-tr:last-child .table-td-volume,
+.table-tr:last-child .table-td-chart,
+.table-tr:last-child .table-td-volume1d-tvl,
+.table-tr:last-child .table-td-apr,
+.table-tr:last-child .table-td-volume1d,
+.table-tr:last-child .table-td-volume7d,
+.table-tr:last-child .table-td-tvl {
+    border: 0;
+}
+
+.table-tr:last-child .table-td-volume1d-tvl {
+    border-bottom-right-radius: 12px;
+}
+
+
+.text-change {
+    display: flex;
+
+    align-items: center;
+    justify-content: end;
+    gap: 4px;
+    font-weight: 500;
+}
+
+.text-green {
+    color: var(--green-text-color);
+}
+
+.text-red {
+    color: var(--red-text-color);
+}
+
+
+/* tabel pool */
+
+.token-info-logo {
+    display: flex;
+    align-items: center;
+
+}
+
+
+.token-info-logo-item-first,
+.token-info-logo-item-second {
+    position: relative;
+    display: flex;
+}
+
+.token-info-logo-item-first {
+    width: 12px;
+    height: 24px;
+    overflow: hidden;
+}
+
+.token-info-logo-item-second {
+    width: 12px;
+    height: 25px;
+    margin-top: -1px;
+    overflow: hidden;
+}
+
+.token-info-logo-item-second>img {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 25px;
+    height: 25px;
+}
+
+.fee-tier-text-table {
+    display: flex;
+    padding: 4px 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 6px;
+    border: 1px solid var(--black-text-color);
+    color: var(--black-text-color);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+/* table transaction */
+
+.table-td-time{
+    padding-left: 23px;
+    border-bottom: 1px solid var(--border-black-color);
+    position: relative;
+    text-align: start;
+}
+
+.text-header-time{
+    margin-left: 10px;
+    text-align: start;
+}
+
+.table-td-time::after{
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 23px;
+    height: 3px;
+    background: var(--white-text-color);
+}
+
+.table-tr:first-child .table-td-time::after{
+    display: none;
+}
+
+.table-tr:last-child .table-td-time{
+    border: 0;
+}
+
+
+.text-header-usd,.table-td-usd,
+.text-header-wallet,
+.text-header-token-amount,.table-td-token-amount{
+    text-align: end;
+    padding-right: 43px;
+}
+
+.table-td-wallet,.text-header-wallet{
+    text-align: end;
+    padding-right: 23px;
+}
+
+.table-td-usd,
+.table-td-type,
+.table-td-wallet,
+.table-td-token-amount{
+    border-bottom: 1px solid var(--border-black-color);
+}
+
+.table-tr:last-child .table-td-usd,
+.table-tr:last-child .table-td-type,
+.table-tr:last-child .table-td-wallet,
+.table-tr:last-child .table-td-token-amount{
+    border: 0
+}
+
+.table-tr:last-child .table-td-wallet{
+    border-bottom-right-radius: 12px;
+}
+
+.table-td-wallet{
+    position: relative;
+}
+
+.table-td-wallet::before{
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: 0;
+    width: 23px;
+    height: 3px;
+    background: var(--white-text-color);
+}
+
+.table-tr:first-child .table-td-wallet::before{
+    display: none;
+}
+
+.text-time, .type-text {
+    opacity: 0.5;
+}
+
+.type-transaction,.transaction-item{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.token-item{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: end;
+    font-size: 18px;
+}
+
+.table-tr{
+    transition: background 0.3s ease;
+    cursor: pointer;
+}
+
+.table-tr:hover{
+    background: #EEE;
+}
+
+/* table token */
+
+.time-transaction, .table-td-time-transaction{
+    padding-left: 15px !important;
+    text-align: start;
+}
+
+.table-td-time-transaction{
+border-bottom: 1px solid var(--border-black-color);
+    position: relative;
+}
+
+.table-td-time-transaction::before{
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 15px;
+    height: 3px;
+    background: var(--white-text-color);
+}
+
+.table-tr:first-child .table-td-time-transaction::before{
+    display: none;
+}
+
+.table-tr:last-child .table-td-time-transaction{
+    border-bottom-left-radius: 12px;
+    border: 0
+}
+
+.text-header-Type-transaction,
+.text-header-usdt-transaction,
+.text-header-for-transaction,
+.text-header-wallet-transaction,
+.text-header-usd-transaction{
+    text-align: end;
+    padding-right: 20px;
+}
+
+.table-td-Type-transaction,
+.table-td-usdt-transaction,
+.table-td-for-transaction,
+.table-td-wallet-transaction,
+.table-td-usd-transaction{
+    text-align: end;
+    padding-right: 20px;
+    border-bottom: 1px solid var(--border-black-color);
+}
+
+.table-td-wallet-transaction{
+    padding-right: 20px;
+    position: relative;
+}
+
+.table-td-wallet-transaction::before{
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: 0;
+    width: 20px;
+    height: 3px;
+    background: var(--white-text-color);
+}
+
+.table-tr:first-child .table-td-wallet-transaction::before{
+    display: none;
+}
+
+
+.text-header-Type-transaction,.table-td-Type-transaction{
+    text-align: center;
+}
+
+.table-tr:last-child .table-td-Type-transaction,
+.table-tr:last-child .table-td-usdt-transaction,
+.table-tr:last-child .table-td-for-transaction,
+.table-tr:last-child .table-td-wallet-transaction,
+.table-tr:last-child .table-td-usd-transaction{
+    border: 0;
+}
+
+.table-tr:last-child .table-td-wallet-transaction{
+    border-bottom-right-radius: 12px;
+}
+
+/* table pool */
+
+.text-header-pool{
+    text-align: start;
+    padding-right: 23px;
+}
+
+.text-header-tvl-pool,
+.text-header-apr-pool,
+.text-header-1d-vol-pool,
+.text-header-7d-vol-pool{
+    text-align: end;
+    padding-right: 23px;
+}
+
+.table-td-tvl-pool,
+.table-td-apr-pool,
+.table-td-1d-vol-pool,
+.table-td-7d-vol-pool{
+    text-align: end;
+    padding-right: 23px;
+    border-bottom: 1px solid var(--border-black-color);
+}
+
+.table-td-pool{
+    text-align: start;
+    padding-right: 23px;
+    border-bottom: 1px solid var(--border-black-color);
+}
+
+.table-tr:last-child .table-td-pool,
+.table-tr:last-child .table-td-tvl-pool,
+.table-tr:last-child .table-td-apr-pool,
+.table-tr:last-child .table-td-1d-vol-pool,
+.table-tr:last-child .table-td-7d-vol-pool{
+    border: 0;
+}
+
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px; /* Adjust the height as needed */
+    text-align: center;
+  }

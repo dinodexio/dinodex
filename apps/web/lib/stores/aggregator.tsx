@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { Token, tokens } from "@/tokens";
+import { generatePriceData } from "../utils";
 
 export interface ComputedTransactionJSON {
   argsFields: string[];
@@ -36,6 +37,28 @@ export interface ComputedTransactionJSON {
     r: string;
     s: string;
   };
+}
+
+export interface ComputedPoolTransactionJSON {
+  hash?: string | number;
+  creator?: string;
+  eventIndex?: string | number;
+  tokenAId: string;
+  tokenBId: string;
+  tokenAAmount?: string | number;
+  tokenBAmount?: string | number;
+  directionAB?: boolean;
+  type?: string;
+  blockHeight?: string | number;
+  timestamp?: string | number;
+  price?: {
+    usd?: string | number;
+  };
+}
+
+export interface PoolTransactionQueryResponse {
+  data: Array<ComputedPoolTransactionJSON>;
+  error: boolean;
 }
 
 export interface ComputedBlockJSON {
@@ -90,16 +113,19 @@ export interface TokenDataJSON {
   name?: string;
   price?: string | number;
   volume?: string | number;
+  tvl?: string | number;
   fdv?: string | number;
+  prices?: any[];
 }
 
 export interface ComputedTokenJSON {
   id?: string | number;
   ticker?: string | number;
   name?: string;
-  price?: { usd?: string }
-  volume?: string | number;
-  fdv?: string | number;
+  price?: { usd?: string };
+  volume?: { usd?: string };
+  tvl?: { usd?: string };
+  fdv?: { usd?: string };
 }
 
 export interface PoolsDataJSON extends ComputedPoolsJSON {
@@ -136,7 +162,9 @@ export interface AggregatorState {
   loading: boolean;
   transactions: any;
   pools: Array<PoolsDataJSON>;
-  tokens: Array<TokenDataJSON>
+  tokens: Array<TokenDataJSON>;
+  totalTVL: number | string;
+  totalVOL: number | string;
   error: boolean;
   loadTokens: () => Promise<void>;
   loadPools: () => Promise<void>;
@@ -152,6 +180,8 @@ export const useAggregatorStore = create<
     pools: [],
     transactions: [],
     tokens: [],
+    totalTVL: 0,
+    totalVOL: 0,
     error: false,
     async loadTokens() {
       set((state) => {
@@ -169,21 +199,41 @@ export const useAggregatorStore = create<
       );
 
       const data = (await response.json()) as TokensQueryResponse;
-      const newData: any = data.data.map((token: ComputedTokenJSON, index): TokenDataJSON => {
-        return {
-          index: index + 1,
-          id: token.id,
-          ticker: token.ticker,
-          name: token.name,
-          price: token.price?.usd,
-          volume: token.volume,
-          fdv: token.fdv,
-          logo: token.id ? tokens[token.id]?.logo : ''
-        };
-      });
+      const newData: any = data.data.map(
+        (token: ComputedTokenJSON, index): TokenDataJSON => {
+          const basePrice = Number(token.price?.usd) || 100;
+
+          const priceData = generatePriceData(basePrice);
+          return {
+            index: index + 1,
+            id: token.id,
+            ticker: token.ticker,
+            name: token.name,
+            price: token.price?.usd,
+            volume: token.volume?.usd,
+            fdv: token.fdv?.usd,
+            tvl: token.tvl?.usd,
+            logo: token.id ? tokens[token.id]?.logo : "",
+            prices: priceData,
+          };
+        },
+      );
+      const result = newData.reduce(
+        (
+          acc: { totalTVL: any; totalVOL: any },
+          item: { tvl: any; volume: any },
+        ) => {
+          acc.totalTVL += item.tvl || 0;
+          acc.totalVOL += item.volume || 0;
+          return acc;
+        },
+        { totalTVL: 0, totalVOL: 0 },
+      );
       set((state) => {
         state.loading = false;
         state.tokens = newData;
+        state.totalTVL = result.totalTVL;
+        state.totalVOL = result.totalVOL;
         state.error = data?.error;
       });
     },
@@ -214,8 +264,9 @@ export const useAggregatorStore = create<
             second: secondToken,
           },
           feeTier: pool?.feeTier || null,
-          volume1d: pool?.volume_1d || null,
-          volume7d: pool?.volume_7d || null
+          tvl: pool?.tvl?.usd || null,
+          volume1d: pool?.volume_1d?.usd || null,
+          volume7d: pool?.volume_7d?.usd || null,
         };
       });
       set((state) => {
@@ -272,10 +323,12 @@ export const useSwapRoutes = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:3333/routers/?${new URLSearchParams({
-          tokenAId,
-          tokenBId,
-        })}`,
+        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/routers/?${new URLSearchParams(
+          {
+            tokenAId,
+            tokenBId,
+          },
+        )}`,
         {
           method: "GET",
           headers: {
@@ -293,4 +346,116 @@ export const useSwapRoutes = () => {
     }
   };
   return { routes, loading, error, getRoutes };
+};
+
+export const usePoolInfo = (poolKey: string) => {
+  const [data, setData] = useState<any>({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const getPoolInfo = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/pool/info/${poolKey}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const data = await response.json();
+      setLoading(false);
+      setData(data?.data || {});
+      setError(data?.error);
+    } catch {
+      setData({});
+    }
+  };
+  return { data, loading, error, getPoolInfo };
+};
+
+export const usePoolTxs = (poolKey: string) => {
+  const [data, setData] = useState<Array<ComputedPoolTransactionJSON>>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const getPoolTxs = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/pool/txs/${poolKey}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const dataRes = (await response.json()) as PoolTransactionQueryResponse;
+      setLoading(false);
+      setData(dataRes?.data || []);
+      setError(dataRes?.error);
+    } catch {
+      setData([]);
+    }
+  };
+  return { data, loading, error, getPoolTxs };
+};
+
+export const useTokenInfo = (tokenId: string) => {
+  const [data, setData] = useState<any>({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const getTokenInfo = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/token/info/${tokenId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const data = await response.json();
+      setLoading(false);
+      setData(data?.data || {});
+      setError(data?.error);
+    } catch {
+      setData({});
+    }
+  };
+  return { data, loading, error, getTokenInfo };
+};
+
+export const useTokenTxs = (tokenId: string) => {
+  const [data, setData] = useState<Array<ComputedPoolTransactionJSON>>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const getTokenTxs = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/token/txs/${tokenId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const dataRes = (await response.json()) as PoolTransactionQueryResponse;
+      setLoading(false);
+      setData(dataRes?.data || []);
+      setError(dataRes?.error);
+    } catch {
+      setData([]);
+    }
+  };
+  return { data, loading, error, getTokenTxs };
 };

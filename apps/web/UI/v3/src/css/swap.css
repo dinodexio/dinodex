@@ -1,0 +1,224 @@
+
+.swap-container {
+    width: min(90%, 605px);
+    margin: 90px auto 59px auto;
+    z-index: 99;
+    position: relative;
+}
+
+.swap-container {
+    display: flex;
+    flex-direction: column;
+    gap: 29px;
+}
+
+.swap-text {
+    display: flex;
+    width: 91px;
+    height: 37px;
+    padding: 6px 21px;
+    justify-content: center;
+    align-items: center;
+    gap: var(--100625-rem, 10px);
+    border-radius: 10px;
+    border: 1px solid var(--black-text-color);
+    background: var(--white-text-color);
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.swap-content {
+    height: 582px;
+    width: 100%;
+    flex-shrink: 0;
+    border-radius: 10px;
+    border: 2px solid var(--black-text-color);
+    background: var(--white-text-color);
+    padding: 23px 17px 29px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 43px;
+}
+
+.swap-content-item {
+    height: 193px;
+    width: 100%;
+    border-radius: 10px;
+    border: 2px solid var(--black-text-color);
+    background: var(--white-text-color);
+    padding: 20px 18px 24px 21px;
+    position: relative;
+}
+
+.swap-item-first .swap-item-select-have-token{
+    background-color: var(--button-connect-wallet-color);
+}
+
+.swap-item-second .swap-item-select-have-token{
+    background-color: var(--button-connected-wallet-color);
+}
+
+.swap-button {
+    position: absolute;
+    right: 50%;
+    top: 50%;
+    z-index: 10;
+    transform: translate(50%, -50%);
+    cursor: pointer;
+}
+
+.swap-item-header {
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    opacity: 0.6;
+    padding-left: 4px;
+}
+
+.line-swap-item {
+    width: 100%;
+    height: 1px;
+    background: var(--black-text-color);
+    opacity: 0.6;
+    margin-bottom: 12.35px;
+}
+
+.value-price {
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    opacity: 0.6;
+    position: absolute;
+    bottom: 23px;
+    display: none;
+}
+
+.swap-item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.swap-item-select {
+    display: flex;
+    width: 121px;
+    height: 34.941px;
+    padding: 5.824px 22px;
+    align-items: center;
+    gap: 6.471px;
+    border-radius: 18.118px;
+    border: 0.953px solid var(--black-text-color);
+    background: var(--white-text-color);
+    cursor: pointer;
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 19.056px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.swap-item-select-have-token{
+    padding: 5.471px 11px 5.471px 10px;
+    width: max-content;
+}
+
+.swap-item-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    opacity: 0.6;
+    margin-top: -8px;
+}
+
+.slippage-container {
+    display: flex;
+    align-items: center;
+    gap: 17px
+}
+
+.slippage-head,
+.slippage-item {
+    display: flex;
+    width: max-content;
+    height: 37px;
+    padding: 6px 21px;
+    justify-content: center;
+    align-items: center;
+    gap: var(--100625-rem, 10px);
+    border-radius: 10px;
+    border: 1px solid var(--black-text-color);
+    background: var(--white-text-color);
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.slippage-item {
+    cursor: pointer;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+.slippage-item:hover{
+    background: var(--bg-switch-range-color);
+}
+
+.slippage-item-active, .slippage-item-active:hover {
+    background-color: var(--black-text-color) !important;
+    color: var(--white-text-color);
+}
+
+.swap-container-form {
+    display: flex; flex-direction: column; gap: 43px; position: relative;
+}
+
+.footer-container {
+    padding-left: 50px;
+    padding-bottom: 34px;
+    position: fixed;
+    bottom: 0;
+}
+
+@media (max-height: 800px) {
+    .swap-container{
+        margin: 30px auto 0 auto;
+        gap: 20px;
+    }
+    .swap-content-item{
+        height: 160px;
+        padding-bottom: 12px;
+    }
+
+    .value-price{
+        bottom: 13px;
+    }
+
+    .swap-container-form{
+        gap: 20px;
+    }
+
+    .swap-content{
+        height: auto;
+        gap: 30px;
+    }
+}

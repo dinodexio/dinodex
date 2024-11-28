@@ -1,5 +1,5 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { cn, formatPriceUSD } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Loader2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -8,7 +8,6 @@ import { USDBalance } from "../ui/usd-balance";
 // @ts-ignore
 import truncateMiddle from "truncate-middle";
 import { tokens } from "@/tokens";
-import useClickOutside from "@/hook/useClickOutside";
 import Image from "next/image";
 import stylesButton from "../css/button.module.css";
 import {
@@ -25,8 +24,9 @@ import { TransferLayout } from "../layoutWallet/TransferLayout/TransferLayout";
 import BigNumber from "bignumber.js";
 import { ChangeWalletLayout } from "../layoutWallet/changeWalletLayout";
 import { useClientStore } from "@/lib/stores/client";
-import { useBalancesStore, useFaucet } from "@/lib/stores/balances";
+import { useFaucet } from "@/lib/stores/balances";
 import Link from "next/link";
+import { usePollTransactions } from "@/lib/stores/aggregator";
 
 export interface Balances {
   [tokenId: string]: string | any;
@@ -53,12 +53,10 @@ export function Wallet({
   address,
   blockHeight,
   balances,
-  loadingBalances,
   open,
   setIsWalletOpen,
-  onConnectWallet,
-  forceIsWalletOpen,
 }: WalletProps) {
+  usePollTransactions();
   const { client } = useClientStore();
   const [menuItemActive, setMenuItemActive] = useState("");
   const [listDataWallet, setListDataWallet] = useState("token");
@@ -68,9 +66,9 @@ export function Wallet({
   //   useState(true);
   // const [shouldDelayChevrons, setShouldDelayChevrons] = useState(false);
 
-  const refDrawer = useClickOutside<HTMLDivElement>(() => {
-    setIsWalletOpen && setIsWalletOpen(false);
-  });
+  // const refDrawer = useClickOutside<HTMLDivElement>(() => {
+  //   setIsWalletOpen && setIsWalletOpen(false);
+  // });
 
   // useEffect(() => {
   //   setShouldDelayChevrons(false);
@@ -143,9 +141,19 @@ export function Wallet({
           </p>
         </Button>
       </div> */}
-      <div className={`fixed right-0 top-[100px] left-[0] bottom-0 ${open ? "opacity-100 visible" : "opacity-0 invisible"}`} style={{zIndex:100}} onClick={() => setIsWalletOpen && setIsWalletOpen(false)}/>
-      <div className={`fixed right-0 top-0 w-[95%] max-w-[400px] h-[100vh] transition-all duration-300 ease-in-out ${open ? "opacity-100 visible" : "opacity-0 invisible"}`}
-        style={{ background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.00) 0%, #898989 100%)', zIndex: 101 }} />
+      <div
+        className={`fixed bottom-0 left-[0] right-0 top-[100px] ${open ? "visible opacity-100" : "invisible opacity-0"}`}
+        style={{ zIndex: 100 }}
+        onClick={() => setIsWalletOpen && setIsWalletOpen(false)}
+      />
+      <div
+        className={`fixed right-0 top-0 h-[100vh] w-[95%] max-w-[400px] transition-all duration-300 ease-in-out ${open ? "visible opacity-100" : "invisible opacity-0"}`}
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(255, 255, 255, 0.00) 0%, #898989 100%)",
+          zIndex: 101,
+        }}
+      />
 
       <div
         // ref={refDrawer}
@@ -158,7 +166,7 @@ export function Wallet({
               open,
           },
         ])}
-        style={{zIndex: 102 }}
+        style={{ zIndex: 102 }}
       >
         <div
           className={cn(
@@ -172,11 +180,16 @@ export function Wallet({
           <Loader2Icon className="h-12 w-12 animate-spin text-textBlack" />
         </div>
         <div
-          className={cn("flex h-full flex-col transition-all duration-100", {
-            "blur-md": false,
-          })}
+          className={cn(
+            "list-token-wallet flex h-full flex-col overflow-y-scroll transition-all duration-100",
+            {
+              "blur-md": false,
+            },
+          )}
         >
-          <div className="flex items-center justify-between">
+          <div
+            className={`flex items-center justify-between ${styles["wallet-header"]}`}
+          >
             <div className="flex items-center gap-[10px]">
               <Image
                 src="/images/home/dex.svg"
@@ -263,14 +276,12 @@ export function Wallet({
               <span className="text-[18px] font-[300] tracking-[1px] text-textBlack">
                 {showInfoWallet ? (
                   <USDBalance
-                    balance={
-                      balances
-                        ? BigNumber(balances?.["0"] * PRICE_MINA * PRICE_USD)
-                            .div(10 ** precision)
-                            .toFixed(2)
-                            .toString()
-                        : "0"
-                    }
+                    balance={formatPriceUSD(
+                      BigNumber(balances?.["0"])
+                        .div(10 ** precision)
+                        .toNumber(),
+                      "MINA",
+                    )}
                     type="USD"
                   />
                 ) : (
@@ -343,13 +354,7 @@ export function Wallet({
                 History
               </span>
             </div>
-            <div
-              className="list-token-wallet mb-[20px] mt-[18px] grid gap-[15px] overflow-y-scroll"
-              style={{
-                maxHeight:
-                  "calc(100vh - (60px + 80px + 174px + 25px + 30px + 21px + 200px + 87px + 48px))",
-              }}
-            >
+            <div className="list-token-wallet mb-[20px] mt-[18px] grid max-h-[210px] gap-[15px] overflow-y-scroll">
               {listDataWallet === "token" && (
                 <>
                   {Object.entries(balances ?? {}).map(([tokenId, balance]) => {
@@ -432,19 +437,19 @@ export function Wallet({
                       </div>
                       <div className="flex flex-col gap-[2px]">
                         <span
-                          className={`flex items-center justify-end text-textBlack text-[16px] font-[500] capitalize`}
+                          className={`flex items-center justify-end text-[16px] font-[500] capitalize text-textBlack`}
                         >
                           {Number(item.price).toFixed(2)} {item.token.label}
                         </span>
                         <span
                           className="cursor-pointer text-[12px] font-[300] italic text-borderOrColor"
                           style={{ textDecoration: "underline" }}
-                          onClick={() => {
-                            window.open(
-                              `https://minascan.io/mainnet/account/${item.address}/txs`,
-                              "_blank",
-                            );
-                          }}
+                          // onClick={() => {
+                          //   window.open(
+                          //     `https://minascan.io/mainnet/account/${item.address}/txs`,
+                          //     "_blank",
+                          //   );
+                          // }}
                         >
                           View on Minascan
                         </span>
@@ -480,13 +485,15 @@ export function Wallet({
                 </p>
               </div>
               <div className="mr-[-12px] flex items-center justify-center gap-[8.8px]">
-                <Image
-                  src={"/images/social/git.svg"}
-                  alt="logo"
-                  width={22}
-                  height={22}
-                  style={{ cursor: "pointer" }}
-                />
+                <Link href="https://github.com/dinodexio" target="_blank">
+                  <Image
+                    src={"/images/social/git.svg"}
+                    alt="logo"
+                    width={22}
+                    height={22}
+                    style={{ cursor: "pointer" }}
+                  />
+                </Link>
                 <Link href="https://x.com/realDinoDex" target="_blank">
                   {" "}
                   <Image

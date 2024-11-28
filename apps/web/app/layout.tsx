@@ -1,9 +1,9 @@
 "use client";
 import "./globals.css";
-import { cn } from "@/lib/utils";
+// import { cn } from "@/lib/utils";
 import AsyncLayoutDynamic from "@/containers/async-layout-dynamic";
-import CustomCursor from "@/components/ui/CustomCursor";
-import '../components/style.css'
+// import CustomCursor from "@/components/ui/CustomCursor";
+import "../components/style.css";
 
 export default function RootLayout({
   children,
@@ -11,10 +11,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en">
       <body
-        className={cn("h-full bg-background font-sans antialiased")}
-        style={{ background: "#FFFBF7" }}
+        className="font-sans"
+        // style={{ background: "#FFFBF7" }}
       >
         {/* <CustomCursor /> */}
         <div className="relative z-10">

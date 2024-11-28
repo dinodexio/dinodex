@@ -25,14 +25,14 @@ export function Home({ }: HomeProps) {
           <div className={`${styles["logo-content"]} flex flex-col items-center`}>
             <span style={{ fontFamily: 'PPMondwest', color: 'var(--black-text-color)', height: '150px', display: 'flex', alignItems: 'center' }}>DinoDEX</span>
             <div className="flex items-center gap-[20px]">
-              {/* <Link href="/" target="_blank">
+              <Link href="https://github.com/dinodexio" target="_blank">
                 <Image
                   src={"/images/social/git.svg"}
                   width={32}
                   alt={""}
                   height={32}
                 />
-              </Link> */}
+              </Link>
               <Link href="https://x.com/realDinoDex" target="_blank">
                 <Image
                   src={"/images/social/x.svg"}

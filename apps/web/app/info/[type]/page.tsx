@@ -1,11 +1,7 @@
 "use client";
 import "reflect-metadata";
-import AsyncInfoPageDynamic from '@/containers/async-info-page-dynamic';
+import AsyncInfoPageDynamic from "@/containers/async-info-page-dynamic";
 
-export default function Tokens({
-  params,
-}: {
-  params: Promise<{ type: string }>
-}) {
-  return <AsyncInfoPageDynamic param={params}/>;
+export default function Info({ params }: { params: any }) {
+  return <AsyncInfoPageDynamic param={params} />;
 }

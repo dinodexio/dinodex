@@ -7,13 +7,14 @@ import {
 import styles from "../css/table.module.css";
 import { Table } from "../table/table";
 import { ComputedTransactionJSON, useChainStore } from "@/lib/stores/chain";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   ADDLIQUIDITY,
   BLOCK_TIME,
   CREATEPOOL,
   EMPTY_DATA,
   REMOVELIQUIDITY,
+  SELLPATH
 } from "@/constants";
 import { tokens } from "@/tokens";
 import Link from "next/link";
@@ -28,7 +29,6 @@ import { formatBigNumber, precision } from "../ui/balance";
 export interface TransactionPanelProps {
   valueSearch: string;
   client?: any;
-  transactions?: ComputedTransactionJSON[];
   loading?: boolean;
 }
 
@@ -215,14 +215,14 @@ let columTableTransaction = [
   },
 ];
 
-export function TransactionPanel({ valueSearch }: TransactionPanelProps) {
+const TransactionPanelComponent = ({ valueSearch }: TransactionPanelProps) => {
   const { transactions, loading } = useAggregatorStore();
   usePollTransactions();
   // Memoize the transaction processing to avoid re-computation on every render
   const processedTransactions = useMemo(() => {
     if (!transactions) return [];
 
-    return transactions.map((item: any) => {
+    return transactions?.filter?.((el: any) => el?.data !== null)?.map((item: any) => {
       let tokenData: any = {};
       if (
         item.type === ADDLIQUIDITY ||
@@ -239,7 +239,7 @@ export function TransactionPanel({ valueSearch }: TransactionPanelProps) {
             amount: formatBigNumber(item?.data?.tokenB?.amount),
           },
         };
-      } else if (item.type === "Swap") {
+      } else if (item.type === SELLPATH) {
         tokenData = {
           first: {
             ...tokens[item.data.from.tokenId],
@@ -285,3 +285,5 @@ export function TransactionPanel({ valueSearch }: TransactionPanelProps) {
     </>
   );
 }
+
+export const TransactionPanel = React.memo(TransactionPanelComponent);

@@ -1,6 +1,4 @@
 "use client";
-import { useRouter, usePathname } from "next/navigation";
-// import { Header } from "./header";
 import { Toaster } from "@/components/ui/toaster";
 import { Footer } from "./footer";
 import dynamic from "next/dynamic";
@@ -11,9 +9,13 @@ const Header = dynamic(() => import("./header"), {
 export interface SwapProps {
   swapForm: JSX.Element;
   wallet?: JSX.Element;
+  isDetail?: boolean;
 }
 
-export function SwapForm({ swapForm }: SwapProps) {
+export function SwapForm({ swapForm, isDetail = false }: SwapProps) {
+  if (isDetail) {
+    return swapForm;
+  }
   return (
     <div className="flex items-center justify-center">
       <Toaster />

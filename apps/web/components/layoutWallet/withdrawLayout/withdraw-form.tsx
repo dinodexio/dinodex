@@ -2,16 +2,20 @@ import { useFormContext } from "react-hook-form";
 import Image from "next/image";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import {
+  cn,
+  formatBigNumber,
+  formatPriceUSD,
+  truncateString,
+} from "@/lib/utils";
 import { USDBalance } from "@/components/ui/usd-balance";
 import { tokens } from "@/tokens";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { useBalance } from "@/lib/stores/balances";
 import BigNumber from "bignumber.js";
 import { Balance, precision } from "@/components/ui/balance";
-import { amout, PRICE_MINA, PRICE_USD } from "@/constants";
+import { amout, EMPTY_DATA, PRICE_MINA, PRICE_USD } from "@/constants";
 import { TokenSelector } from "@/components/ui/token-selector";
-import styles from '../../css/wallet.module.css'
 
 export interface WithdrawFormProps {
   onClose?: () => void;
@@ -25,7 +29,6 @@ export function WithdrawForm({
   // handleOpenSelectToken,
 }: WithdrawFormProps) {
   const wallet = useWalletStore();
-  const [inputValue, setInputValue] = useState<any>(500);
   const [amountPercent, setAmoutPercent] = useState(null);
   const form = useFormContext();
   const error = Object.values(form.formState.errors)[0]?.message?.toString();
@@ -55,33 +58,58 @@ export function WithdrawForm({
           )}
         </div>
         <div className="flex flex-col gap-[10px]">
-          <div className={`flex items-center justify-between rounded-[8px] p-2 shadow-content`}>
+          <div
+            className={`flex items-center justify-between rounded-[8px] p-2 shadow-content`}
+          >
             <div className="flex flex-col gap-[4px]">
               <span className="text-[12px] font-[400] text-textBlack opacity-60">
                 Amount
               </span>
               <div className="flex flex-col items-start gap-[2px]">
                 <Input
-                  {...form.register("amountValue")}
+                  {...form.register("amountValue", {
+                    onChange: (e) => {
+                      let value = e.target.value;
+
+                      // Step 1: Remove invalid characters (e/E)
+                      value = value.replace(/[eE]/g, "");
+
+                      // Step 2: Replace ',' with '.' for decimal formatting
+                      value = value.replace(/,/g, ".");
+
+                      // Step 3: Remove all invalid characters except digits and '.'
+                      value = value.replace(/[^0-9.]/g, "");
+
+                      // Step 4: Ensure only one '.'
+                      const parts = value.split(".");
+                      if (parts.length > 2) {
+                        value = parts[0] + "." + parts[1]; // Keep the first two parts
+                      }
+
+                      // Step 5: Add '0' before '.' if it starts with '.'
+                      if (value.startsWith(".")) {
+                        value = `0${value}`;
+                      }
+
+                      // Step 6: Update the form value
+                      form.setValue("amountValue", value);
+                    },
+                  })}
                   placeholder="0"
                   autoFocus
                   className={cn([
-                    "h-auto border-0 w-[80px] bg-bgWhiteColor p-0 text-[16.774px] font-[400] text-textBlack outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+                    "h-auto w-[120px] border-0 bg-bgWhiteColor p-0 text-[16.774px] font-[400] text-textBlack outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
                   ])}
-                  onChange={(e) => {
-                    let value = e.target.value.replace(/[^0-9.]/g, "");
-                    const parts = value.split(".");
-                    if (parts.length > 2) {
-                      value = parts[0] + "." + parts.slice(1).join("");
-                    }
-                    setInputValue(value);
-                  }}
+                  type="text"
+                  maxLength={30} // Enforces maximum input length at the browser level
+                  inputMode="decimal" // Suggests a numeric keyboard on mobile devices
                 />
                 <span className="text-[9.202px] font-[500] italic text-textBlack opacity-50">
                   <USDBalance
-                    balance={
-                      (fields?.amountValue * PRICE_USD).toString() || "0"
-                    }
+                    balance={formatPriceUSD(
+                      fields.amountValue,
+                      tokens[fields.amount_token]?.ticker ?? "",
+                    )}
                     type="USD"
                   />
                 </span>
@@ -93,7 +121,7 @@ export function WithdrawForm({
             {amout?.map((item: any, index) => {
               return (
                 <div
-                  className={`flex w-[39px] cursor-pointer items-center justify-center rounded-[4.553px] px-[9.53px] py-[2.73px] transition-all shadow-content duration-300 ease-in-out ${amountPercent === item.value ? "bg-textBlack hover:bg-textBlack" : "bg-white hover:bg-[#EBEBEB]"}`}
+                  className={`flex w-[39px] cursor-pointer items-center justify-center rounded-[4.553px] px-[9.53px] py-[2.73px] shadow-content transition-all duration-300 ease-in-out ${amountPercent === item.value ? "bg-textBlack hover:bg-textBlack" : "bg-white hover:bg-[#EBEBEB]"}`}
                   key={index}
                   //   onClick={() => setAmoutActive(item.value)}
                   onClick={() => {
@@ -134,7 +162,7 @@ export function WithdrawForm({
             {...form.register("toRecipientAddress")}
             placeholder={"0x1351617..."}
             className={cn([
-              "rounded-[8px] border-none bg-bgWhiteColor h-[40px] px-[10px] py-[8px] text-[12px] font-[400] text-textBlack focus-visible:ring-0 focus-visible:ring-offset-0 shadow-content",
+              "h-[40px] rounded-[8px] border-none bg-bgWhiteColor px-[10px] py-[8px] text-[12px] font-[400] text-textBlack shadow-content focus-visible:ring-0 focus-visible:ring-offset-0",
             ])}
           />
         </div>
@@ -143,14 +171,15 @@ export function WithdrawForm({
             <span className="text-[12px] font-[400] text-textBlack">Fee</span>
             <div className="flex items-center gap-[2px]">
               <span className="text-[12px] font-[500] text-textBlack">
-                <Balance balance={(0.01 * fields.amountValue).toString()} />{" "}
+                {truncateString(
+                  Number(0.01 * fields.amountValue).toString(),
+                  precision,
+                ) || EMPTY_DATA}{" "}
                 MINA
               </span>
               <span className="text-[12px] font-[500] text-textBlack opacity-60">
                 <USDBalance
-                  balance={(0.01 * fields.amountValue * PRICE_MINA)
-                    .toFixed(2)
-                    .toString()}
+                  balance={formatPriceUSD(0.01 * fields.amountValue, "MINA")}
                   type="USD"
                 />
               </span>
@@ -159,7 +188,7 @@ export function WithdrawForm({
         )}
 
         <div
-          className="mt-[6px] flex cursor-pointer items-center justify-center rounded-[8px] shadow-content bg-white px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#EBEBEB]"
+          className="mt-[6px] flex cursor-pointer items-center justify-center rounded-[8px] bg-white px-4 py-2 shadow-content transition-all duration-300 ease-in-out hover:bg-[#EBEBEB]"
           onClick={() => {
             if (!error) {
               handleChangeStatusLayout?.({

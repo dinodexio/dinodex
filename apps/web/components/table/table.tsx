@@ -1,13 +1,17 @@
-import { Key, useRef } from "react";
+import { Key, useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { Loader } from "../ui/Loader";
 import "../style.css";
 import styles from "../css/table.module.css";
+import { ScrollToTopButton } from "../scrollToTopButton/scrollToTopButton";
+import { SkeletonLoading } from "../detail/SkeletonLoading";
+
 export interface TokenProps {
   data: Array<any>;
   column: Array<any>;
   onClickTr: (data: any) => void;
   classTable?: string;
   loading?: boolean;
+  onScrollEnd?: () => void; // Thêm prop để xử lý sự kiện cuộn
 }
 
 export function Table({
@@ -16,38 +20,59 @@ export function Table({
   onClickTr,
   classTable,
   loading,
+  onScrollEnd,
 }: TokenProps) {
   const tableRef = useRef<HTMLDivElement>(null); // Tạo ref cho phần tử chứa bảng
+  const rowHeight = 56; // Chiều cao mỗi hàng
+  const buffer = 5; // Số hàng thêm để render
+  const [scrollTop, setScrollTop] = useState(0);
+  const [visibleItems, setVisibleItems] = useState(15); // Số lượng item hiển thị
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!tableRef.current) return; // Kiểm tra nếu ref không tồn tại
-    const startX = e.pageX - tableRef.current.offsetLeft;
-    const scrollLeft = tableRef.current.scrollLeft;
+  const handleScroll = useCallback(() => {
+    if (tableRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = tableRef.current;
+      setScrollTop(scrollTop);
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!tableRef.current) return;
-      const x = e.pageX - tableRef.current.offsetLeft;
-      const walk = (x - startX) * 2; // scroll-fast
-      tableRef.current.scrollLeft = scrollLeft - walk;
+      // Kiểm tra nếu người dùng cuộn gần đến đáy
+      if (scrollTop + clientHeight >= scrollHeight - 500) {
+        onScrollEnd && onScrollEnd(); // Gọi hàm khi cuộn đến đáy
+      }
+    }
+  }, [onScrollEnd]);
+
+  useEffect(() => {
+    const currentRef = tableRef.current;
+    currentRef?.addEventListener("scroll", handleScroll);
+    return () => {
+      currentRef?.removeEventListener("scroll", handleScroll);
     };
+  }, [handleScroll]);
 
-    const handleMouseUp = () => {
-      tableRef.current?.removeEventListener("mousemove", handleMouseMove);
-      tableRef.current?.removeEventListener("mouseup", handleMouseUp);
-    };
+  const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - buffer);
+  const endIndex = Math.min(data.length, Math.floor((scrollTop + 500) / rowHeight) + buffer);
+  const visibleData = loading ? [{},{},{},{},{},{}] : data.slice(startIndex, endIndex);
+  const paddingTop = useMemo(() => {
+    return startIndex * rowHeight
+  }, [startIndex])
+  const paddingBottom = useMemo(() => {
+    return (data.length - endIndex) * rowHeight
+  }, [data, endIndex])
 
-    tableRef.current.addEventListener("mousemove", handleMouseMove);
-    tableRef.current.addEventListener("mouseup", handleMouseUp);
-  };
+  useEffect(() => {
+    if (tableRef.current) {
+      tableRef.current.scrollTop = scrollTop;
+    }
+  }, [paddingTop]);
+
   const renderTableHeader = () => {
     return (
       <tr className={styles["table-head-row"]}>
-        {column.map((col,index) => (
+        {column.map((col, index) => (
           <th
             key={col.id}
             className={styles[col.key]}
             data-hide-swap={col.hideSwap || false}
-            style={{ width: col.width, borderBottomLeftRadius: index === 0 && (!data || data.length < 1) ? "12px" : "0px", borderBottomRightRadius: index === column.length - 1 && (!data || data.length < 1) ? "12px" : "0px" }}
+            style={{ width: col.width }}
           >
             <div className={`text-[20px] font-[400] text-textBlack opacity-40 ${styles[`text-header-${col.key}`]}`}>
               {col.title}
@@ -59,7 +84,7 @@ export function Table({
   };
 
   const renderTableBody = () => {
-    return data.map((record, index) => (
+    return visibleData.map((record, index) => (
       <tr
         key={index}
         className={styles["table-tr"]}
@@ -71,7 +96,7 @@ export function Table({
             className={`${styles["table-td"]} ${styles[`table-td-${col.key}`]}`}
             data-hide-swap={col.hideSwap || false}
           >
-            <div>{col.render(record)}</div>
+            {loading ? <SkeletonLoading loading={loading} className="w-[98%] h-[20px]" /> : <div>{col.render(record)}</div>}
           </td>
         ))}
       </tr>
@@ -79,28 +104,21 @@ export function Table({
   };
 
   // Custom render loading
-  const renderLoading = () => {
-    return (
-      <tr>
-        <td colSpan={column.length}>
-          <div className={styles["loading-container"]}>
-            <Loader w={8} h={8} />
-          </div>
-        </td>
-      </tr>
-    );
-  };
 
   return (
     <>
-      <div className={`${styles["table-container"]} ${styles[classTable || '']}`} onMouseDown={handleMouseDown} ref={tableRef}>
+      <div className={`${styles["table-container"]} ${styles[classTable || '']}`} ref={tableRef}>
         <table id="dataTable" className={styles["container-table"]}>
           <thead className={styles["table-head"]}>{renderTableHeader()}</thead>
           <tbody className={styles["table-body"]}>
-            {loading ? renderLoading() : renderTableBody()}
+            <tr style={{ height: `${paddingTop}px` }} />
+            {/* {loading ? renderLoading() : renderTableBody()} */}
+            {renderTableBody()}
+            <tr style={{ height: `${paddingBottom}px` }} />
           </tbody>
         </table>
       </div>
+      {/* {scrollTop > 50 && <ScrollToTopButton onClick={() => setScrollTop(0)}/>} */}
     </>
   );
 }

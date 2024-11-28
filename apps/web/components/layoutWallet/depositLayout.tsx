@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React from "react";
+import React, { use, useRef } from "react";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { QRCodeSVG } from "qrcode.react";
 import styles from '../css/wallet.module.css'
@@ -10,6 +10,7 @@ export interface depositLayoutProps {
 
 export function DepositLayout({ onClose }: depositLayoutProps) {
   const { wallet } = useWalletStore();
+  const copiedRef = useRef(false);
   const walletAddress = `mina://testnet/${wallet}`;
   return (
     <div
@@ -50,9 +51,12 @@ export function DepositLayout({ onClose }: depositLayoutProps) {
           <span className={`p-3 h-[38px] rounded-[8px] flex-1 text-[12px] font-[400] text-textBlack bg-bgWhiteColor shadow-content`}>
             {wallet?.slice(0, 6) + "..." + wallet?.slice(-6)}
           </span>
-          <div className={`cursor-pointer h-[38px] p-[9px] shadow-content rounded-[8px] bg-bgWhiteColor`} onClick={() => {
+          <div className={`cursor-pointer h-[38px] p-[9px] rounded-[8px] bg-bgWhiteColor ${styles['copy-deposit']}`} onClick={() => {
             navigator.clipboard.writeText(wallet || "");
-            alert("copied!");
+            copiedRef.current = true;
+            setTimeout(() => {
+              copiedRef.current = false;
+            }, 1000);
           }}>
             <Image
               src="/icon/Copy-icon.svg"
@@ -60,6 +64,9 @@ export function DepositLayout({ onClose }: depositLayoutProps) {
               height={20}
               alt="copy"
             />
+            {copiedRef.current && (
+              <div className="absolute bottom-[-50%] left-[50%] translate-x-[-50%] bg-white text-[12px] shadow-content w-[60px] font-[400] text-textBlack flex justify-center rounded-[12px]">Copied!</div>
+            )}
           </div>
         </div>
       </div>

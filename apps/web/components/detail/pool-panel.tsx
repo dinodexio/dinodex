@@ -1,14 +1,14 @@
-import { formatLargeNumber } from "@/lib/utils";
+import { formatLargeNumber, truncateString } from "@/lib/utils";
 import { Table } from "../table/table";
 import Image from "next/image";
 import { DATA_POOL, EMPTY_DATA } from "@/constants";
 import styles from "../css/table.module.css";
 
 export interface PoolPanelProps {
-  token?: object | undefined;
+  loading?: boolean
 }
 
-export function PoolPanel({}: PoolPanelProps) {
+export function PoolPanel({loading}: PoolPanelProps) {
   let columnTablePoolTokenInfo = [
     {
       id: 1,
@@ -30,7 +30,7 @@ export function PoolPanel({}: PoolPanelProps) {
             <div className="relative h-6 w-6 overflow-hidden">
               <Image
                 className="absolute left-1/2"
-                src={data?.tokenselected?.first?.logo}
+                src={'/'+data?.tokenselected?.first?.logo}
                 alt={data?.tokenselected?.first?.name}
                 width={24}
                 height={24}
@@ -39,7 +39,7 @@ export function PoolPanel({}: PoolPanelProps) {
             <div className="relative h-6 w-6 overflow-hidden">
               <Image
                 className="absolute right-1/2"
-                src={data?.tokenselected?.second?.logo}
+                src={'/'+data?.tokenselected?.second?.logo}
                 alt={data?.tokenselected?.second?.name}
                 width={24}
                 height={24}
@@ -47,7 +47,7 @@ export function PoolPanel({}: PoolPanelProps) {
             </div>
           </div>
           <span className={styles["token-name-text"]}>
-            {`${data?.tokenselected?.first?.ticker}/${data?.tokenselected?.second?.ticker}`}
+            {`${truncateString(data?.tokenselected?.first?.ticker,4)}/${truncateString(data?.tokenselected?.second?.ticker,4)}`}
           </span>
           <div className={styles["fee-tier-text-table"]}>
             {data?.feeTier || EMPTY_DATA}%
@@ -110,6 +110,7 @@ export function PoolPanel({}: PoolPanelProps) {
         column={columnTablePoolTokenInfo}
         onClickTr={() => {}}
         classTable="table-layout"
+        loading={loading}
       />
     </>
   );

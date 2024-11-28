@@ -14,6 +14,8 @@ import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { TransferConfirm } from "./transfer-confirm";
 import { TransferWaiting } from "./transfer-waiting";
+import { dataSubmitProps } from "@/types";
+import { tokens } from "@/tokens";
 
 export interface transferLayoutProps {
   onClose: () => void;
@@ -104,11 +106,17 @@ export function TransferLayout({ onClose }: transferLayoutProps) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
+    const data: dataSubmitProps = {
+      toRecipientAddress: values.toRecipientAddress,
+      ticker: tokens[values.amount_token]?.ticker || "",
+      amountValue: values.amountValue,
+    };
     try {
       await transfer(
         values.amount_token,
         values.toRecipientAddress,
         addPrecision(values?.amountValue),
+        data,
       );
     } catch (e) {
     } finally {
@@ -150,7 +158,12 @@ export function TransferLayout({ onClose }: transferLayoutProps) {
           {statusLayout.confirm && (
             <>
               <form onSubmit={form.handleSubmit(onSubmit)}>
-                <TransferConfirm onClose={onClose} loading={loading} onSubmit={onSubmit}  />
+                <TransferConfirm
+                  onClose={onClose}
+                  loading={loading}
+                  onSubmit={onSubmit}
+                  isConfirm={statusLayout.confirm}
+                />
               </form>
             </>
           )}

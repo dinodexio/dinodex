@@ -1,0 +1,606 @@
+.header-pool-container {
+  padding: 32px 41px 0 41px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.button-header {
+  height: 52.264px;
+  width: 115.829px;
+  flex-shrink: 0;
+  border-radius: 19.38px;
+  background: var(--white-color-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--black-color-text);
+  text-align: center;
+  font-size: 18.605px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  text-decoration: none !important;
+  box-shadow: 0px 5.426px 0px 0px var(--black-color-text);
+  border: 1.55px solid var(--black-color-text);
+  position: relative;
+  cursor: pointer;
+}
+
+.button-header-active {
+  background-color: var(--orange-color-bg);
+  color: var(--white-color-bg);
+}
+
+.button-connect-wallet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 211px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 19.38px;
+  background: var(--purple-color-bg);
+  box-shadow: 0px 5.426pvar (--black-color-text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button-connect-wallet:hover {
+  transition: all 0.3s ease;
+  background: linear-gradient(
+    180deg,
+    var(--green-color-bg) 0%,
+    var(--purple-color-bg) 100%
+  );
+}
+
+.button-connected-wallet-text {
+  color: var(--white-color-bg);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 18.605px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+/* Content */
+
+.containerModalAdd {
+  display: flex;
+  width: 575px;
+  padding: 25px 15px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  border-radius: 24px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 4px 4px 0px var(--black-color-shadow);
+  margin: 72.75px auto 0px;
+}
+
+.boxModalAdd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 25px;
+  align-self: stretch;
+}
+
+.headerModal {
+  display: flex;
+  padding: 0px 10px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+.titleModal {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.bodyModal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  align-self: stretch;
+}
+
+.boxTip {
+  display: flex;
+  padding: 24px 20px;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+  border-radius: 20px;
+  background: var(--brown-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+}
+
+.contentBoxTip {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.boxDeposit {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+}
+
+.contentBoxDepositTop {
+  display: flex;
+  padding: 30px 20px 20px 20px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  align-self: stretch;
+  border-radius: 20px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+}
+
+.boxTitleDepo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+.titleDepo {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.titleDetail {
+  color: var(--orange-color-bg);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.percent {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 96px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.boxPercentDepo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  align-self: stretch;
+}
+
+.boxScroll {
+  display: flex;
+  height: 31px;
+  padding: 0px 12px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  position: relative;
+}
+
+.iconPoint {
+  position: absolute;
+  left: 0;
+}
+
+.boxBtnDeposit {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+}
+
+.btnDeposit {
+  display: flex;
+  width: 49px;
+  padding: 18px 28px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+  /* text */
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  cursor: pointer;
+}
+
+.contentBoxDepositBot {
+  display: flex;
+  padding: 20px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 15px;
+  align-self: stretch;
+  border-radius: 20px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+}
+
+.boxInfoToken {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+.text {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.boxNameToken {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nameToken {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.btnReceive {
+  display: flex;
+  padding: 8px 18px;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  border-radius: 9999px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+  cursor: pointer;
+  /* text */
+  color: var(--orange-color-bg);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.boxRate {
+  display: flex;
+  padding: 22px 20px;
+  align-self: stretch;
+  border-radius: 20px;
+  background: var(--white-color-bg);
+  justify-content: space-between;
+}
+
+.contentRightBoxRate {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.boxBtn {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.btnActive {
+  display: flex;
+  padding: 20px 10px;
+  justify-content: center;
+  align-items: center;
+  flex: 1 0 0;
+  border-radius: 20px;
+  background: var(--orange-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+  border: none;
+  cursor: pointer;
+  /* text */
+  color: var(--white-color-bg);
+  font-family: "SF Pro Display";
+  font-size: 26px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.btnDefault {
+  display: flex;
+  padding: 20px 10px;
+  justify-content: center;
+  align-items: center;
+  flex: 1 0 0;
+  border-radius: 20px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+  border: none;
+  cursor: pointer;
+  /* text */
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 26px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.boxPosition {
+  display: flex;
+  padding: 20px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 15px;
+  align-self: stretch;
+  border-radius: 20px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+}
+
+.titlePosition {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.boxInfoTokenPosition {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.boxImg {
+  display: flex;
+  /* width: 37.331px; */
+  height: 26px;
+}
+
+.textNameToken {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.numberInfoToken {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 2.2px;
+}
+
+.logoDino {
+  position: fixed;
+  left: 50px;
+  bottom: 34px;
+}
+
+/* Modal receive */
+
+.containerModalReceive {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  background: var(--black-color-text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.boxModalReceive {
+  display: inline-flex;
+  padding: 35px 30px 20px 30px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  border-radius: 27px;
+  background: var(--white-color-bg);
+  opacity: 1;
+  z-index: 2;
+  margin: 0 auto;
+  position: relative;
+}
+
+.modalReceive {
+  display: flex;
+  width: 565px;
+  flex-direction: column;
+  align-items: center;
+  gap: 33px;
+  background: var(--white-color-bg);
+  opacity: 1;
+}
+
+.titleModalReceive {
+  color: var(--black-color-text);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.contentModalReceive {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 30px;
+  align-self: stretch;
+}
+
+.contentTop {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 15px;
+  align-self: stretch;
+  width: 100%;
+}
+
+.textContentTop {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.boxSymbolToken {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.contentBottom {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  align-self: stretch;
+}
+
+.noti {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: normal;
+  opacity: 0.5;
+}
+
+.boxContentBottom {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  align-self: stretch;
+}
+
+.containerPrice {
+  display: flex;
+  padding: 2px 0px;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+}
+
+.textContentBot {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.boxPrice {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.btnConfirm {
+  display: flex;
+  padding: 20px 10px;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  border-radius: 20px;
+  background: var(--orange-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+  border: none;
+  cursor: pointer;
+  /* text */
+  color: var(--white-color-bg);
+  font-family: "SF Pro Display";
+  font-size: 26px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.iconClose{
+ position: absolute;
+ top: 25px;
+ right: 25px;
+ cursor: pointer;
+}

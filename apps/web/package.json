@@ -32,6 +32,7 @@
     "d3": "^7.9.0",
     "geist": "^1.3.1",
     "immer": "^10.0.3",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.292.0",
     "moment": "^2.30.1",
     "next": "14.0.1",
@@ -49,6 +50,7 @@
     "zustand": "^4.4.6"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.13",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

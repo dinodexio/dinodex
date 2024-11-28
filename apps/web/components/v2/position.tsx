@@ -8,6 +8,7 @@ import { TokenId } from "@proto-kit/library";
 import { Balances } from "../wallet/wallet";
 import { Balance } from "../ui/balance";
 import { useFormContext } from "react-hook-form";
+import { validateValue } from "@/lib/utils";
 
 export interface PoolPositionProps {
   dataPool?: any;
@@ -63,7 +64,7 @@ export function PoolPosition({
 
   return (
     <div
-      className={`flex w-full max-w-[605px] flex-col items-start justify-center gap-[10px] rounded-[20px] border-none shadow-content p-5 sm:gap-[10px] lg:gap-[15px] xl:gap-[15px] ${styles["pool-container"]}`}
+      className={`flex w-full max-w-[605px] flex-col items-start justify-center gap-[10px] rounded-[12px] border-none shadow-content px-[25px] py-[15px] sm:gap-[10px] lg:gap-[12px] xl:gap-[12px] ${styles["pool-container"]}`}
     >
       <span className="text-[18px] font-[600] text-textBlack sm:text-[18px] lg:text-[22px] xl:text-[22px]">
         Your position
@@ -96,26 +97,26 @@ export function PoolPosition({
         </span>
       </div>
       <div className="flex w-full items-center justify-between">
-        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[20px] xl:text-[20px]">
+        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[18px] xl:text-[18px]">
           Your pool share
         </span>
-        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[20px] xl:text-[20px]">
-          {dataPooled?.poolOfShare ?? "0"} %
+        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[18px] xl:text-[18px]">
+          {validateValue(dataPooled?.poolOfShare) ?? "0"} %
         </span>
       </div>
       <div className="flex w-full items-center justify-between">
-        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[20px] xl:text-[20px]">
+        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[18px] xl:text-[18px]">
           {firstTokenLabel}:
         </span>
-        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[20px] xl:text-[20px]">
+        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[18px] xl:text-[18px]">
         <Balance balance={(dataPooled?.first ?? "0").toString()} />
         </span>
       </div>
       <div className="flex w-full items-center justify-between">
-        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[20px] xl:text-[20px]">
+        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[18px] xl:text-[18px]">
           {secondTokenLabel}:
         </span>
-        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[20px] xl:text-[20px]">
+        <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[18px] xl:text-[18px]">
           <Balance balance={(dataPooled?.second ?? "0").toString()} />
         </span>
       </div>

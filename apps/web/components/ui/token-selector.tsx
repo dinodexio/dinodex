@@ -49,7 +49,7 @@ export function TokenSelector({ disabled, name }: TokenSelectorProps) {
                 aria-expanded={open}
                 className={`flex h-[38px] flex-row items-center justify-between gap-[8px] 
                   rounded-[8px] py-[8px] pl-[12px] border-none pr-[8px] text-textBlack hover:text-textBlack hover:bg-[#D1D1D1] 
-                  ${field.value ? "bg-bgWhiteColor" : "bg-[#D1D1D1]"} ${styles['box-shadow-content-wallet']}`}
+                  ${field.value ? "bg-bgWhiteColor" : "bg-[#D1D1D1] hover:opacity-70"} ${styles['select-token']}`}
                 style={{ width: "max-content" }}
               >
                 <div className="flex items-center justify-start">

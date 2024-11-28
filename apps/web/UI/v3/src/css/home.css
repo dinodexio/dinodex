@@ -1,0 +1,52 @@
+.home-a{
+    position: relative;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+.header-home {
+    display: flex;
+    justify-content: flex-end;
+    padding: 42px 59px;
+}
+
+.content-home{
+    padding-top: calc(100vh /10);
+    z-index: 100;
+    position: relative;
+}
+
+.cloud-content{
+    padding: 0px 37px 6px 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-content{
+    display: flex;
+    justify-content: center
+}
+
+.game-content{
+    position: fixed;
+    bottom: 76px;
+    width: 100%;
+}
+
+.dex-content{
+    position: absolute;
+    bottom: 16px;
+    left: 129px;
+}
+
+.cactus-content{
+    position: absolute;
+    top: -182px;
+    right: 133px;
+}
+
+@media screen and (min-width: 1500px) {
+    .land-img{
+        width: 100%;
+    }
+}

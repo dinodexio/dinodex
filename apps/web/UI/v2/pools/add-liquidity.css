@@ -1,0 +1,496 @@
+.header-pool-container {
+  padding: 32px 41px 0 41px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.button-header {
+  height: 52.264px;
+  width: 115.829px;
+  flex-shrink: 0;
+  border-radius: 19.38px;
+  background: var(--white-color-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--black-color-text);
+  text-align: center;
+  font-size: 18.605px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  text-decoration: none !important;
+  box-shadow: 0px 5.426px 0px 0px var(--black-color-text);
+  border: 1.55px solid var(--black-color-text);
+  position: relative;
+  cursor: pointer;
+}
+
+.button-header-active {
+  background-color: var(--orange-color-bg);
+  color: var(--white-color-bg);
+}
+
+.button-connect-wallet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 211px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 19.38px;
+  border: 1.55px solid var(--black-color-text);
+  background: var(--purple-color-bg);
+  box-shadow: 0px 5.426pvar (--black-color-text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button-connect-wallet:hover {
+  transition: all 0.3s ease;
+  background: linear-gradient(
+    180deg,
+    var(--green-color-bg) 0%,
+    var(--purple-color-bg) 100%
+  );
+}
+
+.button-connected-wallet-text {
+  color: var(--white-color-bg);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 18.605px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+/* content */
+
+.containerModalAdd {
+  display: flex;
+  width: 575px;
+  padding: 25px 15px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  border-radius: 24px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 4px 4px 0px var(--black-color-shadow);
+  margin: 72.75px auto 0px;
+}
+
+.boxModalAdd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 25px;
+  align-self: stretch;
+}
+
+.headerModalAdd {
+  display: flex;
+  padding: 0px 10px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+.titleModal {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.bodyModalAdd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  align-self: stretch;
+}
+
+.contentBodyModalAdd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  align-self: stretch;
+}
+
+.boxTipModalAdd {
+  display: flex;
+  padding: 24px 20px;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+  border-radius: 12px;
+  background: var(--brown-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+}
+
+.tipModalAdd {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.containerInput {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+}
+
+.boxInput {
+  display: flex;
+  padding: 21px 10px 21px 20px;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+}
+
+.input {
+  display: flex;
+  width: 100%;
+  max-width: 300px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+  border: none;
+  outline: none;
+  height: 100%;
+  max-height: 38px;
+  /* text */
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  align-self: stretch;
+  opacity: 0.4;
+}
+
+.boxBtnSelectToken {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.btnSelectTokenActive {
+  display: flex;
+  padding: 6px 18px;
+  align-items: center;
+  gap: 10px;
+  border-radius: 18.118px;
+  background: var(--purple-color-bg);
+  box-shadow: 0px 1px 4px 0px var(--gray-color-shadow) inset;
+  cursor: pointer;
+}
+
+.textBtnSelectTokenActive {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.boxBalance {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.textBalance {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.btnMax {
+  display: flex;
+  padding: 4px 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 6px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 4px 0px var(--black-color-shadow);
+  /* text */
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.btnSelectTokenDefault {
+  display: flex;
+  padding: 6px 18px;
+  align-items: center;
+  gap: 4px;
+  border-radius: 18.118px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 1px 4px 0px var(--gray-color-shadow) inset;
+  cursor: pointer;
+}
+
+.textBtnSelectTokenDefault {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.btnInvalid {
+  display: flex;
+  padding: 20px 10px;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+  /* text */
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 26px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  opacity: 0.3;
+}
+
+.boxDeposit {
+  display: flex;
+  padding: 25px 20px 0px 20px;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+  border-radius: 20px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+}
+
+.titleBoxDepo {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  align-self: stretch;
+}
+
+.containerInfoDepo {
+  display: flex;
+  width: 525px;
+  padding: 25px;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-radius: 20px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+}
+
+.boxInfoDepo {
+  display: flex;
+  width: 150px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.infoDepo {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.logoDino {
+  position: fixed;
+  left: 50px;
+  bottom: 34px;
+}
+
+/* modal select token */
+
+.containerModalSelectToken {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  background: var(--black-color-text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.boxModalSelectToken {
+  display: flex;
+  width: 460px;
+  padding: 20px 20px 15px 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 25px;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 4px 4px 0px var(--black-color-shadow);
+  z-index: 2;
+  position: relative;
+}
+
+.icon-close {
+  position: absolute;
+  right: 20.033px;
+  top: 20px;
+  cursor: pointer;
+}
+
+.titleModalSelect {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.boxInputSearch {
+  display: flex;
+  padding: 15px 0px 15px 40px;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+}
+
+.inputSearch {
+  outline: none;
+  border: none;
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 19.835px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  opacity: 0.3;
+}
+
+.headerTopTokens {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  align-self: stretch;
+}
+
+.titleTopTokens {
+  display: flex;
+  padding-left: 25px;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 19.835px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  opacity: 0.6;
+}
+
+.listItemTokens {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.itemToken {
+  display: flex;
+  padding: 12px 0px 12px 25px;
+  /* flex-direction: column; */
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.boxNameToken {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.nameToken {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 19.835px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  align-self: stretch;
+}
+
+.symbolToken {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 13.223px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  align-self: stretch;
+  opacity: 0.6;
+}

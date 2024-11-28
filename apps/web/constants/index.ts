@@ -57,7 +57,7 @@ export const DATA_TOKENS = [
     logo: "/images/swap/logo-token-default.svg",
     name: "ethereum",
     slug: "ethereum",
-    symbol: "ETH",
+    ticker: "ETH",
     price: 1000,
     change1h: "0.1",
     fdv: 7100000000,
@@ -68,7 +68,7 @@ export const DATA_TOKENS = [
     logo: "/images/swap/logo-token-default.svg",
     name: "bitcoin",
     slug: "bitcoin",
-    symbol: "BTC",
+    ticker: "BTC",
     price: 1000,
     change1h: "0.1",
     change1d: "-0.2",
@@ -80,7 +80,7 @@ export const DATA_TOKENS = [
     logo: "/images/swap/logo-token-default.svg",
     name: "wrapped bitcoin",
     slug: "wrapped-bitcoin",
-    symbol: "WBTC",
+    ticker: "WBTC",
     price: 1000,
     change1h: "0.1",
     fdv: 7100000000,
@@ -91,7 +91,7 @@ export const DATA_TOKENS = [
     logo: "/images/swap/logo-token-default.svg",
     name: "Ton coin",
     slug: "ton-coin",
-    symbol: "TON",
+    ticker: "TON",
     price: 1000,
     change1h: "0.1",
     change1d: "-0.2",
@@ -103,7 +103,7 @@ export const DATA_TOKENS = [
     logo: "/images/swap/logo-token-default.svg",
     name: "Worldcoin",
     slug: "worldcoin",
-    symbol: "WLD",
+    ticker: "WLD",
     price: 1000,
     change1d: "-0.2",
     fdv: 7100000000,
@@ -113,7 +113,7 @@ export const DATA_TOKENS = [
     id: 6,
     logo: "/images/swap/logo-token-default.svg",
     name: "Aave",
-    symbol: "AAVE",
+    ticker: "AAVE",
     slug: "aave",
     price: 1000,
     fdv: 7100000000,
@@ -124,7 +124,7 @@ export const DATA_TOKENS = [
     logo: "/images/swap/logo-token-default.svg",
     name: "Solana",
     slug: "solana",
-    symbol: "SOL",
+    ticker: "SOL",
     price: 1000,
     change1h: "0.1",
     change1d: "-0.2",
@@ -140,12 +140,12 @@ export const DATA_POOL = [
       first: {
         logo: "images/swap/logo-token-default.svg",
         name: "ethereum",
-        symbol: "ETH",
+        ticker: "ETH",
       },
       second: {
         logo: "images/swap/logo-token-dummy.svg",
         name: "Wrapped Bitcoin",
-        symbol: "WBTC",
+        ticker: "WBTC",
       },
     },
     feeTier: 0.03,
@@ -160,12 +160,12 @@ export const DATA_POOL = [
       first: {
         logo: "images/swap/logo-token-default.svg",
         name: "ethereum",
-        symbol: "ETH",
+        ticker: "ETH",
       },
       second: {
         logo: "images/swap/logo-token-dummy.svg",
         name: "Wrapped Bitcoin",
-        symbol: "WBTC",
+        ticker: "WBTC",
       },
     },
     feeTier: 0.03,
@@ -180,12 +180,12 @@ export const DATA_POOL = [
       first: {
         logo: "images/swap/logo-token-default.svg",
         name: "ethereum",
-        symbol: "ETH",
+        ticker: "ETH",
       },
       second: {
         logo: "images/swap/logo-token-dummy.svg",
         name: "Wrapped Bitcoin",
-        symbol: "WBTC",
+        ticker: "WBTC",
       },
     },
     feeTier: 0.03,
@@ -200,12 +200,12 @@ export const DATA_POOL = [
       first: {
         logo: "images/swap/logo-token-default.svg",
         name: "ethereum",
-        symbol: "ETH",
+        ticker: "ETH",
       },
       second: {
         logo: "images/swap/logo-token-dummy.svg",
         name: "Wrapped Bitcoin",
-        symbol: "WBTC",
+        ticker: "WBTC",
       },
     },
     feeTier: 0.03,
@@ -220,12 +220,12 @@ export const DATA_POOL = [
       first: {
         logo: "images/swap/logo-token-default.svg",
         name: "ethereum",
-        symbol: "ETH",
+        ticker: "ETH",
       },
       second: {
         logo: "images/swap/logo-token-dummy.svg",
         name: "Wrapped Bitcoin",
-        symbol: "WBTC",
+        ticker: "WBTC",
       },
     },
     feeTier: 0.03,
@@ -240,12 +240,12 @@ export const DATA_POOL = [
       first: {
         logo: "images/swap/logo-token-default.svg",
         name: "ethereum",
-        symbol: "ETH",
+        ticker: "ETH",
       },
       second: {
         logo: "images/swap/logo-token-dummy.svg",
         name: "Wrapped Bitcoin",
-        symbol: "WBTC",
+        ticker: "WBTC",
       },
     },
     feeTier: 0.03,
@@ -260,12 +260,12 @@ export const DATA_POOL = [
       first: {
         logo: "images/swap/logo-token-default.svg",
         name: "ethereum",
-        symbol: "ETH",
+        ticker: "ETH",
       },
       second: {
         logo: "images/swap/logo-token-dummy.svg",
         name: "Wrapped Bitcoin",
-        symbol: "WBTC",
+        ticker: "WBTC",
       },
     },
     feeTier: 0.03,
@@ -303,11 +303,11 @@ export const LIST_STATUS: any = {
 };
 
 export const DRIPBUNDLE = "dripBundle";
-export const CREATEPOOL = "CreatePool";
-export const SELLPATH = "Swap";
-export const ADDLIQUIDITY = "AddLiquidity";
+export const CREATEPOOL = "createPool";
+export const SELLPATH = "swap";
+export const ADDLIQUIDITY = "addLiquidity";
 export const TRANSFER = "transferSigned";
-export const REMOVELIQUIDITY = "RemoveLiquidity";
+export const REMOVELIQUIDITY = "removeLiquidity";
 export const EMPTY_DATA = "--";
 export const PRICE_USDT = 25.395;
 export const PRICE_USD = 1.01;
@@ -317,16 +317,16 @@ export const BLOCK_TIME = 5
 export const MENU_WALLET = [
   {
     value: "deposit",
-    icon_default: "/images/wallet/deposit_default.svg",
-    icon_hover: "/images/wallet/deposit_hover.svg",
-    icon_active: "/images/wallet/deposit_active.svg",
+    icon_default: "/images/wallet/withdraw_default.svg",
+    icon_hover: "/images/wallet/withdraw_hover.svg",
+    icon_active: "/images/wallet/withdraw_active.svg",
     label: "Deposit",
   },
   {
     value: "withdraw",
-    icon_default: "/images/wallet/withdraw_default.svg",
-    icon_hover: "/images/wallet/withdraw_hover.svg",
-    icon_active: "/images/wallet/withdraw_active.svg",
+    icon_default: "/images/wallet/deposit_default.svg",
+    icon_hover: "/images/wallet/deposit_hover.svg",
+    icon_active: "/images/wallet/deposit_active.svg",
     label: "Withdraw",
   },
   {
@@ -374,16 +374,17 @@ export let amout = [
   { value: 100, label: "MAX" },
 ];
 
-export const TOKEN_PRICES = {
-  BTC:  67920, // Assuming 1 BTC = $30,000
-  ETH: 2535,  // Assuming 1 ETH = $2,000
-  MINA: PRICE_MINA,       // Assuming the price is already defined
+export const TOKEN_PRICES: any = {
+  BTC:  88068.7, // Assuming 1 BTC = $30,000
+  ETH: 3062.91,  // Assuming 1 ETH = $2,000
+  MINA: 0.6044,       // Assuming the price is already defined
   DAI: 1.01,         // Assuming 1 DAI = $1
-  BNB: 591.9,   // Assuming 1 BNB = $350
-  USDC: 25.374, // Assuming 1 USDC = $0.25
+  BNB: 618.56,   // Assuming 1 BNB = $350
+  USDC: 0.99905, // Assuming 1 USDC = $0.25
   USDT: 1, // Assuming 1 USDT = $0.25
   TUSD: 1,      // Assuming 1 TUSD = $1
   BUSD: 1,      // Assuming 1 BUSD = $1
+  WBTC: 87802.7, // Assuming 1 WBTC = $30,000
 };
 
 export const DATA_DUMMY_CHART = [
@@ -6991,3 +6992,13 @@ export const DATA_DUMMY_PRICE_TOKEN = [
   [1728518400000, 2367.615096789395],
   [1728520799000, 2370.2129627641916],
 ];
+
+export const TRANSACTION_TYPES = {
+  SWAP: "Swap",
+  ADD: "Added Liquidity",
+  REMOVE: "Remove Liquidity",
+  TRANSFER: "Transfer",
+  DEPOSIT: "Deposit",
+  WITHDRAW: "Withdraw",
+  CREATE: "Add Pool",
+}

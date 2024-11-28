@@ -8,7 +8,10 @@ import stylesButton from "../css/button.module.css";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogOverlay,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ModalListToken } from "../modalListToken/modalListToken";
@@ -44,6 +47,7 @@ import { Footer } from "../footer";
 import dynamic from "next/dynamic";
 import { formatPercentage } from "@/lib/utils";
 import { EMPTY_DATA } from "@/constants";
+import { dataSubmitProps } from "@/types";
 const Header = dynamic(() => import("@/components/header"), {
   ssr: false,
 });
@@ -250,6 +254,14 @@ export function PoolAdd({ tokenParams, balances }: PoolAddProps) {
     setLoading(true);
     const { deposit_amount } = dataPoolCreate;
     const { first_token, second_token, first, second } = deposit_amount;
+    const data: dataSubmitProps = {
+      logoA: tokens[first_token]?.logo,
+      logoB: tokens[second_token]?.logo,
+      tickerA: tokens[first_token]?.ticker,
+      tickerB: tokens[second_token]?.ticker,
+      amountA: first,
+      amountB: (Number(second) * 1.02).toString(),
+    };
     try {
       if (pool?.exists) {
         await addLiquidity(
@@ -257,6 +269,7 @@ export function PoolAdd({ tokenParams, balances }: PoolAddProps) {
           second_token,
           addPrecision(first),
           addPrecision((Number(second) * 1.02).toString()),
+          data,
         );
       } else {
         await createPool(
@@ -264,11 +277,11 @@ export function PoolAdd({ tokenParams, balances }: PoolAddProps) {
           second_token,
           addPrecision(first),
           addPrecision(second),
+          data,
         );
       }
       return true;
     } catch (error: any) {
-      console.log("error", error);
       return error;
     } finally {
       setLoading(false);
@@ -682,7 +695,13 @@ export function PoolAdd({ tokenParams, balances }: PoolAddProps) {
                       )}
                   </div>
                   <DialogOverlay className="bg-[rgba(0,0,0,0.5)]" />
-                  <DialogContent className={`${stylesModal['modal-container']} bg-white px-[20px] pb-[15px] pt-[20px]`}>
+                  <DialogContent
+                    className={`${stylesModal["modal-container"]} bg-white px-[20px] pb-[15px] pt-[20px]`}
+                  >
+                    <DialogHeader>
+                      <DialogTitle />
+                      <DialogDescription />
+                    </DialogHeader>
                     <ModalListToken
                       tokenSelected={dataPoolCreate.tokenPool[typeOpenModal]}
                       onClickToken={(token) => handleSelectToken(token)}
@@ -719,10 +738,14 @@ export function PoolAdd({ tokenParams, balances }: PoolAddProps) {
                     <DialogContent
                       className={`${stylesModal["modal-container"]} ${stylesModal["modal-pool"]} w-[99%] max-w-[625px] border-none bg-white px-[20px] pb-[20px] pt-[27px] sm:px-[20px] sm:pt-[27px] lg:px-[30px] lg:pt-[35px] xl:px-[30px] xl:pt-[35px]`}
                     >
+                      <DialogHeader>
+                        <DialogTitle />
+                        <DialogDescription />
+                      </DialogHeader>
                       <ModalSupplyComfirm
                         lpAmount={
                           <span
-                            className="h-[45px] text-[34px] font-[600] text-black sm:text-[34px] lg:texst-[52px] xl:text-[52px]"
+                            className="lg:texst-[52px] h-[45px] text-[34px] font-[600] text-black sm:text-[34px] xl:text-[52px]"
                             style={{
                               lineHeight: "52px",
                               letterSpacing: "-1px",
@@ -739,9 +762,15 @@ export function PoolAdd({ tokenParams, balances }: PoolAddProps) {
                         tokenIn={tokenParams?.tokenA?.label || EMPTY_DATA}
                         tokenOut={tokenParams?.tokenB?.label || EMPTY_DATA}
                         tokenIn_token={tokenParams?.tokenA?.value || EMPTY_DATA}
-                        tokenOut_token={tokenParams?.tokenB?.value || EMPTY_DATA}
-                        tokenInAmount={dataPoolCreate?.deposit_amount?.first || EMPTY_DATA}
-                        tokenOutAmount={dataPoolCreate?.deposit_amount?.second || EMPTY_DATA}
+                        tokenOut_token={
+                          tokenParams?.tokenB?.value || EMPTY_DATA
+                        }
+                        tokenInAmount={
+                          dataPoolCreate?.deposit_amount?.first || EMPTY_DATA
+                        }
+                        tokenOutAmount={
+                          dataPoolCreate?.deposit_amount?.second || EMPTY_DATA
+                        }
                         poolExists={poolExists}
                         valuePer={valuePer}
                         onClickAddPool={handleCreatePool}

@@ -1,0 +1,145 @@
+
+
+:root {
+  --white-color-bg: #fff;
+  --white-color-bg-opacity: rgba(255, 255, 255, 0.8);
+  --black-color-text: #000;
+  --black-color-shadow: rgba(0, 0, 0, 0.25);
+  --orange-color-bg: #ff603b;
+  --purple-color-bg: #c5b4e3;
+  --green-color-bg: #9fe4c9;
+  --black-shadow-item-token: rgba(255, 255, 255, 0.25);
+  --black-overlay: rgba(0, 0, 0, 0.5);
+  --brown-color-bg: rgba(255, 96, 59, 0.25);
+  --gray-color-shadow: rgba(26, 26, 26, 0.3);
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 240 5.9% 10%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 240 5.9% 10%;
+  --radius: 0.5rem;
+
+  /* dark */
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 240 5.9% 10%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 240 4.9% 83.9%;
+
+  --secondary-color: #6c757d;
+  --background-color: #fff;
+  --text-color: #333;
+  --border-color: #ccc;
+  --header-background-color: #f8f9fa;
+  --footer-background-color: #343a40;
+  --hero-background-color: #e9ecef;
+  --header-button-color: radial-gradient(
+    1465.72% 50% at 60.91% 50%,
+    #ff603b 0%,
+    #f83b28 100%
+  );
+  --black-text-color: #000;
+  --white-text-color: #fff;
+  --red-text-color: #f83b28;
+  --green-text-color: #45b272;
+  --green2-text-color: #0a6;
+  --bg-button-active-color: #ff603b;
+  --bg-button-active-color-25: #ff603b40;
+  --bg-button-color: #ffcabd;
+  --button-connect-wallet-color: #c5b4e3;
+  --button-connect-wallet-hover-color: linear-gradient(
+    180deg,
+    #9fe4c9 0%,
+    #c5b4e3 100%
+  );
+  --button-header-hover-color: linear-gradient(90deg, #ff603b 0%, #6a16ff 100%);
+  --button-connected-wallet-color: #ffd4c8;
+  --bg-overlay-color: rgba(217, 217, 217, 0.48);
+  --bg-overlay-black-color: rgba(0, 0, 0, 0.5);
+  --overlay-black-color: rgba(0, 0, 0, 0.4);
+  --border-black-color: rgba(0, 0, 0, 0.3);
+  --shadow-popup-color: rgba(0, 0, 0, 0.25);
+  --bg-pool-color: rgba(255, 255, 255, 0.5);
+  --bg-switch-range-color: #ebebeb;
+  --bg-fixed-color: #fccdc2;
+  --bg-body-color: #fffbf7;
+  --bg-chart-color: #6a16ff;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("assets/fonts/SFProDisplay/SF-Pro-Display-Bold.otf")
+    format("opentype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("assets/fonts/SFProDisplay/SF-Pro-Display-BoldItalic.otf")
+    format("opentype");
+  font-weight: 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("assets/fonts/SFProDisplay/SF-Pro-Display-Regular.otf")
+    format("opentype");
+  font-weight: 400;
+  font-style: regular;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("assets/fonts/SFProDisplay/SF-Pro-Display-RegularItalic.otf")
+    format("opentype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("assets/fonts/SFProDisplay/SF-Pro-Display-Medium.otf")
+    format("opentype");
+  font-weight: 500;
+  font-style: regular;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("assets/fonts/SFProDisplay/SF-Pro-Display-Thin.otf")
+    format("opentype");
+  font-weight: 300;
+  letter-spacing: 1px;
+  font-style: regular;
+>>>>>>> apps/web/UI/v2/global.css
+}

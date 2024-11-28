@@ -7,13 +7,14 @@ import stylesButton from "../../css/button.module.css";
 import { tokens } from "@/tokens";
 import { precision } from "@/components/ui/balance";
 import BigNumber from "bignumber.js";
+import { formatBigNumber } from "@/lib/utils";
 
 export interface layoutWaitingAndSuccessProps {
   statusLayout: any;
   tokenParams?: any;
   dataPool?: any;
   valueTokenPool?: any;
-  handleClosePool?: () => void;
+  handleClosePool?: (value?: boolean) => void;
   type: string;
   tokenIn?: string;
   tokenOut?: string;
@@ -36,15 +37,15 @@ export function LayoutWaitingAndSuccess({
 }: layoutWaitingAndSuccessProps) {
   const tokenA_amount =
     type === "remove"
-      ? BigNumber(tokenInAmount || 0)
-          .dividedBy(10 ** precision)
-          .toString()
+      ? formatBigNumber(
+          BigNumber(tokenInAmount || 0).dividedBy(10 ** precision),
+        ).toString()
       : tokenInAmount;
   const tokenB_amount =
     type === "remove"
-      ? BigNumber(tokenOutAmount || 0)
-          .dividedBy(10 ** precision)
-          .toString()
+      ? formatBigNumber(
+          BigNumber(tokenOutAmount || 0).dividedBy(10 ** precision),
+        ).toString()
       : tokenOutAmount;
   const textType = type === "remove" ? "Removing" : "Deposited";
   return (
@@ -52,7 +53,7 @@ export function LayoutWaitingAndSuccess({
       <div className="relative mb-[15px] flex flex-col items-center justify-center gap-[50px]">
         <DialogClose
           className="absolute right-[-6px] top-[-10px]"
-          onClick={() => handleClosePool && handleClosePool()}
+          onClick={() => handleClosePool && handleClosePool(true)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -163,13 +164,13 @@ export function LayoutWaitingAndSuccess({
             <span className="text-[22px] font-[600] text-textBlack sm:text-[22px] lg:text-[28px] xl:text-[28px]">
               Transaction submitted
             </span>
-            <DialogClose className="w-full">
+            <DialogClose asChild className="w-full">
               <Button
                 loading={false}
                 type={"submit"}
                 className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]}`}
                 style={{ width: "100%" }}
-                onClick={() => handleClosePool && handleClosePool()}
+                onClick={() => handleClosePool && handleClosePool(true)}
               >
                 <span>Close</span>
               </Button>
@@ -192,13 +193,13 @@ export function LayoutWaitingAndSuccess({
                   return a.toUpperCase();
                 }) || "Transaction failed"}
             </span>
-            <DialogClose className="w-full">
+            <DialogClose asChild className="w-full">
               <Button
                 loading={false}
                 type={"submit"}
                 className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]}`}
                 style={{ width: "100%" }}
-                onClick={() => handleClosePool && handleClosePool()}
+                onClick={() => handleClosePool && handleClosePool(true)}
               >
                 <span>Close</span>
               </Button>

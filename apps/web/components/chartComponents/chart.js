@@ -1,7 +1,7 @@
-import * as d3 from 'd3';
+import * as d3 from "d3";
 
 class Stick {
-  constructor(ctx, { x = 0, y = 0, width = 10, height, color = 'black' }) {
+  constructor(ctx, { x = 0, y = 0, width = 10, height, color = "black" }) {
     this.ctx = ctx;
     this.canvas = this.ctx.canvas;
     this.width = width;
@@ -52,7 +52,7 @@ class Stick {
 class Rectangle {
   constructor(
     ctx,
-    { x = 0, y = 0, radius = 0, width, height, color = 'rgba(0, 0, 0, 0.2)' },
+    { x = 0, y = 0, radius = 0, width, height, color = "rgba(0, 0, 0, 0.2)" },
   ) {
     this.ctx = ctx;
     this.canvas = ctx.canvas;
@@ -139,7 +139,7 @@ class Drag {
   }
 
   isStickHover(mouseX, mouseY) {
-    return [this.stickFrom, this.stickTo].some(stick =>
+    return [this.stickFrom, this.stickTo].some((stick) =>
       stick.isInside(mouseX, mouseY),
     );
   }
@@ -167,7 +167,7 @@ class Drag {
   }
 
   getStickDragging() {
-    return [this.stickFrom, this.stickTo].find(stick => stick.isDragging);
+    return [this.stickFrom, this.stickTo].find((stick) => stick.isDragging);
   }
 
   getSpaceSticks() {
@@ -200,9 +200,9 @@ class Drag {
     const mouseY = e.offsetY;
 
     if (this.isDraggingStick() || this.isStickHover(mouseX, mouseY)) {
-      this.canvas.style.cursor = 'ew-resize';
+      this.canvas.style.cursor = "ew-resize";
     } else {
-      this.canvas.style.cursor = 'default';
+      this.canvas.style.cursor = "default";
     }
 
     if (this.stickFrom.isDragging && this.isMouseOverStickFrom(mouseX)) {
@@ -229,20 +229,20 @@ class Drag {
 }
 
 class TextDraw {
-  constructor(ctx, { x = 0, y = 0, size = 30, value = '', color }) {
+  constructor(ctx, { x = 0, y = 0, size = 30, value = "", color }) {
     this.ctx = ctx;
     this.canvas = ctx.canvas;
     this.x = x;
     this.y = y;
     this.size = size;
     this.value = value;
-    this.color = color || 'blue';
+    this.color = color || "blue";
   }
 
   draw() {
     this.ctx.font = `400 ${this.size}px SF Pro Display`;
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'middle';
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "middle";
     this.ctx.fillStyle = this.color;
     this.ctx.fillText(this.value, this.x, this.y);
   }
@@ -262,7 +262,7 @@ class AxisX {
   }
 
   draw() {
-    this.labels.forEach(label => {
+    this.labels.forEach((label) => {
       new TextDraw(this.ctx, {
         x: label.position,
         y: this.y,
@@ -293,7 +293,7 @@ class AxisY {
 
   draw() {
     const yTicks = this.scaleD3.ticks(this.tick);
-    yTicks.forEach(tick => {
+    yTicks.forEach((tick) => {
       const y = this.scaleD3(tick);
       // this.ctx.beginPath();
       // this.ctx.moveTo(this.x - 30 + 5, this.y - y);
@@ -315,7 +315,7 @@ class BarsChart {
     ctx,
     {
       data = [],
-      axis = { color: 'green', size: 20 },
+      axis = { color: "green", size: 20 },
       marginBottomChart = 20,
       marginRightChart = 40,
       marginTopChart = 20,
@@ -332,13 +332,13 @@ class BarsChart {
     this.axis = axis;
     const columns = this.initColumn();
     this.column = columns.map(
-      col =>
+      (col) =>
         new Rectangle(ctx, {
           x: col.x,
           y: col.y,
           width: col.width,
           height: col.height,
-          color: color || '#FF603B',
+          color: color || "#FF603B",
           radius: col.width / 4,
         }),
     );
@@ -348,7 +348,7 @@ class BarsChart {
       y: this.canvas.height - 10,
       color: this.axis.color,
       size: this.axis.size,
-      labels: columns.map(col => ({
+      labels: columns.map((col) => ({
         position: col.x + col.width / 2,
         label: col.label,
       })),
@@ -367,26 +367,26 @@ class BarsChart {
 
   getValues() {
     return {
-      message: 'Barschart hehe!!!',
+      message: "Barschart hehe!!!",
     };
   }
 
   initColumn() {
     this.positionX = d3
       .scaleBand()
-      .domain(this.data.map(d => d.letter))
+      .domain(this.data.map((d) => d.letter))
       .range([0, this.canvas.width - this.marginRightChart])
       .padding(0.1);
 
     this.positionY = d3
       .scaleLinear()
-      .domain([0, d3.max(this.data, d => d.value)])
+      .domain([0, d3.max(this.data, (d) => d.value)])
       .range([
         0,
         this.canvas.height - this.marginBottomChart - this.marginTopChart,
       ]);
 
-    return this.data.map(d => ({
+    return this.data.map((d) => ({
       label: d.letter,
       x: this.positionX(d.letter),
       y: this.canvas.height - this.positionY(d.value) - this.marginBottomChart,
@@ -396,7 +396,7 @@ class BarsChart {
   }
 
   draw() {
-    this.column.forEach(col => col.draw());
+    this.column.forEach((col) => col.draw());
     this.axisX.draw();
     this.axisY.draw();
   }
@@ -407,8 +407,8 @@ class PoolChart {
     ctx,
     {
       data = [],
-      from = { value: 50, color: '#9FE4C9' },
-      to = { value: 200, color: '#C5B4E3' },
+      from = { value: 50, color: "#9FE4C9" },
+      to = { value: 200, color: "#C5B4E3" },
       currentPrice = 150,
     },
   ) {
@@ -422,7 +422,7 @@ class PoolChart {
     });
     this.stickCurrentPrice = new Rectangle(ctx, {
       x: currentPrice,
-      color: 'black',
+      color: "black",
       width: 2,
       height: this.canvas.height,
     });
@@ -431,10 +431,10 @@ class PoolChart {
 
   // Initialize event listeners
   init() {
-    this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-    this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
-    this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
-    this.canvas.addEventListener('mouseout', this.onMouseOut.bind(this));
+    this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this));
+    this.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
+    this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this));
+    this.canvas.addEventListener("mouseout", this.onMouseOut.bind(this));
     this.draw();
   }
 
@@ -474,10 +474,10 @@ class DoubleBarChart {
     this.ctx = ctx;
     this.canvas = ctx.canvas;
     this.data = config.data;
-    this.colors = config.colors || ['#E1D9F0', '#E4F5EE'];
+    this.colors = config.colors || ["#E1D9F0", "#E4F5EE"];
     this.axis = config.axis;
-    this.onHover = config.onHover || function () { };
-    this.hoverColors = config.hoverColors || ['#C0B0E0', '#C0E0D0'];
+    this.onHover = config.onHover || function () {};
+    this.hoverColors = config.hoverColors || ["#C0B0E0", "#C0E0D0"];
     this.setupEventListeners();
     this.margin = config.margin || { top: 20, right: 20, bottom: 29, left: 10 };
     this.hoverX = 0;
@@ -487,13 +487,13 @@ class DoubleBarChart {
 
     this.xScale = d3
       .scaleBand()
-      .domain(this.data.map(d => d.date))
+      .domain(this.data.map((d) => d.date))
       .range([this.margin.left, this.canvas.width - this.margin.right])
       .padding(0.1);
 
     this.yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(this.data, d => Math.max(d.value1, d.value2))])
+      .domain([0, d3.max(this.data, (d) => Math.max(d.value1, d.value2))])
       .range([this.canvas.height - this.margin.bottom, this.margin.top]);
 
     this.draw();
@@ -502,19 +502,19 @@ class DoubleBarChart {
   drawXAxis() {
     const xTicks = this.xScale.domain().filter((_, i) => i % 3 === 0); // Show every 3rd label
 
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'top';
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "top";
     this.ctx.fillStyle = this.axis.color;
     this.ctx.font = `400 ${this.axis.size}px SF Pro Display`;
 
-    xTicks.forEach(date => {
+    xTicks.forEach((date) => {
       const x = this.xScale(date) + this.xScale.bandwidth() / 2;
       const y = this.canvas.height - this.margin.bottom + 10;
 
       // Format the date as needed
-      const formattedDate = new Date(date).toLocaleDateString('en-US', {
-        month: 'short',
-        year: 'numeric',
+      const formattedDate = new Date(date).toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
       });
 
       this.ctx.fillText(formattedDate, x, y);
@@ -529,7 +529,7 @@ class DoubleBarChart {
     this.ctx.clearRect(0, 0, width, height);
 
     const maxValue = Math.max(
-      ...this.data.flatMap(item => item.value1 + item.value2),
+      ...this.data.flatMap((item) => item.value1 + item.value2),
     );
 
     // Vẽ các cột
@@ -548,7 +548,7 @@ class DoubleBarChart {
         this.ctx.fillRect(x, y - height1 + 1, this.barWidth, height1);
 
         // border top
-        this.ctx.fillStyle = '#6A16FF';
+        this.ctx.fillStyle = "#6A16FF";
         this.ctx.fillRect(x, y - height1, this.barWidth, 1);
 
         // Vẽ cột cho value2
@@ -562,7 +562,7 @@ class DoubleBarChart {
         );
 
         // border top
-        this.ctx.fillStyle = '#0A6';
+        this.ctx.fillStyle = "#0A6";
         this.ctx.fillRect(x, y - height1 - height2 + 1, this.barWidth, 1);
 
         if (isHovered) {
@@ -572,10 +572,10 @@ class DoubleBarChart {
         if (index % 3 === 0) {
           this.ctx.fillStyle = this.axis.color;
           this.ctx.font = `400 ${this.axis.size}px SF Pro Display`;
-          this.ctx.textAlign = 'center';
+          this.ctx.textAlign = "center";
           const formattedDate = new Date(item.date).toLocaleDateString(
-            'en-US',
-            { month: 'short', year: 'numeric' },
+            "en-US",
+            { month: "short", year: "numeric" },
           );
           this.ctx.fillText(formattedDate, x + this.barWidth / 2 + 10, y + 20);
         }
@@ -590,15 +590,15 @@ class DoubleBarChart {
   }
 
   setupEventListeners() {
-    this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
-    this.canvas.addEventListener('mouseout', this.handleMouseOut.bind(this));
+    this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
+    this.canvas.addEventListener("mouseout", this.handleMouseOut.bind(this));
   }
 
   handleMouseMove(event) {
     const rect = this.canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    this.canvas.style.cursor = 'pointer';
+    this.canvas.style.cursor = "pointer";
     this.checkHover(x, y);
   }
 
@@ -606,7 +606,7 @@ class DoubleBarChart {
     if (this.hoveredBar !== null) {
       this.hoveredBar = null;
       this.draw();
-      this.canvas.style.cursor = 'default';
+      this.canvas.style.cursor = "default";
     }
   }
 
@@ -645,7 +645,7 @@ class DoubleBarChart {
       // Vertical line
       this.ctx.moveTo(x + 10, this.margin.top);
       this.ctx.lineTo(x + 10, y);
-      this.ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+      this.ctx.strokeStyle = "rgba(0,0,0,0.5)";
       this.ctx.lineWidth = 0.5;
       this.ctx.stroke();
     }
@@ -657,24 +657,24 @@ class DoubleAreaChart {
     ctx,
     {
       data = [],
-      colors = ['#0A6', '#6A16FF'],
+      colors = ["#0A6", "#6A16FF"],
       colorPointHover = [
         {
-          color: '#8E59ED',
-          colorStroke: '#9767EE',
+          color: "#8E59ED",
+          colorStroke: "#9767EE",
         },
         {
-          color: '#57CD9E',
-          colorStroke: '#7BD8B2',
+          color: "#57CD9E",
+          colorStroke: "#7BD8B2",
         },
       ],
-      colorArea = ['red', 'blue'],
-      axis = { color: '#000', size: 14 },
+      colorArea = ["red", "blue"],
+      axis = { color: "#000", size: 14 },
       marginBottom = 28,
       marginRight = 1,
       marginTop = 20,
       marginLeft = 1,
-      onHover = (x, dataHover) => { },
+      onHover = (x, dataHover) => {},
     },
   ) {
     this.ctx = ctx;
@@ -699,19 +699,19 @@ class DoubleAreaChart {
   }
 
   setupEventListeners() {
-    this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
-    this.canvas.addEventListener('mouseout', this.handleMouseOut.bind(this));
+    this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
+    this.canvas.addEventListener("mouseout", this.handleMouseOut.bind(this));
   }
 
   handleMouseMove(event) {
     const rect = this.canvas.getBoundingClientRect();
     const x = event.clientX - rect.left - this.margin.left;
     const date = this.xScale.invert(x);
-    this.canvas.style.cursor = 'pointer';
+    this.canvas.style.cursor = "pointer";
 
     this.hoverLine = x;
 
-    const bisect = d3.bisector(d => d.date).left;
+    const bisect = d3.bisector((d) => d.date).left;
     const index = bisect(this.data, date, 1);
     const d0 = this.data[index - 1];
     const d1 = this.data[index];
@@ -726,7 +726,7 @@ class DoubleAreaChart {
   handleMouseOut() {
     this.hoverLine = null;
     this.hoverData = null;
-    this.canvas.style.cursor = 'default';
+    this.canvas.style.cursor = "default";
     this.draw();
   }
 
@@ -759,7 +759,7 @@ class DoubleAreaChart {
           this.yScale(this.hoverData.value2) + this.margin.top,
         );
       }
-      this.ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+      this.ctx.strokeStyle = "rgba(0,0,0,0.5)";
       this.ctx.lineWidth = 0.5;
       this.ctx.stroke();
 
@@ -798,11 +798,11 @@ class DoubleAreaChart {
 
     this.xScale = d3
       .scaleTime()
-      .domain(d3.extent(this.data, d => d.date))
+      .domain(d3.extent(this.data, (d) => d.date))
       .range([0, width]);
 
-    const yMin = d3.min(this.data, d => Math.min(d.value1, d.value2));
-    const yMax = d3.max(this.data, d => Math.max(d.value1, d.value2));
+    const yMin = d3.min(this.data, (d) => Math.min(d.value1, d.value2));
+    const yMax = d3.max(this.data, (d) => Math.max(d.value1, d.value2));
 
     this.yScale = d3
       .scaleLinear()
@@ -814,8 +814,8 @@ class DoubleAreaChart {
   drawLine(values, color) {
     const line = d3
       .line()
-      .x(d => this.xScale(d.date))
-      .y(d => this.yScale(d.value))
+      .x((d) => this.xScale(d.date))
+      .y((d) => this.yScale(d.value))
       .context(this.ctx);
 
     this.ctx.save();
@@ -831,9 +831,9 @@ class DoubleAreaChart {
   drawArea(values, color) {
     const area = d3
       .area()
-      .x(d => this.xScale(d.date))
+      .x((d) => this.xScale(d.date))
       .y0(this.yScale.range()[0])
-      .y1(d => this.yScale(d.value))
+      .y1((d) => this.yScale(d.value))
       .context(this.ctx);
 
     this.ctx.save();
@@ -851,12 +851,12 @@ class DoubleAreaChart {
 
     // Draw X-axis labels
     const xTicks = this.xScale.ticks(d3.timeYear.every(1));
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'top';
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "top";
     this.ctx.fillStyle = this.axis.color;
     this.ctx.font = `400 ${this.axis.size}px SF Pro Display`;
 
-    xTicks.forEach(date => {
+    xTicks.forEach((date) => {
       const x = this.xScale(date) + this.margin.left;
       const y = height + this.margin.top + 10;
       this.ctx.fillText(date.getFullYear(), x, y);
@@ -867,20 +867,20 @@ class DoubleAreaChart {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.drawArea(
-      this.data.map(d => ({ date: d.date, value: d.value1 })),
+      this.data.map((d) => ({ date: d.date, value: d.value1 })),
       this.colorArea[0],
     );
     this.drawLine(
-      this.data.map(d => ({ date: d.date, value: d.value1 })),
+      this.data.map((d) => ({ date: d.date, value: d.value1 })),
       this.colors[0],
     );
 
     this.drawArea(
-      this.data.map(d => ({ date: d.date, value: d.value2 })),
+      this.data.map((d) => ({ date: d.date, value: d.value2 })),
       this.colorArea[1],
     );
     this.drawLine(
-      this.data.map(d => ({ date: d.date, value: d.value2 })),
+      this.data.map((d) => ({ date: d.date, value: d.value2 })),
       this.colors[1],
     );
 
@@ -897,7 +897,7 @@ class DoubleAreaChart {
 
   getValues() {
     return {
-      message: 'Line Chart Data',
+      message: "Line Chart Data",
     };
   }
 }
@@ -907,23 +907,23 @@ class SingleAreaChart {
     ctx,
     {
       data = [],
-      color = '#0A6',
+      color = "#0A6",
       colorPointHover = {
-        color: '#57CD9E',
-        colorStroke: '#7BD8B2',
+        color: "#57CD9E",
+        colorStroke: "#7BD8B2",
       },
-      colorArea = 'rgba(10, 102, 0, 0.1)',
-      axis = { color: '#000', size: 14 },
+      colorArea = "rgba(10, 102, 0, 0.1)",
+      axis = { color: "#000", size: 14 },
       marginBottom = 28,
       marginRight = 40,
       marginTop = 20,
       marginLeft = 0,
-      onHover = (x, dataHover) => { },
+      onHover = (x, dataHover) => {},
     },
   ) {
     this.ctx = ctx;
     this.canvas = ctx.canvas;
-    this.data = data.map(d => ({ date: d[0], value: d[1] }));
+    this.data = data.map((d) => ({ date: d[0], value: d[1] }));
     this.hoverLine = null;
     this.setupEventListeners();
     this.colorArea = colorArea;
@@ -943,19 +943,19 @@ class SingleAreaChart {
   }
 
   setupEventListeners() {
-    this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
-    this.canvas.addEventListener('mouseout', this.handleMouseOut.bind(this));
+    this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
+    this.canvas.addEventListener("mouseout", this.handleMouseOut.bind(this));
   }
 
   handleMouseMove(event) {
     const rect = this.canvas.getBoundingClientRect();
     const x = event.clientX - rect.left - this.margin.left;
     const date = this.xScale.invert(x);
-    this.canvas.style.cursor = 'pointer';
+    this.canvas.style.cursor = "pointer";
 
     this.hoverLine = x;
 
-    const bisect = d3.bisector(d => d.date).left;
+    const bisect = d3.bisector((d) => d.date).left;
     const index = bisect(this.data, date, 1);
     const d0 = this.data[index - 1];
     const d1 = this.data[index];
@@ -971,7 +971,7 @@ class SingleAreaChart {
   handleMouseOut() {
     this.hoverLine = null;
     this.hoverData = null;
-    this.canvas.style.cursor = 'default';
+    this.canvas.style.cursor = "default";
     this.draw();
   }
 
@@ -983,7 +983,7 @@ class SingleAreaChart {
       this.ctx.beginPath();
       this.ctx.moveTo(x, this.margin.top);
       this.ctx.lineTo(x, this.canvas.height - this.margin.bottom);
-      this.ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+      this.ctx.strokeStyle = "rgba(0,0,0,0.5)";
       this.ctx.lineWidth = 0.5;
       this.ctx.stroke();
 
@@ -1016,11 +1016,11 @@ class SingleAreaChart {
 
     this.xScale = d3
       .scaleTime()
-      .domain(d3.extent(this.data, d => d.date))
+      .domain(d3.extent(this.data, (d) => d.date))
       .range([0, width]);
 
-    const yMin = d3.min(this.data, d => d.value);
-    const yMax = d3.max(this.data, d => d.value);
+    const yMin = d3.min(this.data, (d) => d.value);
+    const yMax = d3.max(this.data, (d) => d.value);
 
     this.yScale = d3
       .scaleLinear()
@@ -1032,8 +1032,8 @@ class SingleAreaChart {
   drawLine() {
     const line = d3
       .line()
-      .x(d => this.xScale(d.date))
-      .y(d => this.yScale(d.value))
+      .x((d) => this.xScale(d.date))
+      .y((d) => this.yScale(d.value))
       .context(this.ctx);
 
     this.ctx.save();
@@ -1049,9 +1049,9 @@ class SingleAreaChart {
   drawArea() {
     const area = d3
       .area()
-      .x(d => this.xScale(d.date))
+      .x((d) => this.xScale(d.date))
       .y0(this.yScale.range()[0])
-      .y1(d => this.yScale(d.value))
+      .y1((d) => this.yScale(d.value))
       .context(this.ctx);
 
     this.ctx.save();
@@ -1067,12 +1067,12 @@ class SingleAreaChart {
     const height = this.canvas.height - this.margin.top - this.margin.bottom;
 
     const yTicks = this.yScale.ticks(5);
-    this.ctx.textAlign = 'right';
-    this.ctx.textBaseline = 'middle';
+    this.ctx.textAlign = "right";
+    this.ctx.textBaseline = "middle";
     this.ctx.fillStyle = this.axis.color;
     this.ctx.font = `400 ${this.axis.size}px SF Pro Display`;
 
-    yTicks.forEach(tick => {
+    yTicks.forEach((tick) => {
       const x = this.canvas.width;
       const y = this.yScale(tick) + this.margin.top;
       this.ctx.fillText(`$${tick}`, x, y);
@@ -1086,24 +1086,24 @@ class SingleAreaChart {
     for (let i = 0; i < 6; i++) {
       const time = new Date(
         startTime.getTime() +
-        (endTime.getTime() - startTime.getTime()) * (i / 6),
+          (endTime.getTime() - startTime.getTime()) * (i / 6),
       );
       xTicks.push(time);
     }
 
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'top';
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "top";
     this.ctx.fillStyle = this.axis.color;
     this.ctx.font = `400 ${this.axis.size}px SF Pro Display`;
 
-    xTicks.forEach(date => {
+    xTicks.forEach((date) => {
       const x = this.xScale(date) + 40;
       const y = height + this.margin.top + 10;
       // Hiển thị giờ và phút
       this.ctx.fillText(
-        date.toLocaleTimeString('us-UA', {
-          hour: '2-digit',
-          minute: '2-digit',
+        date.toLocaleTimeString("us-UA", {
+          hour: "2-digit",
+          minute: "2-digit",
           hour12: true,
         }),
         x,
@@ -1130,8 +1130,109 @@ class SingleAreaChart {
 
   getValues() {
     return {
-      message: 'Single Line Chart Data',
+      message: "Single Line Chart Data",
     };
+  }
+}
+
+class LineChart {
+  constructor(
+    ctx,
+    {
+      data,
+      color = "#0A6",
+      axis,
+      marginBottom,
+      marginLeft,
+      marginTop,
+      marginRight,
+    },
+  ) {
+    this.ctx = ctx;
+    this.canvas = ctx.canvas;
+    this.data = data.map((d) => ({
+      date: d.date instanceof Date ? d.date : new Date(d.date),
+      value: d.value,
+    }));
+    this.color = color;
+    this.axis = axis;
+    this.margin = {
+      bottom: marginBottom || 30,
+      left: marginLeft || 40,
+      top: marginTop || 20,
+      right: marginRight || 20,
+    };
+
+    this.initScales();
+    this.draw();
+  }
+
+  initScales() {
+    const width = this.canvas.width - this.margin.left - this.margin.right;
+    const height = this.canvas.height - this.margin.top - this.margin.bottom;
+
+    this.xScale = d3
+      .scaleTime()
+      .domain(d3.extent(this.data, (d) => d.date))
+      .range([0, width]);
+
+    // this.xScale = d3
+    // .scalePoint()
+    // .domain(this.data.map((d) => d.date))
+    // .range([0, width])
+    // .padding(0.3);
+
+    this.yScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(this.data, (d) => d.value)])
+      .range([height, 0]);
+  }
+
+  drawAxes() {
+    // const width = this.canvas.width;
+    // const height = this.canvas.height - this.margin.top - this.margin.bottom;
+    // this.ctx.fillStyle = this.axis.color;
+    // this.ctx.font = `400 ${this.axis.size}px Arial`;
+    // this.ctx.textAlign = "center";
+    // this.ctx.textBaseline = "top";
+    // const xTicks = this.xScale.ticks(5);
+    // xTicks.forEach((tick) => {
+    //   const x = this.xScale(tick) + this.margin.left;
+    //   const y = height + this.margin.top + 10;
+    //   const formattedTick = d3.timeFormat("%b %d")(tick);
+    //   this.ctx.fillText(formattedTick, x, y);
+    // });
+    // const yTicks = this.yScale.ticks(5);
+    // this.ctx.textAlign = "right";
+    // this.ctx.textBaseline = "middle";
+    // yTicks.forEach((tick) => {
+    //   const x = this.margin.left - 10;
+    //   const y = this.yScale(tick) + this.margin.top;
+    //   this.ctx.fillText(tick, x, y);
+    // });
+  }
+
+  drawLine() {
+    const line = d3
+      .line()
+      .x((d) => this.xScale(d.date))
+      .y((d) => this.yScale(d.value))
+      .context(this.ctx);
+
+    this.ctx.save();
+    this.ctx.translate(this.margin.left, this.margin.top);
+    this.ctx.beginPath();
+    line(this.data);
+    this.ctx.strokeStyle = this.color;
+    this.ctx.lineWidth = 1;
+    this.ctx.stroke();
+    this.ctx.restore();
+  }
+
+  draw() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    // this.drawAxes();
+    this.drawLine();
   }
 }
 
@@ -1142,6 +1243,7 @@ export {
   DoubleBarChart,
   BarsChart,
   PoolChart,
+  LineChart,
   DoubleAreaChart,
-  SingleAreaChart
+  SingleAreaChart,
 };

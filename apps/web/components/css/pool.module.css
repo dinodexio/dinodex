@@ -475,7 +475,7 @@
 }
 
 .pool-item-active {
-    height: 327px;
+    height: 265px;
 }
 
 .content-pool-item {
@@ -492,7 +492,7 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    gap: 25px;
+    gap: 15px;
     height: 227px;
 }
 
@@ -611,13 +611,65 @@
     height: 76px !important;
 }
 
+.pool-container {
+    z-index: 10;
+}
+
+.button-withdraw {
+    display: flex;
+    width: 105px;
+    padding: 12px 25px;
+    justify-content: center;
+    align-items: center;
+    gap: var(--100625-rem, 10px);
+    border-radius: 8px;
+    background: var(--white-text-color);
+    box-shadow: 0px 2px 8px 0px var(--shadow-popup-color);
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.button-withdraw:hover{
+    background: #E8E8E8;
+}
+
+.popup-setting {
+    display: flex;
+    width: min(90vw, 450px);
+    padding: var(--20125-rem, 20px) var(--100625-rem, 10px) 15px var(--20125-rem, 20px);
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    border-radius: 12px;
+    background: var(--white-text-color);
+    box-shadow: 0px 2px 8px 0px var(--shadow-popup-color);
+    position: absolute;
+    top: 40px;
+    right: 0;
+    z-index: 103;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.popup-setting-open {
+    opacity: 1;
+    visibility: visible;
+}
+
 @media (min-width: 800px) and (max-width: 1367px) {
     .pool-container {
         width: min(100%, 600px);
     }
 
     .tip-text {
-        font-size: 20px;
+        font-size: 16px;
     }
 }
 
@@ -701,7 +753,7 @@
     }
 
     .pool-item-active {
-        height: 275px;
+        height: 240px;
     }
 
     .text-or {
@@ -711,6 +763,11 @@
 
     .modal-pool {
         border-radius: 12px;
+    }
+
+    .button-withdraw{
+        padding: 12px 18px;
+        width: min(20%,70px);
     }
 }
 

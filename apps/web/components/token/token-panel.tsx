@@ -1,28 +1,31 @@
-import { useEffect } from "react";
+import React, { useMemo } from "react";
 import { Table } from "../table/table";
 import Image from "next/image";
-import { formatLargeNumber, formatNumber, formatterInteger } from "@/lib/utils";
+import { formatNumber, formatterInteger } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { LIST_TOKENS } from "@/tokens";
-import { EMPTY_DATA,DATA_TOKENS } from "@/constants";
+import { EMPTY_DATA } from "@/constants";
 import styles from "../css/table.module.css";
 import { useAggregatorStore } from "@/lib/stores/aggregator";
-import { removePrecision } from "@/lib/utils";
-import { precision } from "../ui/balance";
 import BigNumber from "bignumber.js";
+import ChartLine from "../chartComponents/LineChart";
 
 export interface TokenPanelProps {
   valueSearch?: string;
 }
 
 function formatNumberPrecisionVol(value: string, isPrice: boolean = false) {
-  if (!value) return EMPTY_DATA
+  if (!value) return EMPTY_DATA;
 
-  const priceResult = formatNumber(BigNumber(removePrecision(value, precision)).toNumber(), isPrice)
-  return `${priceResult == '< 0.01'
-    ? (isPrice ? "< $0.01" : priceResult)
-    : ( isPrice ? `$${priceResult}` : priceResult
-  )}`
+  const priceResult = formatNumber(BigNumber(value).toNumber());
+  return `${
+    priceResult == "<0.01"
+      ? isPrice
+        ? "< $0.01"
+        : priceResult
+      : isPrice
+        ? `$${priceResult}`
+        : priceResult
+  }`;
 }
 
 let columTableToken = [
@@ -43,11 +46,18 @@ let columTableToken = [
     render: (data: any) => {
       return (
         <div className={styles["token-info"]}>
-          <Image src={data?.logo || ''} alt={data?.name || ''} width={24} height={24} />
+          <Image
+            src={data?.logo || ""}
+            alt={data?.name || ""}
+            width={24}
+            height={24}
+          />
           <span className={styles["token-name-text"]}>
-            {data.name ? data.name?.length > 8
-              ? data?.name?.slice(0, 8) + "..."
-              : data?.name : ''}
+            {data.name
+              ? data.name?.length > 8
+                ? data?.name?.slice(0, 8) + "..."
+                : data?.name
+              : ""}
           </span>
           <span className={styles["token-symbol-text"]}>{data?.ticker}</span>
         </div>
@@ -62,7 +72,10 @@ let columTableToken = [
     render: (data: any) => {
       return (
         <span className={styles["price-text"]}>
-          ${formatterInteger(data?.price)}
+          $
+          {Number(data?.price) > 1000000
+            ? formatNumberPrecisionVol(data?.price, true)
+            : formatterInteger(data?.price)}
         </span>
       );
     },
@@ -156,7 +169,7 @@ let columTableToken = [
     key: "volume",
     width: 150,
     render: (data: any) => {
-      return <span>{formatNumberPrecisionVol(data?.volume)}</span>;
+      return <span>{formatNumberPrecisionVol(data?.volume, true)}</span>;
     },
   },
   {
@@ -165,34 +178,35 @@ let columTableToken = [
     key: "chart",
     width: 100,
     render: (data: any) => {
-      const randomImage =
-        Math.random() < 0.5
-          ? "chart-price-dummy-1.svg"
-          : "chart-price-dummy-2.svg";
       return (
         <span style={{ display: "block", width: 100, height: 24 }}>
-          <Image
-            src={`/images/token/${randomImage}`}
-            alt="chart"
-            width={100}
-            height={24}
-          />
+          <ChartLine tokenData={data?.prices} width={100} height={40} id={`chart-${data.index}`} />
         </span>
       );
     },
   },
 ];
 
-export function TokenPanel({ valueSearch }: TokenPanelProps) {
+const TokenPanelComponent = ({ valueSearch }: TokenPanelProps) => {
   const router = useRouter();
-  const { loading, tokens, loadTokens } = useAggregatorStore()
-  useEffect(() => {
-    loadTokens()
-  }, [])
+  const { tokens } = useAggregatorStore();
+  const filterDataToken = useMemo(() => {
+    let tokensFilter = tokens;
+    if (valueSearch) {
+      const lowerValueSearch = valueSearch.toLowerCase();
+      tokensFilter = tokens.filter(
+        (item: any) =>
+          item?.ticker?.toLowerCase()?.includes(lowerValueSearch) ||
+          item?.name?.toLowerCase()?.includes(lowerValueSearch),
+      );
+    }
+    return tokensFilter;
+  }, [tokens, valueSearch]);
+
   return (
     <>
       <Table
-        data={tokens}
+        data={filterDataToken}
         column={columTableToken}
         onClickTr={(dataToken) => {
           router.push(`/info/tokens/${dataToken?.ticker}`);
@@ -200,4 +214,6 @@ export function TokenPanel({ valueSearch }: TokenPanelProps) {
       />
     </>
   );
-}
+};
+
+export const TokenPanel = React.memo(TokenPanelComponent);

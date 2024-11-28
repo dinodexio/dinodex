@@ -3,6 +3,7 @@
     overflow-x: scroll;
     margin-bottom: 20px;
     background-color: #FFF;
+    max-height: 393px;
     box-shadow: 0px 2px 4px 0px var(--shadow-popup-color);
     border-radius: 12px;
 }
@@ -29,6 +30,12 @@
 
 .table-container::-webkit-scrollbar{
     display: none;
+}
+
+.table-head{
+    position: sticky;
+    top: 0px;
+    z-index: 100;
 }
 
 .table-head-row {
@@ -406,6 +413,7 @@
     align-items: center;
     gap: 4px;
     justify-content: end;
+    font-size: 18px;
 }
 
 .table-tr{
@@ -425,7 +433,7 @@
 }
 
 .table-td-time-transaction{
-    border-bottom: 1px solid var(--border-black-color);
+border-bottom: 1px solid var(--border-black-color);
     position: relative;
 }
 

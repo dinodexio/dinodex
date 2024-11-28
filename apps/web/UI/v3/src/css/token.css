@@ -1,0 +1,357 @@
+.content-tokens-container {
+  display: flex;
+  width: min(90%, 1146px);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 30px;
+  margin: 63px auto 0 auto;
+  z-index: 10;
+  position: relative;
+}
+
+.container-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 50px;
+  min-height: 387px;
+  width: 100%;
+}
+
+.chart-content-text-title {
+  color: var(--black-text-color);
+  text-align: center;
+  font-family: 'SF Pro Display';
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.chart-content-text-value {
+  color: #ff603b;
+  text-align: center;
+  font-family: 'SF Pro Display';
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.chart-content-text-price {
+  color: var(--black-text-color);
+  text-align: center;
+  font-family: 'SF Pro Display';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.chart-content-text {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  align-items: flex-start;
+  position: absolute;
+  top: -50px;
+  left: 0;
+}
+
+.token-content-menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.content-menu-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-token {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.menu-token-item {
+  color: var(--black-text-color);
+  text-align: center;
+  font-family: 'SF Pro Display';
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.menu-token-item:hover {
+  color: var(--black-text-color);
+  opacity: 1;
+}
+
+.menu-token-item-active,
+.menu-token-item-active:hover {
+  color: var(--bg-button-active-color);
+  opacity: 1;
+}
+
+.network-content {
+  display: flex;
+  padding: 1px 4px 1px 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  border: 0.5px solid var(--black-text-color);
+  background: var(--white-text-color);
+  cursor: pointer;
+  height: 30px;
+  position: relative;
+  width: max-content;
+}
+
+.volumn-value {
+  color: var(--black-text-color);
+  text-align: center;
+  font-family: 'SF Pro Display';
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.search-token-container {
+  display: flex;
+  height: 30px;
+  padding: 3px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  border: 0.5px solid var(--black-text-color);
+  background: var(--white-text-color);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.show-input-search {
+  border-color: var(--bg-button-active-color);
+}
+
+.show-input-search .input-search-token {
+  width: 100px;
+  margin-left: 10px;
+  margin-right: 26px;
+}
+
+.network-content-menu,
+.volume-menu {
+  display: flex;
+  padding: 10px 8px 10px 12px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 6px;
+  border: 0.5px solid var(--bg-button-active-color);
+  background: var(--white-text-color);
+  position: absolute;
+  width: max-content;
+  z-index: 101;
+  top: 30px;
+  right: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.network-content-menu {
+  padding: 0;
+}
+
+.network-content-menu-show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.volume-menu-show {
+  opacity: 1;
+  visibility: visible;
+  z-index: 101;
+}
+
+.network-content-menu-header,
+.network-content-menu-item {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 4px 8px 4px 12px;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.network-content-menu-item:hover {
+  background-color: var(--bg-overlay-color);
+}
+
+.network-content-menu-item-text,
+.network-content-menu-header-text {
+  color: var(--black-text-color);
+  text-align: center;
+  font-family: 'SF Pro Display';
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.network-content-menu-item-active {
+  display: flex;
+  align-items: center;
+}
+
+.img-active-volume {
+  display: none;
+}
+
+.network-content-menu-item-active .img-active-volume {
+  display: block;
+}
+
+.info-mobile-chart {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.info-mobile-chart-item {
+  display: flex;
+  width: 49%;
+  padding: 12px 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  align-self: stretch;
+  border-radius: 12px;
+  border: 1.5px solid var(--bg-button-active-color);
+  background: var(--bg-pool-color);
+}
+
+.info-mobile-chart-item-title {
+  color: var(--black-text-color);
+  font-family: 'SF Pro Display';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.info-mobile-chart-item-value {
+  color: var(--bg-button-active-color);
+  font-family: 'SF Pro Display';
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.info-mobile-chart-item-desc {
+  color: var(--black-text-color);
+  font-family: 'SF Pro Display';
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  opacity: 0.75;
+}
+
+.char-container {
+  width: 100%;
+  height: 298px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  border: 1px solid var(--bg-button-active-color);
+  position: absolute;
+  top: 0;
+}
+
+#chart-dou-bars-pool,
+#chart-dou-area-pool {
+  z-index: 10;
+  position: relative;
+}
+
+.box-info-data-hover-chart {
+  display: inline-flex;
+  padding: 4px 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  border-radius: 3px;
+  border: 0.5px solid #000;
+  background: #fff;
+  width: max-content;
+  position: absolute;
+  bottom: 94%;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+  z-index: 100;
+}
+
+#chart-dou-area-pool:hover ~ .box-info-data-hover-chart {
+  opacity: 1;
+  visibility: visible;
+}
+
+#chart-dou-bars-pool:hover ~ .box-info-data-hover-chart {
+  opacity: 1;
+  visibility: visible;
+}
+
+.box-info-data-hover-chart-item {
+  color: #000;
+  text-align: center;
+  font-family: 'SF Pro Display';
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.box-color-item {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: #3fc590;
+}
+
+.box-info-data-hover-chart-item:last-child .box-color-item {
+  background-color: #6a16ff;
+}
+
+.bg-chart {
+  position: absolute;
+  top: 30px;
+  background-image: url('/assets/images/token/bg-chart.svg');
+  background-size: cover;
+  width: calc(100% - 40px);
+  height: calc(100% - 83px);
+}
+
+#chart-line-token {
+  position: relative;
+  z-index: 100;
+}

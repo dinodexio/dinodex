@@ -8,6 +8,7 @@
     display: flex;
     justify-content: flex-end;
     padding: 42px 59px;
+    height: 130px;
 }
 
 .content-home {
@@ -102,6 +103,29 @@
 
 .logo-content>span {
     font-size: 160px
+}
+
+@media (min-width: 800px) and (max-width: 1367px) {
+    .dex-content > img {
+        width: 200px;
+        height: 200px;
+    }
+
+    .cactus-content{
+        top: -140px;
+    }
+
+    .cactus-content > img:first-child,
+    .cactus-content > img:last-child {
+        width: 150px;
+        height: 150px;
+    }
+
+    .cactus-content > img:nth-child(2) {
+        width: 100px !important;
+        height: 100px !important;
+        margin-right: -16px;
+    }
 }
 
 @media screen and (min-width: 1500px) {

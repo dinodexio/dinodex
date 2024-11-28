@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "../css/swap.module.css";
 import stylesModal from "../css/modal.module.css";
 import stylesButton from "../css/button.module.css";
@@ -10,6 +10,8 @@ import {
   DialogHeader,
   DialogOverlay,
   DialogTrigger,
+  DialogDescription,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { ModalListToken } from "../modalListToken/modalListToken";
 import { Button } from "../ui/button";
@@ -17,12 +19,12 @@ import { tokens } from "@/tokens";
 import { client, PoolKey, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
 import { Balance } from "../ui/balance";
-import { cn } from "@/lib/utils";
+import { cn, formatPriceUSD, truncateString } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
 import { Input } from "../ui/input";
-import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { useBalancesStore } from "@/lib/stores/balances";
 import useClickOutside from "@/hook/useClickOutside";
+import { USDBalance } from "../ui/usd-balance";
 
 export interface SwapProps {
   token?: any;
@@ -34,16 +36,16 @@ export interface SwapProps {
   balance?: string | number;
   balanceOut?: string | number;
   balances?: any;
+  isDetail?: boolean;
 }
 
 export function Swap({
-  type,
   loading,
-  unitPrice,
   changeSwap,
   balance,
   balanceOut,
   balances,
+  isDetail,
 }: SwapProps) {
   const { setLoadBalances } = useBalancesStore();
   const form = useFormContext();
@@ -91,25 +93,63 @@ export function Swap({
     }
   };
 
+  function adjustFontSize(input: HTMLInputElement): void {
+    const maxFontSize = isDetail ? 38 : 64; // Maximum font size in px
+    const minFontSize = isDetail ? 20 : 30; // Minimum font size in px
+    const maxLength = isDetail ? 9 : 7; // Length at which to start reducing the font size
+
+    const length = input.value.length;
+
+    // Adjust font size based on input length
+    const fontSize =
+      length <= maxLength
+        ? maxFontSize
+        : Math.max(minFontSize, maxFontSize - (length - maxLength) * 4);
+
+    // Set font size and ensure text is centered within the input
+    input.style.fontSize = `${fontSize}px`;
+  }
+
+  const USDBalances = useMemo(() => {
+    return {
+      tokenIn: formatPriceUSD(
+        fields.tokenIn_amount,
+        tokens[fields.tokenIn_token]?.ticker ?? "",
+      ),
+      tokenOut: formatPriceUSD(
+        fields.tokenOut_amount,
+        tokens[fields.tokenOut_token]?.ticker ?? "",
+      ),
+    };
+  }, [
+    fields.tokenIn_amount,
+    fields.tokenOut_amount,
+    fields.tokenIn_token,
+    fields.tokenOut_token,
+  ]);
   return (
     <Dialog>
       <div
         className={`${styles["swap-container"]} ${
-          type === "tokenDetail"
+          isDetail
             ? `${styles["token-swap-container"]} ${styles["pc-swap-token"]}`
             : ""
         }`}
       >
-        <div className="flex w-full items-center justify-between">
+        <div
+          className={`flex w-full items-center justify-between ${styles["swap-header"]}`}
+        >
           <span className={styles["swap-text"]}>Swap</span>
-          <div className="relative flex items-center gap-1 p-[6px]">
+          <div className="relative flex h-[42px] items-center gap-1 p-[6px]">
             <span className="text-[20px] font-[400] text-textBlack opacity-60">
-              {fields.slippage_custom ? `${fields.slippage_custom}%` : null}
+              {fields.slippage_custom
+                ? `${truncateString(fields.slippage_custom, 6)}%`
+                : null}
             </span>
             <Image
               src="/images/swap/setting-icon.svg"
-              width={30}
-              height={30}
+              width={25}
+              height={25}
               alt=""
               className="cursor-pointer"
               onClick={() => setOpenSetting(!openSetting)}
@@ -118,24 +158,83 @@ export function Swap({
               ref={settingRef}
               className={`${styles["popup-setting"]} ${openSetting ? styles["popup-setting-open"] : ""}`}
             >
-              <span className="text-center text-[22px] font-[500] text-textBlack sm:text-[22px] lg:text-[24px] xl:text-[28px]">
+              <span
+                className={`text-center text-[22px] font-[500] text-textBlack sm:text-[22px] lg:text-[24px] xl:text-[28px] ${styles["popup-setting-title"]}`}
+              >
                 Swap setting
               </span>
               <div className="flex w-full items-center justify-between">
-                <span className="text-[18px] font-[400] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[24px]">
+                <span
+                  className={`text-[18px] font-[400] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[24px] ${styles["popup-setting-label"]}`}
+                >
                   Max Slippage
                 </span>
-                <div className="shadow-content flex items-center gap-[12px] rounded-[12px] bg-[#EBEBEB] pr-[12px]">
-                  <div className="shadow-content flex items-center justify-center rounded-[12px] bg-bgWhiteColor px-3 py-[6px] text-[18px] font-[400] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[20px]">
+                <div className="flex items-center gap-[12px] rounded-[12px] bg-[#EBEBEB] pr-[12px] shadow-content">
+                  <div
+                    className={`flex cursor-pointer items-center justify-center rounded-[12px] bg-bgWhiteColor px-3 py-[6px] text-[18px] font-[400]
+                       shadow-content transition duration-300 ease-in-out hover:bg-[#EBEBEB] sm:text-[18px] lg:text-[20px] xl:text-[20px]
+                      ${fields.slippage_custom ? "text-textBlack" : "text-borderOrColor"}
+                      `}
+                    onClick={() => {
+                      if (form.getValues("slippage_custom")) {
+                        form.setValue("slippage_custom", "");
+                      }
+                      form.setValue("slippage", "1");
+                    }}
+                  >
                     Auto
                   </div>
                   <div className="flex items-center gap-[2px]">
                     <Input
-                      {...form.register("slippage_custom")}
-                      className="padding-0 mr-[2px] h-full w-[60px] border-0 border-none bg-transparent text-[18px] font-[400] text-textBlack opacity-50 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-[18px] lg:text-[20px] xl:text-[20px]"
+                      {...form.register("slippage_custom", {
+                        onChange: (e) => {
+                          let input = e.target.value;
+
+                          // Step 1: Remove invalid characters (e/E)
+                          input = input.replace(/[eE]/g, "");
+
+                          // Step 2: Replace ',' with '.' for decimal formatting
+                          input = input.replace(/,/g, ".");
+
+                          // Step 3: Remove all invalid characters except digits and '.'
+                          input = input.replace(/[^0-9.]/g, "");
+
+                          // Step 4: Allow only one '.' in the input
+                          const parts = input.split(".");
+                          if (parts.length > 2) {
+                            form.setValue("slippage_custom", ""); // Reset if more than one '.'
+                            return;
+                          }
+
+                          // Step 5: Add '0' before '.' if the input starts with '.'
+                          if (input.startsWith(".")) {
+                            input = `0${input}`;
+                          }
+
+                          // Step 6: Limit to 2 decimal places if a '.' is present
+                          if (parts.length === 2) {
+                            const integerPart = parts[0];
+                            const decimalPart = parts[1].slice(0, 2); // Keep only up to 2 digits after '.'
+                            input = `${integerPart}.${decimalPart}`;
+                          }
+
+                          // Step 7: Parse input and validate against range [0.1, 20]
+                          const value = parseFloat(input);
+                          if (value > 20 || value < 0.1) {
+                            form.setValue("slippage_custom", ""); // Reset if input is out of range
+                            return;
+                          }
+
+                          // Step 8: Update form value if valid
+                          form.setValue("slippage_custom", input);
+                        },
+                      })}
+                      className="mr-[2px] h-full w-[50px] border-0 border-none bg-transparent p-0 text-right text-[18px] font-[400] text-textBlack opacity-50 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-[18px] lg:text-[20px] xl:text-[20px]"
                       placeholder="1.00"
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
                     />
+
                     <span className="text-[20px] font-[400] text-textBlack opacity-50 ">
                       %
                     </span>
@@ -143,7 +242,9 @@ export function Swap({
                 </div>
               </div>
               <div className="flex w-full items-center justify-between">
-                <span className="text-[18px] font-[400] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[24px]">
+                <span
+                  className={`text-[18px] font-[400] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[24px] ${styles["popup-setting-label"]}`}
+                >
                   Transaction deadline
                 </span>
                 <div
@@ -153,9 +254,18 @@ export function Swap({
                   }}
                 >
                   <Input
-                    {...form.register("transactionDeadline")}
+                    {...form.register("transactionDeadline", {
+                      onChange: (e) => {
+                        const value = parseFloat(e.target.value) || 0;
+                        if (value > 4320) {
+                          form.setValue("transactionDeadline", "4320");
+                        }
+                      },
+                    })}
                     type="number"
-                    className="padding-0 h-full w-[60px] border-0 border-none bg-transparent text-[18px] font-[500] text-textBlack outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-[18px] lg:text-[20px] xl:text-[20px]"
+                    min={0}
+                    max={4320}
+                    className="padding-0 h-full w-[70px] border-0 border-none bg-transparent text-[18px] font-[500] text-textBlack outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-[18px]"
                   />
                   <span className="text-[18px] font-[400] text-textBlack opacity-50 sm:text-[18px] lg:text-[20px] xl:text-[20px]">
                     Minutes
@@ -165,6 +275,7 @@ export function Swap({
               <div
                 className={stylesButton["button-close-setting-swap"]}
                 onClick={() => setOpenSetting(false)}
+                style={isDetail ? { height: 50, fontSize: 20 } : {}}
               >
                 Close
               </div>
@@ -173,12 +284,12 @@ export function Swap({
         </div>
         <div
           className={`${styles["swap-content"]} ${
-            type === "tokenDetail" ? styles["token-swap-content"] : ""
+            isDetail ? styles["token-swap-content"] : ""
           }`}
         >
           <div
             className={`${styles["swap-container-form"]} ${
-              type === "tokenDetail" ? styles["token-swap-form"] : ""
+              isDetail ? styles["token-swap-form"] : ""
             }`}
           >
             <div
@@ -188,13 +299,47 @@ export function Swap({
               <div className={styles["line-swap-item"]}></div>
               <div className={styles["swap-item-content"]}>
                 <Input
-                  {...form.register("tokenIn_amount")}
+                  {...form.register("tokenIn_amount", {
+                    onChange: (e) => {
+                      let value = e.target.value;
+
+                      // Step 1: Remove invalid characters (e/E)
+                      value = value.replace(/[eE]/g, "");
+
+                      // Step 2: Replace ',' with '.' for decimal formatting
+                      value = value.replace(/,/g, ".");
+
+                      // Step 3: Remove all invalid characters except digits and '.'
+                      value = value.replace(/[^0-9.]/g, "");
+
+                      // Step 4: Ensure only one '.'
+                      const parts = value.split(".");
+                      if (parts.length > 2) {
+                        value = parts[0] + "." + parts[1]; // Keep the first two parts
+                      }
+
+                      // Step 5: Add '0' before '.' if it starts with '.'
+                      if (value.startsWith(".")) {
+                        value = `0${value}`;
+                      }
+
+                      // Step 6: Update the form value
+                      form.setValue("tokenIn_amount", value);
+                    },
+                  })}
                   placeholder="0"
+                  type="text"
+                  maxLength={30} // Enforces maximum input length at the browser level
+                  inputMode="decimal" // Suggests a numeric keyboard on mobile devices
+                  onInput={(e: React.FormEvent<HTMLInputElement>) =>
+                    adjustFontSize(e.currentTarget)
+                  }
                   className={cn([
                     styles["swap-item-input"],
-                    "border-0 focus-visible:ring-0 focus-visible:ring-offset-0",
+                    "w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0",
                   ])}
                 />
+
                 <DialogTrigger>
                   <div
                     className={`${styles["swap-item-select"]} ${
@@ -228,15 +373,20 @@ export function Swap({
                 </DialogTrigger>
               </div>
               <div className={styles["swap-item-footer"]}>
+                <USDBalance
+                  className={styles["value-price"]}
+                  balance={USDBalances.tokenIn}
+                  type="USD"
+                />
                 <span className={styles["swap-item-footer-text"]}>
-                  Balance: <Balance balance={balance?.toString() || "0"} />
+                  Balance: <Balance balance={balance?.toString() || "~"} />
                 </span>
               </div>
             </div>
             <div className={styles["swap-button"]} onClick={() => changeSwap()}>
               <Image
-                width={90}
-                height={90}
+                width={65}
+                height={65}
                 src="/images/swap/swap-button-icon.svg"
                 alt="swap-button"
               />
@@ -250,6 +400,7 @@ export function Swap({
                 <Input
                   {...form.register("tokenOut_amount")}
                   placeholder="0"
+                  type="number"
                   disabled
                   className={cn([
                     styles["swap-item-input"],
@@ -289,17 +440,21 @@ export function Swap({
                 </DialogTrigger>
               </div>
               <div className={styles["swap-item-footer"]}>
+                <USDBalance
+                  className={styles["swap-item-footer-text"]}
+                  balance={USDBalances.tokenOut}
+                  type="USD"
+                />
                 <span className={styles["swap-item-footer-text"]}>
-                  Balance: <Balance balance={balanceOut?.toString() || "0"} />
+                  Balance: <Balance balance={balanceOut?.toString() || "~"} />
                 </span>
               </div>
             </div>
           </div>
           <Button
             loading={loading}
-            className={`${stylesButton["button-swap"]} ${type === "tokenDetail" && stylesButton["button-swap-token-detail"]}`}
+            className={`${stylesButton["button-swap"]} ${isDetail && stylesButton["button-swap-token-detail"]}`}
             disabled={!form.formState.isValid}
-            style={{ marginTop: "-12px" }}
           >
             <span>{error ?? "Swap"}</span>
           </Button>

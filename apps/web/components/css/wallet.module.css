@@ -98,13 +98,147 @@ div:has(.popover-content){
     box-shadow: 0px 2px 8px 0px var(--shadow-popup-color);
 }
 
+.token-pool-logo {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    border: 1px solid var(--black-text-color);
+    border-radius: 999px;
+    justify-content: center;
+    width: 25px;
+}
+
+
+.token-pool-logo-item-first,
+.token-pool-logo-item-second {
+    position: relative;
+    display: flex;
+}
+
+.token-pool-logo-item-first {
+    width: 25px;
+    height: 25px;
+    overflow: hidden;
+    margin-left: -25px;
+}
+
+.token-pool-logo-item-second {
+    width: 25px;
+    height: 25px;
+    overflow: hidden;
+    margin-right: -25px;
+}
+
+.pool-logo-item {
+    width: 25px !important;
+    height: 25px !important;
+}
+
+.token-pool-logo-item-first .pool-logo-item{
+    position: absolute;
+    left: 50%;
+}
+
+.token-pool-logo-item-second .pool-logo-item{
+    position: absolute;
+    right: 50%;
+}
+
+.wallet-header{
+    position: sticky;
+    top: 0;
+    background-color: #FFF;
+    z-index: 10;
+}
+
+.wallet-header::before{
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 30px;
+    background-color: #FFF;
+    top: -30px;
+}
+
+.icon-details{
+    width: 12px;
+    height: 12px;
+}
+
+.content-toast{
+    gap: 4px;
+}
+
+.copy-deposit{
+    position: relative;
+}
+
+.copy-deposit::after,.copy-deposit::before{
+    content:'';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.copy-deposit::after{
+    box-shadow: 0px 0px 4px 0px var(--shadow-popup-color);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.copy-deposit::before{
+    box-shadow: 0px 2px 8px 0px var(--shadow-popup-color);
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+.copy-deposit:hover::after{
+    opacity: 1;
+}
+
+.copy-deposit:hover::before{
+    opacity: 0;
+}
+
+.select-token{
+    position: relative;
+    box-shadow: 0px 2px 8px 0px var(--shadow-popup-color);
+    transition: all 0.3s ease;
+}
+
+.toast-container{
+    padding: 12px 0px 12px 34px;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
+@media (max-width:1024px){
+    .token-pool-logo-item-first,.token-pool-logo-item-second,.pool-logo-item, .token-pool-logo{
+        width: 20px !important;
+        height: 20px !important;
+    }
+
+    .token-pool-logo{
+        justify-content: center;
+    }
+
+    .content-toast{
+        gap: 6px;
+    }
+}
 @media (max-width:600px){
     .wallet-container{
         height: calc(100vh - 30px);
+    }
+
+    .content-toast{
+        gap: 0px;
     }
 }

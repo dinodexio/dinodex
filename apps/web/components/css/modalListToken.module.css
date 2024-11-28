@@ -50,13 +50,14 @@
 
 .list-token-item {
     display: flex;
-    padding: 11.57px 0 9.09px 19.01px;
+    padding: 12px;
     cursor: pointer;
     align-items: center;
-    border-radius: 8.264px;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
+    justify-content: space-between;
 }
 
 .list-token-item::after{
@@ -105,17 +106,18 @@
     font-weight: 500;
     line-height: normal;
     text-align: start;
+    opacity: 0.6;
 }
 
 .list-token-item-active {
     border-radius: 8.264px;
-    background: #000;
+    background-color: #F3EEED;
 }
 
-.list-token-item-active .list-token-item-name,
+/* .list-token-item-active .list-token-item-name,
 .list-token-item-active .list-token-item-symbol {
     color: #FFF;
-}
+} */
 
 .modal-container>button {
     border: 1px solid var(--black-text-color);
@@ -147,6 +149,6 @@
 
 @media(max-width: 600px) {
     .list-token {
-        max-width: 400px;
+        max-width: 100%;
     }
 }

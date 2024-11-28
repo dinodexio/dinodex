@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Uniswap V3 Join Pool Chart</title>
+<style>
+body { margin: 0; }
+#poolChart {
+  width: 800px;
+  height: 400px;
+}
+.handle {
+  cursor: ew-resize;
+  /* width: 2px; */
+  /* fill: #d87bff; */
+  stroke: none;
+}
+.selected-area {
+  fill: rgba(139, 92, 246, 0.2);
+  stroke: none;
+}
+.handle-label {
+  fill: #6f7681;
+  font-size: 12px;
+  font-weight: 500;
+  dominant-baseline: middle;
+}
+.handle-label-bg {
+  fill: #f4f5f7;
+  rx: 4px;
+  padding: 4px 8px;
+}
+</style>
+</head>
+<body>
+
+<svg id="poolChart"></svg>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+
+const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+const width = 800 - margin.left - margin.right;
+const height = 400 - margin.top - margin.bottom;
+
+// (thay thế bằng dữ liệu thực tế từ web của mình)
+const liquidityData = [
+  { price: 100, liquidity: 0 },
+  { price: 500, liquidity: 0 },
+  { price: 1000, liquidity: 5 },
+  { price: 1500, liquidity: 10 },
+  { price: 2000, liquidity: 20 },
+  { price: 2500, liquidity: 40 },
+  { price: 3000, liquidity: 60 },
+  { price: 3500, liquidity: 50 },
+  { price: 4000, liquidity: 30 },
+  { price: 4500, liquidity: 20 },
+  { price: 5000, liquidity: 10 },
+  { price: 5500, liquidity: 5 },
+  { price: 6000, liquidity: 0 },
+  { price: 10000, liquidity: 0 },
+];
+
+// Giá trị ban đầu cho phạm vi giá và giá hiện tại
+let lowerPrice = 1500;
+let upperPrice = 4500;
+let currentPrice = 2500;
+
+// Tạo scales
+const xScale = d3.scaleLinear()
+  .domain([d3.min(liquidityData, d => d.price), d3.max(liquidityData, d => d.price)])
+  .range([margin.left, width - margin.right]);
+
+const yScale = d3.scaleLinear()
+  .domain([0, d3.max(liquidityData, d => d.liquidity)])
+  .range([height - margin.bottom, margin.top]);
+
+// Tạo line generator
+const line = d3.line()
+  .x(d => xScale(d.price))
+  .y(d => yScale(d.liquidity))
+  .curve(d3.curveBasis);
+
+// Tạo gradient
+const gradient = d3.select("#poolChart")
+  .append("linearGradient")
+  .attr("id", "gradient")
+  .attr("x1", "0%")
+  .attr("y1", "0%")
+  .attr("x2", "100%")
+  .attr("y2", "0%");
+
+gradient.append("stop")
+  .attr("offset", "0%")
+  .attr("stop-color", "rgba(100, 100, 255, 0.1)");
+
+gradient.append("stop")
+  .attr("offset", `${(currentPrice - xScale.domain()[0]) / (xScale.domain()[1] - xScale.domain()[0]) * 100}%`)
+  .attr("stop-color", "violet");
+
+gradient.append("stop")
+  .attr("offset", "100%")
+  .attr("stop-color", "rgba(255, 100, 100, 0.1)");
+
+// Vẽ nền gradient
+d3.select("#poolChart")
+  .append("rect")
+  .attr("x", margin.left)
+  .attr("y", margin.top)
+  .attr("width", width - margin.left - margin.right)
+  .attr("height", height - margin.top - margin.bottom)
+  .attr("fill", "url(#gradient)");
+
+// Vẽ đường cong thanh khoản
+d3.select("#poolChart")
+  .append("path")
+  .datum(liquidityData)
+  .attr("fill", "none")
+  .attr("stroke", "violet")
+  .attr("stroke-width", 2)
+  .attr("d", line);
+
+// Vẽ thanh trượt trái
+const leftHandle = d3.select("#poolChart")
+  .append("rect")
+  .attr("class", "handle")
+  .attr("x", xScale(lowerPrice) - 1)
+  .attr("y", margin.top)
+  .attr("width", 2)
+  .attr("height", height - margin.top - margin.bottom)
+  .attr("fill", "blue")
+  .call(d3.drag()
+    .on("drag", (event) => {
+      lowerPrice = xScale.invert(event.x);
+      updateChart();
+    }));
+
+// Tạo label cho leftHandle
+const leftHandleLabel = d3.select("#poolChart")
+  .append("text")
+  .attr("class", "handle-label")
+  .attr("x", xScale(lowerPrice) - 80)
+  .attr("y", margin.top - 10) // Thay đổi vị trí y
+  .text(`${(-(currentPrice-lowerPrice)*100/(upperPrice-lowerPrice)).toFixed(2)}%`);
+
+// Tạo nền cho leftHandle label (sau khi tạo label để lấy chiều rộng)
+const leftHandleLabelBg = d3.select("#poolChart")
+  .append("rect")
+  .attr("class", "handle-label-bg")
+  .attr("x", () => {
+    const labelWidth = leftHandleLabel.node().getBBox().width;
+    return xScale(lowerPrice) - labelWidth / 2 - 10; // Căn giữa nền và thêm padding
+  })
+  .attr("y", margin.top - 25)
+  .attr("width", () => leftHandleLabel.node().getBBox().width + 20) // Thêm padding
+  .attr("height", 20);
+
+// Vẽ thanh trượt phải
+const rightHandle = d3.select("#poolChart")
+  .append("rect")
+  .attr("class", "handle")
+  .attr("x", xScale(upperPrice) - 1)
+  .attr("y", margin.top)
+  .attr("width", 2)
+  .attr("height", height - margin.top - margin.bottom)
+  .attr("fill", "pink")
+  .call(d3.drag()
+    .on("drag", (event) => {
+      upperPrice = xScale.invert(event.x);
+      updateChart();
+    }));
+
+// Tạo label cho rightHandle
+const rightHandleLabel = d3.select("#poolChart")
+  .append("text")
+  .attr("class", "handle-label")
+  .attr("x", xScale(upperPrice) + 10)
+  .attr("y", (height - margin.top - margin.bottom) / 2 + margin.top)
+  .text(`${((upperPrice-currentPrice)*100/(upperPrice-lowerPrice)).toFixed(2)}%`);
+
+// Tạo nền cho rightHandle label
+const rightHandleLabelBg = d3.select("#poolChart")
+  .append("rect")
+  .attr("class", "handle-label-bg")
+  .attr("x", xScale(upperPrice) + 5)
+  .attr("y", (height - margin.top - margin.bottom) / 2 + margin.top - 15)
+  .attr("width", 50)
+  .attr("height", 20);
+
+// Vẽ vùng chọn
+const selectedArea = d3.select("#poolChart")
+  .append("rect")
+  .attr("class", "selected-area")
+  .attr("x", xScale(lowerPrice))
+  .attr("y", margin.top)
+  .attr("width", xScale(upperPrice) - xScale(lowerPrice))
+  .attr("height", height - margin.top - margin.bottom);
+
+// Vẽ đường giá hiện tại
+d3.select("#poolChart")
+  .append("line")
+  .attr("x1", xScale(currentPrice))
+  .attr("y1", margin.top)
+  .attr("x2", xScale(currentPrice))
+  .attr("y2", height - margin.bottom)
+  .attr("stroke", "gray")
+  .attr("stroke-dasharray", "5,5");
+
+// Vẽ điểm giá hiện tại
+d3.select("#poolChart")
+  .append("circle")
+  .attr("cx", xScale(currentPrice))
+  .attr("cy", yScale(liquidityData.find(d => d.price === currentPrice).liquidity))
+  .attr("r", 5)
+  .attr("fill", "yellow");
+
+// Hiển thị giá trị lowerPrice và upperPrice
+const lowerPriceText = d3.select("#poolChart")
+  .append("text")
+  .attr("x", xScale(lowerPrice))
+  .attr("y", height - margin.bottom + 20)
+  .attr("text-anchor", "middle")
+  .text(lowerPrice.toFixed(2));
+
+const upperPriceText = d3.select("#poolChart")
+  .append("text")
+  .attr("x", xScale(upperPrice))
+  .attr("y", height - margin.bottom + 20)
+  .attr("text-anchor", "middle")
+  .text(upperPrice.toFixed(2));
+
+// Tạo trục x
+const xAxis = d3.axisBottom(xScale)
+  .tickValues([-5000, 0, 5000, 10000]); // Đặt giá trị tick
+
+// Vẽ trục x
+d3.select("#poolChart")
+  .append("g")
+  .attr("transform", `translate(0, ${height - margin.bottom})`)
+  .call(xAxis);
+
+// Hàm cập nhật chart
+function updateChart() {
+  leftHandle.attr("x", xScale(lowerPrice) - 1);
+  rightHandle.attr("x", xScale(upperPrice) - 1);
+  selectedArea
+    .attr("x", xScale(lowerPrice))
+    .attr("width", xScale(upperPrice) - xScale(lowerPrice));
+
+  // Cập nhật giá trị lowerPrice và upperPrice
+  lowerPriceText.attr("x", xScale(lowerPrice)).text(lowerPrice.toFixed(2));
+  upperPriceText.attr("x", xScale(upperPrice)).text(upperPrice.toFixed(2));
+
+  // Cập nhật vị trí và giá trị của leftHandle label và nền
+  leftHandleLabel
+    .attr("x", xScale(lowerPrice) - 20)
+    .text(`${(-(currentPrice-lowerPrice)*100/(upperPrice-lowerPrice)).toFixed(2)}%`);
+
+  // Cập nhật vị trí và kích thước của nền sau khi cập nhật label
+  const labelWidth = leftHandleLabel.node().getBBox().width;
+  leftHandleLabelBg
+    .attr("x", xScale(lowerPrice) - labelWidth / 2 - 10)
+    .attr("width", labelWidth + 20);
+
+  // Cập nhật vị trí và giá trị của rightHandle label và nền
+  rightHandleLabel
+    .attr("x", xScale(upperPrice) + 10)
+    .text(`${((upperPrice-currentPrice)*100/(upperPrice-lowerPrice)).toFixed(2)}%`);
+  rightHandleLabelBg.attr("x", xScale(upperPrice) + 5);
+}
+
+</script>
+<script>
+  const element = document.querySelector('body');
+  const svgPath = 'assets/images/home/logo_icon_28x28.svg';
+  const cursorUrl = `url(${svgPath}), auto`;
+  element.style.cursor = cursorUrl;
+</script>
+
+</body>
+</html>

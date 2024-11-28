@@ -7,7 +7,10 @@ import Image from "next/image";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogOverlay,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ModalListToken } from "../modalListToken/modalListToken";
@@ -19,7 +22,11 @@ import {
 import { Button } from "../ui/button";
 import { generatePools, pools, tokens } from "@/tokens";
 import { useWalletStore } from "@/lib/stores/wallet";
-import { useBalance, useBalancesStore, useObserveBalancePool } from "@/lib/stores/balances";
+import {
+  useBalance,
+  useBalancesStore,
+  useObserveBalancePool,
+} from "@/lib/stores/balances";
 import { client, dijkstra, PoolKey, prepareGraph, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
 import { useObservePool, useSellPath } from "@/lib/stores/xyk";
@@ -28,6 +35,7 @@ import { Collapsible, CollapsibleContent } from "../ui/collapsible";
 import { USDBalance } from "../ui/usd-balance";
 import { cn } from "@/lib/utils";
 import useClickOutside from "@/hook/useClickOutside";
+import { dataSubmitProps } from "@/types";
 
 export interface SwapProps {
   token: any;
@@ -93,9 +101,9 @@ export function Swap({ token, type }: SwapProps) {
   const [valueSlippage, setValueSlippage] = useState<any>(1.01);
   const [valueTD, setValueTD] = useState<any>(30);
 
-  const settingRef= useClickOutside<HTMLDivElement>(() => {
-    setOpenSetting(false)
-  })
+  const settingRef = useClickOutside<HTMLDivElement>(() => {
+    setOpenSetting(false);
+  });
 
   const renderButtonSwap = useMemo(() => {
     let text = "Swap";
@@ -144,10 +152,7 @@ export function Swap({ token, type }: SwapProps) {
 
   const wallet = useWalletStore();
   const balance = useBalance(tokenSwap.tokenIn?.value, wallet.wallet);
-  const balanceOut = useBalance(
-    tokenSwap.tokenOut?.value,
-    wallet.wallet,
-  );
+  const balanceOut = useBalance(tokenSwap.tokenOut?.value, wallet.wallet);
 
   const handleChangeSlippage = (valueSlippage: number) => {
     setSlippage(valueSlippage);
@@ -202,18 +207,21 @@ export function Swap({ token, type }: SwapProps) {
       symbol: token?.label,
       logo: tokens[token?.value]?.logo,
     };
-    const newTokenSwap = { ...tokenSwap, [typeOpenModal]: tmpToken }
+    const newTokenSwap = { ...tokenSwap, [typeOpenModal]: tmpToken };
     setTokenSwap(newTokenSwap);
 
     // TODO after api pools then remove code
     if (newTokenSwap.tokenIn.value && newTokenSwap.tokenOut.value) {
       const poolKey = PoolKey.fromTokenPair(
-        TokenPair.from(TokenId.from(newTokenSwap.tokenIn.value), TokenId.from(newTokenSwap.tokenOut.value)),
+        TokenPair.from(
+          TokenId.from(newTokenSwap.tokenIn.value),
+          TokenId.from(newTokenSwap.tokenOut.value),
+        ),
       ).toBase58();
-      balances.loadBalance(client, newTokenSwap.tokenIn.value, poolKey)
-      balances.loadBalance(client, newTokenSwap.tokenOut.value, poolKey)
+      balances.loadBalance(client, newTokenSwap.tokenIn.value, poolKey);
+      balances.loadBalance(client, newTokenSwap.tokenOut.value, poolKey);
     }
-  }
+  };
 
   useEffect(() => {
     if (!tokenSwap.tokenIn.value || !tokenSwap.tokenOut.value || pool?.loading)
@@ -259,7 +267,6 @@ export function Swap({ token, type }: SwapProps) {
 
   const balances = useBalancesStore();
   useEffect(() => {
-
     if (
       !tokenSwap.route.length ||
       valueInputSwap.tokenIn === "0" ||
@@ -346,6 +353,14 @@ export function Swap({ token, type }: SwapProps) {
 
   const handleSwap = async () => {
     setLoading(true);
+    const data: dataSubmitProps = {
+      logoA: tokenSwap.tokenIn?.logo || "",
+      logoB: tokenSwap.tokenOut?.logo || "",
+      tickerA: tokenSwap.tokenIn?.symbol || "",
+      tickerB: tokenSwap.tokenOut?.symbol || "",
+      amountA: valueInputSwap.tokenIn || "0",
+      amountB: `${(Number(valueInputSwap.tokenOut) * (100 - slippage)) / 100}`,
+    };
     try {
       await sellPath(
         tokenSwap.route,
@@ -354,12 +369,12 @@ export function Swap({ token, type }: SwapProps) {
         addPrecision(
           `${(Number(valueInputSwap.tokenOut) * (100 - slippage)) / 100}`,
         ),
-        { ...tokenSwap, ...valueInputSwap },
+        data,
       ).then(() => {
         setValueInputSwap({
           ...valueInputSwap,
-          tokenIn: '0',
-        })
+          tokenIn: "0",
+        });
       });
     } finally {
       setLoading(false);
@@ -381,25 +396,47 @@ export function Swap({ token, type }: SwapProps) {
   return (
     <Dialog>
       <div
-        className={`${styles["swap-container"]} ${type === "tokenDetail"
-          ? `${styles["token-swap-container"]} ${styles["pc-swap-token"]}`
-          : ""
-          }`}
+        className={`${styles["swap-container"]} ${
+          type === "tokenDetail"
+            ? `${styles["token-swap-container"]} ${styles["pc-swap-token"]}`
+            : ""
+        }`}
       >
-        <div className="flex items-center justify-between w-full">
+        <div className="flex w-full items-center justify-between">
           <span className={styles["swap-text"]}>Swap</span>
-          <div className="flex items-center gap-1 p-[6px] relative">
-            <span className="text-[18px] font-[400] text-textBlack opacity-60">0.5%</span>
-            <Image src='/images/swap/setting-icon.svg' width={30} height={30} alt="" className="cursor-pointer" onClick={() => setOpenSetting(!openSetting)} />
-            <div ref={settingRef} className={`${type === "tokenDetail" ? styles["popup-setting-token"] : ""} ${styles["popup-setting"]} ${openSetting ? styles["popup-setting-open"] : ""}`}>
-              <span className="text-[28px] font-[500] text-textBlack text-center">Swap setting</span>
-              <div className="flex items-center justify-between w-full">
-                <span className="text-[24px] font-[400] text-textBlack">Max Slippage</span>
-                <div className="flex items-center gap-[12px] rounded-[12px] shadow-content bg-[#EBEBEB] pr-[12px]">
-                  <div className="px-3 py-[6px] flex items-center justify-center shadow-content rounded-[12px] bg-bgWhiteColor text-[20px] font-[400] text-textBlack">Auto</div>
+          <div className="relative flex items-center gap-1 p-[6px]">
+            <span className="text-[18px] font-[400] text-textBlack opacity-60">
+              0.5%
+            </span>
+            <Image
+              src="/images/swap/setting-icon.svg"
+              width={30}
+              height={30}
+              alt=""
+              className="cursor-pointer"
+              onClick={() => setOpenSetting(!openSetting)}
+            />
+            <div
+              ref={settingRef}
+              className={`${type === "tokenDetail" ? styles["popup-setting-token"] : ""} ${styles["popup-setting"]} ${openSetting ? styles["popup-setting-open"] : ""}`}
+            >
+              <span className="text-center text-[28px] font-[500] text-textBlack">
+                Swap setting
+              </span>
+              <div className="flex w-full items-center justify-between">
+                <span className="text-[24px] font-[400] text-textBlack">
+                  Max Slippage
+                </span>
+                <div className="flex items-center gap-[12px] rounded-[12px] bg-[#EBEBEB] pr-[12px] shadow-content">
+                  <div
+                    className="flex items-center justify-center rounded-[12px] bg-bgWhiteColor px-3 py-[6px] text-[20px] font-[400] text-textBlack shadow-content"
+                    onClick={() => setValueSlippage("0.5")}
+                  >
+                    Auto
+                  </div>
                   <div className="flex items-center gap-[2px]">
                     <input
-                      className="bg-transparent h-full padding-0 text-[20px] font-[400] text-textBlack opacity-50 border-none outline-none mr-[2px]"
+                      className="padding-0 mr-[2px] h-full border-none bg-transparent text-[20px] font-[400] text-textBlack opacity-50 outline-none"
                       value={valueSlippage}
                       onChange={(e) => {
                         const value = e.target.value;
@@ -407,17 +444,29 @@ export function Swap({ token, type }: SwapProps) {
                           setValueSlippage(value);
                         }
                       }}
-                      style={{ width: `${(valueSlippage.toString().length) * 10 + 2}px`, maxWidth: "40px" }}
+                      style={{
+                        width: `${valueSlippage.toString().length * 10 + 2}px`,
+                        maxWidth: "40px",
+                      }}
                     />
-                    <span className="text-[20px] font-[400] text-textBlack opacity-50 ">%</span>
+                    <span className="text-[20px] font-[400] text-textBlack opacity-50 ">
+                      %
+                    </span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between w-full">
-                <span className="text-[24px] font-[400] text-textBlack">Transaction deadline</span>
-                <div className="flex items-center gap-[2px] px-[18px] py-[6px] rounded-[18.118px] bg-bgWhiteColor" style={{ boxShadow: '0px 1px 4px 0px rgba(26, 26, 26, 0.30) inset' }}>
+              <div className="flex w-full items-center justify-between">
+                <span className="text-[24px] font-[400] text-textBlack">
+                  Transaction deadline
+                </span>
+                <div
+                  className="flex items-center gap-[2px] rounded-[18.118px] bg-bgWhiteColor px-[18px] py-[6px]"
+                  style={{
+                    boxShadow: "0px 1px 4px 0px rgba(26, 26, 26, 0.30) inset",
+                  }}
+                >
                   <input
-                    className="bg-transparent h-full padding-0 text-[20px] font-[500] text-textBlack border-none outline-none"
+                    className="padding-0 h-full border-none bg-transparent text-[20px] font-[500] text-textBlack outline-none"
                     value={valueTD}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -425,22 +474,34 @@ export function Swap({ token, type }: SwapProps) {
                         setValueTD(value);
                       }
                     }}
-                    style={{ width: `${(valueTD.toString().length) * 10 + 5}px`, maxWidth: "50px" }}
+                    style={{
+                      width: `${valueTD.toString().length * 10 + 5}px`,
+                      maxWidth: "50px",
+                    }}
                   />
-                  <span className="text-[20px] font-[400] text-textBlack opacity-50">Minutes</span>
+                  <span className="text-[20px] font-[400] text-textBlack opacity-50">
+                    Minutes
+                  </span>
                 </div>
               </div>
-              <div className={stylesButton['button-close-setting-swap']} onClick={() => setOpenSetting(false)}>Close</div>
+              <div
+                className={stylesButton["button-close-setting-swap"]}
+                onClick={() => setOpenSetting(false)}
+              >
+                Close
+              </div>
             </div>
           </div>
         </div>
         <div
-          className={`${styles["swap-content"]} ${type === "tokenDetail" ? styles["token-swap-content"] : ""
-            }`}
+          className={`${styles["swap-content"]} ${
+            type === "tokenDetail" ? styles["token-swap-content"] : ""
+          }`}
         >
           <div
-            className={`${styles["swap-container-form"]} ${type === "tokenDetail" ? styles["token-swap-form"] : ""
-              }`}
+            className={`${styles["swap-container-form"]} ${
+              type === "tokenDetail" ? styles["token-swap-form"] : ""
+            }`}
           >
             <div
               className={`${styles["swap-content-item"]} ${styles["swap-item-first"]}`}
@@ -459,9 +520,10 @@ export function Swap({ token, type }: SwapProps) {
                 />
                 <DialogTrigger>
                   <div
-                    className={`${styles["swap-item-select"]} ${tokenSwap.tokenIn.name &&
+                    className={`${styles["swap-item-select"]} ${
+                      tokenSwap.tokenIn.name &&
                       styles["swap-item-select-have-token"]
-                      }`}
+                    }`}
                     onClick={() => setTypeOpenModal("tokenIn")}
                   >
                     {tokenSwap.tokenIn.name ? (
@@ -472,7 +534,9 @@ export function Swap({ token, type }: SwapProps) {
                           width={24}
                           height={24}
                         />
-                        <span style={{ fontWeight: 400 }}>{tokenSwap.tokenIn.symbol}</span>
+                        <span style={{ fontWeight: 400 }}>
+                          {tokenSwap.tokenIn.symbol}
+                        </span>
                       </>
                     ) : (
                       <span>Select a token</span>
@@ -493,7 +557,12 @@ export function Swap({ token, type }: SwapProps) {
               </div>
             </div>
             <div className={styles["swap-button"]} onClick={() => changeSwap()}>
-              <Image width={90} height={90} src="/images/swap/swap-button-icon.svg" alt="swap-button" />
+              <Image
+                width={90}
+                height={90}
+                src="/images/swap/swap-button-icon.svg"
+                alt="swap-button"
+              />
             </div>
             <div
               className={`${styles["swap-content-item"]} ${styles["swap-item-second"]}`}
@@ -509,13 +578,14 @@ export function Swap({ token, type }: SwapProps) {
                   id="input-second"
                   value={valueInputSwap.tokenOut || ""}
                   disabled
-                //   onChange={(e) => handleChangeInput("tokenOut", e)}
+                  //   onChange={(e) => handleChangeInput("tokenOut", e)}
                 />
                 <DialogTrigger>
                   <div
-                    className={`${styles["swap-item-select"]} ${tokenSwap?.tokenOut?.name &&
+                    className={`${styles["swap-item-select"]} ${
+                      tokenSwap?.tokenOut?.name &&
                       styles["swap-item-select-have-token"]
-                      }`}
+                    }`}
                     onClick={() => setTypeOpenModal("tokenOut")}
                   >
                     {tokenSwap.tokenOut.name ? (
@@ -526,7 +596,9 @@ export function Swap({ token, type }: SwapProps) {
                           width={24}
                           height={24}
                         />
-                        <span style={{ fontWeight: 400 }}>{tokenSwap.tokenOut.symbol}</span>
+                        <span style={{ fontWeight: 400 }}>
+                          {tokenSwap.tokenOut.symbol}
+                        </span>
                       </>
                     ) : (
                       <span>Select a token</span>
@@ -566,8 +638,9 @@ export function Swap({ token, type }: SwapProps) {
           <div className={styles["slippage-head"]}>Slippage</div>
           {SLIPPAGE?.map((item, index) => (
             <div
-              className={`${styles["slippage-item"]} ${item?.value === slippage ? styles["slippage-item-active"] : ""
-                }`}
+              className={`${styles["slippage-item"]} ${
+                item?.value === slippage ? styles["slippage-item-active"] : ""
+              }`}
               onClick={() => handleChangeSlippage(item?.value)}
               data-slippage={item?.value}
               key={index}
@@ -610,7 +683,13 @@ export function Swap({ token, type }: SwapProps) {
               )}
             </div> */}
         <DialogOverlay className={styles["bg-overlay"]} />
-        <DialogContent className={`${stylesModal['modal-container']} bg-white px-[20px] pb-[15px] pt-[20px]`}>
+        <DialogContent
+          className={`${stylesModal["modal-container"]} bg-white px-[20px] pb-[15px] pt-[20px]`}
+        >
+          <DialogHeader>
+            <DialogTitle />
+            <DialogDescription />
+          </DialogHeader>
           <ModalListToken
             tokenSelected={tokenSwap[typeOpenModal as keyof TokenSwapState]}
             onClickToken={handleSelectedPool}

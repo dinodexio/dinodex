@@ -1,0 +1,223 @@
+.pool-info-fee-tier-text {
+    display: flex;
+    padding: 4.957px 9.913px;
+    justify-content: center;
+    align-items: center;
+    gap: 12.391px;
+    border-radius: 7.435px;
+    border: 1.239px solid var(--black-text-color);
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 14.87px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.swap-layout {
+    transition: all 0.3s ease;
+    height: 461.469px;
+    margin-top: -7px;
+    margin-bottom: 33px;
+}
+
+.view-pool-link-item-text {
+    display: flex;
+    align-items: center;
+    gap: 7.43px;
+}
+
+.view-pool-link-item-name {
+    color: var(--black-text-color);
+    text-align: center;
+    font-family: "SF Pro Display";
+    font-size: 24.783px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.view-pool-link-item-icon {
+    padding-left: 23px;
+    display: flex;
+    align-items: center;
+}
+
+.view-pool-left {
+    width: min(100%, 427px);
+    display: flex;
+    flex-direction: column;
+}
+
+.hide-swap-layout {
+    opacity: 0;
+    visibility: hidden;
+    z-index: -1;
+    height: 0;
+    margin: 0;
+}
+
+.view-pool-left-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 44px;
+}
+
+.view-pool-left-header-item {
+    display: flex;
+    height: 50px;
+    padding: 8.117px 49px;
+    justify-content: center;
+    align-items: center;
+    gap: 13.529px;
+    flex-shrink: 0;
+    border-radius: 43px;
+    background: var(--bg-button-color);
+    color: var(--bg-button-active-color);
+    font-family: "SF Pro Display";
+    font-size: 27.058px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+}
+
+.view-pool-left-header-item:first-child{
+    width: 161px;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.view-pool-left-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 25.85px 27px 23.1px 28px;
+    width: 100%;
+    border-radius: 7.048px;
+    border: 1.41px solid var(--bg-button-active-color);
+    background: rgba(255, 255, 255, 0.21);
+    backdrop-filter: blur(2px);
+    margin-bottom: 24px;
+}
+
+.view-pool-left-stats-item-info-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.view-pool-left-stats-title {
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.view-pool-left-stats-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.view-pool-left-stats-item:first-child {
+    gap: 18px;
+}
+
+.view-pool-left-stats-item-title {
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 14.097px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    opacity: 0.6;
+}
+
+.view-pool-item-info-token {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.view-pool-item-info-token-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.view-pool-left-stats-item-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.view-pool-item-info-token-item-value {
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 18.813px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.view-pool-left-stats-item{
+    display: flex;
+    flex-direction: column;
+    gap:18px
+}
+
+.view-pool-item-info-token-chart{
+    width: 100%;
+    height: 18px;
+    background-color: transparent;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.view-pool-item-info-token-div-item:first-child{
+    width: 33%;
+    height: 100%;
+    background-color: var(--bg-button-active-color);
+    border-radius:20px 0 0 20px;
+}
+.view-pool-item-info-token-div-item:last-child{
+    width: 65%;
+    height: 100%;
+    background-color: var(--bg-chart-color);
+    border-radius:0 20px 20px 0;
+}
+
+.view-pool-left-stats-item-info-value {
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 54.219px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.view-pool-left-stats-item-info-change {
+    font-family: "SF Pro Display";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-swap-view-pool-close{
+    border: 1px solid var(--black-text-color);
+    background-color: var(--white-text-color);
+}
+
+.stats-mobile{
+    display: none;
+}

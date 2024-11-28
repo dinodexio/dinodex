@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:image" content="assets/images/logo.png" />
+    <link rel="icon" href="assets/images/logo.png" type="image/png" />
+    <title>DinoDEX</title>
+    <link rel="stylesheet" href="./trade.css" />
+    <link rel="stylesheet" href="../global.css" />
+    <script src="./trade.js"></script>
+  </head>
+
+  <body style="height: 100vh; width: 100vw; margin: 0">
+    <div class="header-pool-container">
+      <div class="header-content">
+        <a href="../home/index.html" class="button-header"><span>Home</span></a>
+        <a class="button-header button-header-active"><span>Trade</span></a>
+        <a href="../pools/index.html" class="button-header"><span>Pool</span></a>
+        <a href="../info/index.html" class="button-header"><span>Token</span></a>
+      </div>
+      <div class="button-connect-wallet">
+        <span class="button-connected-wallet-text">Connect Wallet</span>
+      </div>
+    </div>
+    <div class="containerContentSwap">
+      <div class="headerContentSwap">
+        <span class="titleHeaderSwap">Swap</span>
+        <div class="boxSetting">
+          <span class="textBoxSetting">1%</span>
+          <img src="../assets/images/swap/setting-icon.svg" alt="" />
+        </div>
+      </div>
+
+      <div class="bodyContentSwap">
+        <div class="containerInput">
+          <div class="boxInput">
+            <span class="titleContainerInput">Sell</span>
+            <div class="lineInput">
+            </div>
+            <div class="boxContentInput">
+              <div style="display: flex; flex-direction: column;">
+                <input class="input" type="text" placeholder="0">
+                <span class="textUSD">~$</span>
+              </div>
+              <div class="boxBtnInput">
+                <button class="btnInput">Select a token
+                  <img src="../assets/images/swap/drop_down_icon.svg" alt="">
+                </button>
+                <span class="textBalance">Balance:~</span>
+              </div>
+            </div>
+          </div>
+
+          <img class="iconSwap" src="../assets/images/swap/swap-icon.svg" alt="">
+           
+          <div class="boxInput">
+            <span class="titleContainerInput">Buy</span>
+            <div class="lineInput">
+            </div>
+            <div class="boxContentInput">
+              <div style="display: flex; flex-direction: column;">
+                <input class="input" type="text" placeholder="0">
+                <span class="textUSD">~$</span>
+              </div>
+              <div class="boxBtnInput">
+                <button class="btnInput">Select a token
+                  <img src="../assets/images/swap/drop_down_icon.svg" alt="">
+                </button>
+                <span class="textBalance">Balance:~</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="btnSelectToken">Select a token</div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; padding-left: 50px; padding-right: 41px;">
+      <img src="../assets/images/swap/dino-logo.svg" alt="">
+      <div style="display: flex; align-items: center; gap: 17px;">
+        <img src="../assets/images/swap/logo-X.svg" alt="">
+        <img src="../assets/images/swap/logo-discord.svg" alt="">
+      </div>
+    </div>
+
+
+    <div class="containerModalSelectToken" id="containerModalSelectToken" style="display: none;">
+      <div class="boxModalSelectToken">
+         
+        <div class="headerModal">
+          <span class="textTitleModal">Select a token</span>
+          <img id="iconClose" style="padding-right: 10px;cursor: pointer;" height="24px" width="24px" src="../assets/images/swap/close-icon-modal.svg" alt="">
+        </div>
+
+        <div class="boxInputModalSelect">
+          <input class="inputModalSelect" type="text" name="" id="" placeholder="Search tokens ">
+        </div>
+        
+        <div class="headerTopTokens">
+          <span class="textTopTokens">Top Tokens</span>
+          <img src="../assets/images/swap/line.svg" alt="">
+        </div>
+
+        <div class="contentTopTokens">
+          <div class="boxItemToken">
+            <img height="48px" width="48px" style="border-radius: 50%;" src="https://s3-alpha-sig.figma.com/img/66f1/a41b/24651d8e58b745d0d73908efca89a4d4?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hmdsHfc9v95ENBu34-gRyy58BmYoOVzUtlCl9JC3Rd4P20R19J3YG~DvGG2q3nBbxRxD2dRsd26OAvUOQVytCi9rjYChfnKoQfiVrYj3KGJzjpnjamCZukW4a-3OrqDcTNeFrGtgLrHdOwvjenKN-GM0BF3ROu-WBaaB-rz~2ua~5coryZaNN~4NYlJfD0f8QXwyS4hFa9kG9oUH7zM9Vj1heU-pm58ISvczSsdLX7MYXze7Ckl9lDmQOaafALUoBPHWTmI~6KcwrfW8B3Sew00jpqwTOu3HqyCMCjA4f6ndFTDMwlaPFslZgJY7JpXcOPA2zMSvfsqNM6xxfy49fA__" alt="">
+            <div class="boxInfoToken">
+              <span class="nameToken">Wrapped Bitcoin</span>
+              <span class="symbolToken">WBTC</span>
+            </div>
+          </div>
+
+          <div class="boxItemToken">
+            <img height="48px" width="48px" style="border-radius: 50%;" src="https://s3-alpha-sig.figma.com/img/66f1/a41b/24651d8e58b745d0d73908efca89a4d4?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hmdsHfc9v95ENBu34-gRyy58BmYoOVzUtlCl9JC3Rd4P20R19J3YG~DvGG2q3nBbxRxD2dRsd26OAvUOQVytCi9rjYChfnKoQfiVrYj3KGJzjpnjamCZukW4a-3OrqDcTNeFrGtgLrHdOwvjenKN-GM0BF3ROu-WBaaB-rz~2ua~5coryZaNN~4NYlJfD0f8QXwyS4hFa9kG9oUH7zM9Vj1heU-pm58ISvczSsdLX7MYXze7Ckl9lDmQOaafALUoBPHWTmI~6KcwrfW8B3Sew00jpqwTOu3HqyCMCjA4f6ndFTDMwlaPFslZgJY7JpXcOPA2zMSvfsqNM6xxfy49fA__" alt="">
+            <div class="boxInfoToken">
+              <span class="nameToken">Wrapped Bitcoin</span>
+              <span class="symbolToken">WBTC</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="headerTopTokens">
+          <span class="textTopTokens">Favorites</span>
+          <img src="../assets/images/swap/line.svg" alt="">
+        </div>
+
+        <div class="contentTopTokens">
+          <div class="boxItemToken">
+            <img height="48px" width="48px" style="border-radius: 50%;" src="https://s3-alpha-sig.figma.com/img/66f1/a41b/24651d8e58b745d0d73908efca89a4d4?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hmdsHfc9v95ENBu34-gRyy58BmYoOVzUtlCl9JC3Rd4P20R19J3YG~DvGG2q3nBbxRxD2dRsd26OAvUOQVytCi9rjYChfnKoQfiVrYj3KGJzjpnjamCZukW4a-3OrqDcTNeFrGtgLrHdOwvjenKN-GM0BF3ROu-WBaaB-rz~2ua~5coryZaNN~4NYlJfD0f8QXwyS4hFa9kG9oUH7zM9Vj1heU-pm58ISvczSsdLX7MYXze7Ckl9lDmQOaafALUoBPHWTmI~6KcwrfW8B3Sew00jpqwTOu3HqyCMCjA4f6ndFTDMwlaPFslZgJY7JpXcOPA2zMSvfsqNM6xxfy49fA__" alt="">
+            <div class="boxInfoToken">
+              <span class="nameToken">Wrapped Bitcoin</span>
+              <span class="symbolToken">WBTC</span>
+            </div>
+          </div>
+
+          <div class="boxItemToken">
+            <img height="48px" width="48px" style="border-radius: 50%;" src="https://s3-alpha-sig.figma.com/img/66f1/a41b/24651d8e58b745d0d73908efca89a4d4?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hmdsHfc9v95ENBu34-gRyy58BmYoOVzUtlCl9JC3Rd4P20R19J3YG~DvGG2q3nBbxRxD2dRsd26OAvUOQVytCi9rjYChfnKoQfiVrYj3KGJzjpnjamCZukW4a-3OrqDcTNeFrGtgLrHdOwvjenKN-GM0BF3ROu-WBaaB-rz~2ua~5coryZaNN~4NYlJfD0f8QXwyS4hFa9kG9oUH7zM9Vj1heU-pm58ISvczSsdLX7MYXze7Ckl9lDmQOaafALUoBPHWTmI~6KcwrfW8B3Sew00jpqwTOu3HqyCMCjA4f6ndFTDMwlaPFslZgJY7JpXcOPA2zMSvfsqNM6xxfy49fA__" alt="">
+            <div class="boxInfoToken">
+              <span class="nameToken">Wrapped Bitcoin</span>
+              <span class="symbolToken">WBTC</span>
+            </div>
+          </div>
+
+          <div class="boxItemToken">
+            <img height="48px" width="48px" style="border-radius: 50%;" src="https://s3-alpha-sig.figma.com/img/66f1/a41b/24651d8e58b745d0d73908efca89a4d4?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hmdsHfc9v95ENBu34-gRyy58BmYoOVzUtlCl9JC3Rd4P20R19J3YG~DvGG2q3nBbxRxD2dRsd26OAvUOQVytCi9rjYChfnKoQfiVrYj3KGJzjpnjamCZukW4a-3OrqDcTNeFrGtgLrHdOwvjenKN-GM0BF3ROu-WBaaB-rz~2ua~5coryZaNN~4NYlJfD0f8QXwyS4hFa9kG9oUH7zM9Vj1heU-pm58ISvczSsdLX7MYXze7Ckl9lDmQOaafALUoBPHWTmI~6KcwrfW8B3Sew00jpqwTOu3HqyCMCjA4f6ndFTDMwlaPFslZgJY7JpXcOPA2zMSvfsqNM6xxfy49fA__" alt="">
+            <div class="boxInfoToken">
+              <span class="nameToken">Wrapped Bitcoin</span>
+              <span class="symbolToken">WBTC</span>
+            </div>
+          </div>
+
+          <div class="boxItemToken">
+            <img height="48px" width="48px" style="border-radius: 50%;" src="https://s3-alpha-sig.figma.com/img/66f1/a41b/24651d8e58b745d0d73908efca89a4d4?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hmdsHfc9v95ENBu34-gRyy58BmYoOVzUtlCl9JC3Rd4P20R19J3YG~DvGG2q3nBbxRxD2dRsd26OAvUOQVytCi9rjYChfnKoQfiVrYj3KGJzjpnjamCZukW4a-3OrqDcTNeFrGtgLrHdOwvjenKN-GM0BF3ROu-WBaaB-rz~2ua~5coryZaNN~4NYlJfD0f8QXwyS4hFa9kG9oUH7zM9Vj1heU-pm58ISvczSsdLX7MYXze7Ckl9lDmQOaafALUoBPHWTmI~6KcwrfW8B3Sew00jpqwTOu3HqyCMCjA4f6ndFTDMwlaPFslZgJY7JpXcOPA2zMSvfsqNM6xxfy49fA__" alt="">
+            <div class="boxInfoToken">
+              <span class="nameToken">Wrapped Bitcoin</span>
+              <span class="symbolToken">WBTC</span>
+            </div>
+          </div>
+
+          <div class="boxItemToken">
+            <img height="48px" width="48px" style="border-radius: 50%;" src="https://s3-alpha-sig.figma.com/img/66f1/a41b/24651d8e58b745d0d73908efca89a4d4?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hmdsHfc9v95ENBu34-gRyy58BmYoOVzUtlCl9JC3Rd4P20R19J3YG~DvGG2q3nBbxRxD2dRsd26OAvUOQVytCi9rjYChfnKoQfiVrYj3KGJzjpnjamCZukW4a-3OrqDcTNeFrGtgLrHdOwvjenKN-GM0BF3ROu-WBaaB-rz~2ua~5coryZaNN~4NYlJfD0f8QXwyS4hFa9kG9oUH7zM9Vj1heU-pm58ISvczSsdLX7MYXze7Ckl9lDmQOaafALUoBPHWTmI~6KcwrfW8B3Sew00jpqwTOu3HqyCMCjA4f6ndFTDMwlaPFslZgJY7JpXcOPA2zMSvfsqNM6xxfy49fA__" alt="">
+            <div class="boxInfoToken">
+              <span class="nameToken">Wrapped Bitcoin</span>
+              <span class="symbolToken">WBTC</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </body>
+</html>

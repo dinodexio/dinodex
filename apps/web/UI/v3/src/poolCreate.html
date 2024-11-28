@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DinoDEX</title>
+    <link rel="stylesheet" href="./styles.css">
+        <script src="js/chart.js"></script>
+    <script src="js/ChartPool.js"></script>
+    <script src="js/dataDummyToken.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/listRenderModal.js"></script>
+    <script src="js/Modal.js"></script>
+    <script src="js/Pool.js"></script>
+    <script src="js/renderDataToken.js"></script>
+    <script src="js/renderListDataPool.js"></script>
+    <script src="js/renderModalPreviewPool.js"></script>
+    <script src="js/renderTable.js"></script>
+    <script src="js/Swap.js"></script>
+    <script src="js/token.js"></script>
+    <script src="js/tokenLayout.js"></script>
+    <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
+</head>
+
+<body>
+    <div class="bg-body">
+        <img src='./assets/images/home/bg-web.png' />
+    </div>
+    <div class="header-pool-container">
+        <div class="header-content">
+            <a href="index.html" class="button-header"><span>Home</span></a>
+            <a href="swap.html" class="button-header"><span>Trade</span></a>
+            <a class="button-header  button-header-active"><span>Pool</span></a>
+            <a href="token.html" class="button-header"><span>Token</span></a>
+        </div>
+        <div class="header-menu-mobile">
+            <div class="menu button-menu" onclick="togglePopupMenu()"><span></span></div>
+            <img src="assets/images/home/dex.svg" alt="dex" width="30" height="30" style="margin-left: 10px;"/>
+
+            <div class="popup-menu-mobile">
+                <div class="popup-menu-content">
+                    <a href="index.html" class="menu-item"><span>Home</span></a>
+                    <a href="swap.html" class="menu-item "><span>Trade</span></a>
+                    <a class="menu-item menu-item-active"><span>Pool</span></a>
+                    <a href="token.html" class="menu-item"><span>Token</span></a>
+                </div>
+                <div class="content-social-menu-mobile">
+                    <a href="https://twitter.com/dinodex" target="_blank"><img src="assets/images/social/git.svg"
+                            width="28" height="28"></a>
+                    <a href="https://t.me/dinodex" target="_blank"><img src="assets/images/social/x.svg" width="28"
+                            height="28"></a>
+                    <a href="https://discord.com/invite/9nXbJX5" target="_blank"><img
+                            src="assets/images/social/discord.svg" width="28" height="28"></a>
+                </div>
+            </div>
+        </div>
+        <div class="button-connect-wallet">
+            <span class="button-connected-wallet-text">Connect Wallet</span>
+        </div>
+    </div>
+    <div class="pool-content" data-type-pool="poolCreate">
+        <div class="content-left">
+            <div>
+                <span class="content-left-header">
+                    Select Pair
+                </span>
+                <div class="content-left-select-token">
+                    <div class="content-left-select-token-item" data-type="first"
+                        onclick="Modal.open('modalSelectToken','pool'); saveTypeTokenPool('first')">
+                        <span>Select Token</span>
+                        <img src="assets/images/icon/drop-down-icon.svg" alt="circle">
+                    </div>
+                    <div class="content-left-select-token-item" data-type="second"
+                        onclick="Modal.open('modalSelectToken','pool'); saveTypeTokenPool('second')">
+                        <span>Select Token</span>
+                        <img src="assets/images/icon/drop-down-icon.svg" alt="circle">
+                    </div>
+                </div>
+                <div class="content-left-fee-tier content-pool-hide">
+                    <div style="display: flex;flex-direction: column;gap: 10px;">
+                        <span class="fee-tier-text">1% fee tier</span>
+                        <span class="fee-tier-desc" style="width: max-content;">Not created</span>
+                    </div>
+                    <span class="btn-edit-fee-tier">Edit</span>
+                </div>
+            </div>
+            <div class="choose-fee-tier-content">
+                <div class="choose-fee-tier-item" data-fee-tier="0.01">
+                    <div style="display: flex;align-items: center; justify-content: space-between; width: 100%;">
+                        <span class="choose-fee-tier-item-text">0.01%</span>
+                        <img src="assets/images/icon/icon-tick-white.svg" width="18" height="18" class="tick-icon"
+                            alt="circle">
+                    </div>
+                    <span class="choose-fee-tier-item-desc">Best for stable pairs</span>
+                    <span class="fee-tier-desc">Not created</span>
+                </div>
+                <div class="choose-fee-tier-item" data-fee-tier="0.05">
+                    <div style="display: flex;align-items: center; justify-content: space-between; width: 100%;">
+                        <span class="choose-fee-tier-item-text">0.05%</span>
+                        <img src="assets/images/icon/icon-tick-white.svg" width="18" height="18" class="tick-icon"
+                            alt="circle">
+                    </div>
+                    <span class="choose-fee-tier-item-desc">Best for stable pairs</span>
+                    <span class="fee-tier-desc">Not created</span>
+                </div>
+                <div class="choose-fee-tier-item" data-fee-tier="0.3">
+                    <div style="display: flex;align-items: center; justify-content: space-between; width: 100%;">
+                        <span class="choose-fee-tier-item-text">0.3%</span>
+                        <img src="assets/images/icon/icon-tick-white.svg" width="18" height="18" class="tick-icon"
+                            alt="circle">
+                    </div>
+                    <span class="choose-fee-tier-item-desc">Best for stable pairs</span>
+                    <span class="fee-tier-desc">Not created</span>
+                </div>
+                <div class="choose-fee-tier-item choose-fee-tier-active" data-fee-tier="1">
+                    <div style="display: flex;align-items: center; justify-content: space-between; width: 100%;">
+                        <span class="choose-fee-tier-item-text">1%</span>
+                        <img src="assets/images/icon/icon-tick-white.svg" style="display: block;" width="18" height="18"
+                            class="tick-icon" alt="circle">
+                    </div>
+                    <span class="choose-fee-tier-item-desc">Best for exotic pairs</span>
+                    <span class="fee-tier-desc">Not created</span>
+                </div>
+            </div>
+            <div class="content-pool-hide">
+                <span class="content-left-header">
+                    Deposit Amounts
+                </span>
+                <div class="content-deposit-amounts">
+                    <div class="deposit-amounts-item">
+                        <div class="deposit-amounts-item-left">
+                            <input class="input-price-deposit-amount" data-type-deposit="first" value="1">
+                            <span class="value-price-desc">$1,823.80</span>
+                        </div>
+                        <div class="deposit-amounts-item-right">
+                            <div class="token-select-deposit-amount" data-type="first">
+                                <img src="assets/images/swap/logo-token-default.svg" width="24" height="24"
+                                    alt="circle">
+                                <span class="token-symbol-deposit-amount">USDC</span>
+                            </div>
+                            <div class="deposit-amount-balance">
+                                <span class="balance-deposit-amount">Balance: 0</span>
+                                <div class="btn-max-deposit-amount">Max</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="deposit-amounts-item">
+                        <div class="deposit-amounts-item-left">
+                            <input class="input-price-deposit-amount" data-type-deposit="second" value="1">
+                            <span class="value-price-desc">$1,823.80</span>
+                        </div>
+                        <div class="deposit-amounts-item-right">
+                            <div class="token-select-deposit-amount" data-type="second">
+                                <img src="assets/images/swap/logo-token-default.svg" width="24" height="24"
+                                    alt="circle">
+                                <span class="token-symbol-deposit-amount">WBTC</span>
+                            </div>
+                            <div class="deposit-amount-balance">
+                                <span class="balance-deposit-amount">Balance: 0</span>
+                                <div class="btn-max-deposit-amount">Max</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-right content-pool-hide">
+            <div class="header-content-right">
+                <span class="content-left-header">
+                    Set Starting Price
+                </span>
+            </div>
+            <div class="container-join-create">
+                <div class="join-create-text">
+                    This pool must be initialized before you can add liquidity. To initialize, select a starting price
+                    for the pool.
+                    Then, enter your liquidity price range and deposit amount. Gas fees will be higher than usual due to
+                    the initialization transaction.
+                </div>
+                <input class="input-value-current" value="100" data-type-input="current">
+                <div class="content-current-price">
+                    <span class="content-current-price-text">Current ETH Price:</span>
+                    <span class="content-current-price-text">100 DRM</span>
+                </div>
+            </div>
+            <span class="content-left-header">
+                Set Price Range
+            </span>
+            <div class="content-min-price-join-pool">
+                <div class="min-price-join-pool-item">
+                    <span class="min-price-join-pool-item-title">Min Price</span>
+                    <div class="min-price-join-pool-item-content">
+                        <div class="btn-min-price-join-pool-item" data-type="remove-first"
+                            onclick="changeValue('first','remove')">
+                            <img src="assets/images/icon/btn-remove.svg" alt="btn-add">
+                        </div>
+                        <input class="input-min-join-pool-item" data-type-input="first" value="0.9998">
+                        <div class="btn-min-price-join-pool-item" data-type="add-first"
+                            onclick="changeValue('first','add')">
+                            <img src="assets/images/icon/btn-add.svg" alt="btn-add">
+                        </div>
+                    </div>
+                    <span class="min-price-join-pool-item-text">WBTC per ETH</span>
+                </div>
+                <div class="min-price-join-pool-item">
+                    <span class="min-price-join-pool-item-text">Min Price</span>
+                    <div class="min-price-join-pool-item-content">
+                        <div class="btn-min-price-join-pool-item" data-type="remove-second"
+                            onclick="changeValue('second','remove')">
+                            <img src="assets/images/icon/btn-remove.svg" alt="btn-add">
+                        </div>
+                        <input class="input-min-join-pool-item" data-type-input="second" value="1.0001">
+                        <div class="btn-min-price-join-pool-item" data-type="add-second"
+                            onclick="changeValue('second','add')">
+                            <img src="assets/images/icon/btn-add.svg" alt="btn-add">
+                        </div>
+                    </div>
+                    <span class="min-price-join-pool-item-text">WBTC per ETH</span>
+                </div>
+            </div>
+            <div class="btn-approve">Approve WBTC</div>
+            <div class="button-swap btn-prview button-swap-disabled">
+                <span>Preview</span>
+            </div>
+        </div>
+        <div class="popup-hide">
+            <img src="assets/images/icon/icon-hide-pool.svg" alt="icon-hide-pool">
+            <span class="popup-hide-text">Your Position will appear here</span>
+        </div>
+    </div>
+    <div class="footer-container">
+        <img src="assets/images/home/dex.svg" alt="dex" width="84" height="84">
+    </div>
+    <script>
+      const element = document.querySelector('body');
+      const svgPath = 'assets/images/home/logo_icon_28x28.svg';
+      const cursorUrl = `url(${svgPath}), auto`;
+      element.style.cursor = cursorUrl;
+    </script>
+</body>
+
+</html>

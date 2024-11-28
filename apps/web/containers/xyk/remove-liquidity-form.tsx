@@ -23,6 +23,8 @@ import { precision, removeTrailingZeroes } from "@/components/ui/balance";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { usePoolKey } from "@/lib/xyk/usePoolKey";
 import { useSpotPrice } from "@/lib/xyk/useSpotPrice";
+import { tokens } from "@/tokens";
+import { dataSubmitProps } from "@/types";
 
 export function addPrecision(value: string) {
   return new BigNumber(value).times(10 ** precision).toString();
@@ -158,6 +160,18 @@ export function RemoveLiquidityForm() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
+    const data: dataSubmitProps = {
+      logoA: tokens[values.tokenA_token]?.logo,
+      logoB: tokens[values.tokenB_token]?.logo,
+      tickerA: tokens[values.tokenA_token]?.ticker,
+      tickerB: tokens[values.tokenB_token]?.ticker,
+      amountA: new BigNumber(values.tokenA_token).lt(values.tokenB_token)
+        ? addPrecision(values.tokenB_amount)
+        : addPrecision(values.tokenA_amount),
+      amountB: new BigNumber(values.tokenA_token).lt(values.tokenB_token)
+        ? addPrecision(values.tokenA_amount)
+        : addPrecision(values.tokenB_amount),
+    };
     try {
       if (pool?.exists) {
         await removeLiquidity(
@@ -172,6 +186,7 @@ export function RemoveLiquidityForm() {
           new BigNumber(values.tokenA_token).lt(values.tokenB_token)
             ? addPrecision(values.tokenA_amount)
             : addPrecision(values.tokenB_amount),
+          data,
         );
       }
     } finally {

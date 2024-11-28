@@ -9,16 +9,19 @@ import truncateMiddle from "truncate-middle";
 import { usePrevious } from "@uidotdev/usehooks";
 import { useClientStore } from "./client";
 import { useChainStore } from "./chain";
-import { Bool, Field, PublicKey, Signature, UInt64 } from "o1js";
-import { tokens } from "@/tokens";
+import { Field, PublicKey, Signature, UInt64 } from "o1js";
 import Image from "next/image";
 import { useBalancesStore } from "./balances";
+import { TRANSACTION_TYPES } from "@/constants";
+import { dataSubmitProps } from "@/types";
+import stylesWallet from "../../components/css/wallet.module.css";
+import { formatFullValue, truncateAddress } from "../utils";
 
 export interface WalletState {
   wallet?: string;
   isWalletOpen: boolean;
   type?: string;
-  dataTransaction?: any;
+  dataTransaction?: dataSubmitProps;
   setIsWalletOpen: (isWalletOpen: boolean) => void;
   initializeWallet: () => Promise<void>;
   connectWallet: () => Promise<void>;
@@ -188,7 +191,7 @@ export const useNotifyTransactions = () => {
 
       // const [moduleName, methodName] = resolvedMethodDetails;
 
-      const hash = truncateMiddle(transaction.hash().toString(), 15, 15, "...");
+      const hash = truncateMiddle(transaction.hash().toString(), 8, 8, "...");
       // : ${moduleName}.${methodName}
       // function title() {
       //   switch (status) {
@@ -239,174 +242,221 @@ export const useNotifyTransactions = () => {
 
       function description() {
         const { dataTransaction } = wallet;
-        const urlTransaction = `https://minascan.io/mainnet/tx/${transaction.sender.toBase58()}`;
 
-        switch (status) {
-          case "PENDING":
-            return (
-              <div className="flex flex-col items-start gap-[10px]">
-                <span className="flex items-center gap-[4px] text-[26px] font-[500] text-textBlack sm:text-[18px] lg:text-[26px] xl:text-[26px]">
-                  <img
-                    src="/icon/pending-icon.svg"
-                    width={30}
-                    height={30}
-                    alt=""
-                    style={{ marginLeft: "-36px" }}
-                  />
-                  {type} sent
+        const renderTransactionDetails = () => (
+          <div className="flex items-center gap-[4px]">
+            <a
+              // href={urlTransaction}
+              // target="_blank"
+              // rel="noopener noreferrer"
+              className="cursor-pointer text-[10px] font-[600] text-textBlack hover:underline"
+            >
+              View transaction details
+            </a>
+            <img
+              src="/icon/icon-link.svg"
+              alt=""
+              className={stylesWallet["icon-details"]}
+            />
+          </div>
+        );
+
+        const renderAmountDetails = () => {
+          switch (type) {
+            case TRANSACTION_TYPES.SWAP:
+              return (
+                <p className="h-[14px] text-[12px] text-textBlack opacity-50">
+                  {type} {dataTransaction?.amountA}{" "}
+                  {dataTransaction?.tickerA || ""} for{" "}
+                  {formatFullValue(dataTransaction?.amountB || "0")}{" "}
+                  {dataTransaction?.tickerB || ""}
+                </p>
+              );
+            case TRANSACTION_TYPES.ADD:
+            case TRANSACTION_TYPES.REMOVE:
+            case TRANSACTION_TYPES.CREATE:
+              return (
+                <p className="h-[14px] text-[12px] text-textBlack opacity-50">
+                  {dataTransaction?.amountA} {dataTransaction?.tickerA || ""}{" "}
+                  and {Number(dataTransaction?.amountB).toFixed(5)}{" "}
+                  {dataTransaction?.tickerB || ""}
+                </p>
+              );
+            case TRANSACTION_TYPES.TRANSFER:
+              return (
+                <p className="h-[14px] text-[12px] text-textBlack opacity-50">
+                  Transferred {dataTransaction?.amountValue}{" "}
+                  {dataTransaction?.ticker || ""} to{" "}
+                  {truncateAddress(dataTransaction?.toRecipientAddress || "")}
+                </p>
+              );
+            default:
+              return (
+                <p className="h-[14px] text-[12px] text-textBlack opacity-50">
+                  Hash: {hash}
+                </p>
+              );
+          }
+        };
+
+        const renderIcon = (
+          src: string | undefined,
+          alt: string | undefined,
+          className?: string,
+          width?: number | undefined,
+          height?: number | undefined,
+        ) => (
+          <img
+            src={src}
+            width={width ? width : 18}
+            height={height ? height : 18}
+            alt={alt}
+            className={className}
+            // style={{ marginLeft: "-36px" }}
+          />
+        );
+
+        const renderCloseIcon = () => (
+          <Image
+            src="/icon/Close-icon.svg"
+            width={18}
+            height={18}
+            alt=""
+            className="absolute cursor-pointer"
+            style={{ top: 9, right: 13 }}
+          />
+        );
+
+        const getStatusContent = () => {
+          switch (status) {
+            case "PENDING":
+              return {
+                iconSrc: "/icon/pending-icon.svg",
+                message: `${type} sent`,
+              };
+            case "SUCCESS":
+              setLoadBalances(true);
+              return {
+                iconSrc:
+                  type === TRANSACTION_TYPES.ADD ||
+                  type === TRANSACTION_TYPES.REMOVE ||
+                  type === TRANSACTION_TYPES.CREATE
+                    ? [dataTransaction?.logoA, dataTransaction?.logoB]
+                    : "/icon/success-icon.svg",
+                message:
+                  type !== TRANSACTION_TYPES.ADD &&
+                  type !== TRANSACTION_TYPES.REMOVE &&
+                  type !== TRANSACTION_TYPES.CREATE
+                    ? `${type} Successful`
+                    : type,
+              };
+            case "FAILURE":
+              return {
+                iconSrc:
+                  type === TRANSACTION_TYPES.ADD ||
+                  type === TRANSACTION_TYPES.REMOVE ||
+                  type === TRANSACTION_TYPES.CREATE
+                    ? [dataTransaction?.logoA, dataTransaction?.logoB]
+                    : "/icon/failed-ico.svg",
+                message: `${type} Failed`,
+              };
+            default:
+              return {};
+          }
+        };
+
+        const { iconSrc, message } = getStatusContent();
+
+        return (
+          <>
+            {type !== TRANSACTION_TYPES.ADD &&
+            type !== TRANSACTION_TYPES.REMOVE &&
+            type !== TRANSACTION_TYPES.CREATE ? (
+              <div
+                className={`flex flex-col items-start ${stylesWallet["content-toast"]}`}
+              >
+                <span className="flex h-[12px] items-center gap-[4px] text-[12px] font-[500] text-textBlack">
+                  {Array.isArray(iconSrc) ? (
+                    <div className={`ml-[-12px] mr-[-12px] flex items-center`}>
+                      <div className="relative h-[25px] w-[25px] overflow-hidden">
+                        {renderIcon(
+                          iconSrc[0],
+                          "",
+                          "absolute h-[25px] w-[25px] left-1/2",
+                        )}
+                      </div>
+                      <div className="relative h-[25px] w-[25px] overflow-hidden">
+                        {renderIcon(
+                          iconSrc[1],
+                          "",
+                          "absolute h-[25px] w-[25px] right-1/2",
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ marginLeft: "-24px" }}>
+                      {renderIcon(iconSrc, "", stylesWallet["img-toast"])}
+                    </div>
+                  )}
+                  {message}
                 </span>
-                {type !== "Swap" && (
-                  <p className="text-[20px] text-textBlack opacity-50 sm:text-[12px] lg:text-[20px] xl:text-[20px]">
-                    Hash: {hash}
-                  </p>
-                )}
-                {type === "Swap" && (
-                  <p className="text-[20px] text-textBlack opacity-50 sm:text-[12px] lg:text-[20px] xl:text-[20px]">
-                    {type} {dataTransaction?.tokenIn_amount}{" "}
-                    {tokens[dataTransaction?.tokenIn_token]?.ticker || ""} for{" "}
-                    {dataTransaction?.tokenOut_amount}{" "}
-                    {tokens[dataTransaction?.tokenOut_token]?.ticker || ""}
-                  </p>
-                )}
-                <div className="flex items-center gap-[4px]">
-                  <a
-                    href={urlTransaction}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="cursor-pointer text-[20px] font-[600] text-textBlack hover:underline sm:text-[12px] lg:text-[20px] xl:text-[20px]"
-                  >
-                    View transaction details
-                  </a>
-                  <Image
-                    src="/icon/icon-link.svg"
-                    width={24}
-                    height={24}
-                    alt=""
-                  />
-                </div>
-                <Image
-                  src="/icon/Close-icon.svg"
-                  width={30}
-                  height={30}
-                  alt=""
-                  className="absolute cursor-pointer"
-                  style={{ top: 9, right: 13 }}
-                />
+                {renderAmountDetails()}
+                {type !== TRANSACTION_TYPES.ADD &&
+                  type !== TRANSACTION_TYPES.REMOVE &&
+                  type !== TRANSACTION_TYPES.CREATE &&
+                  renderTransactionDetails()}
+                {renderCloseIcon()}
               </div>
-            );
-          case "SUCCESS":
-            setLoadBalances(true);
-            return (
-              <div className="flex flex-col items-start gap-[10px]">
-                <span className="flex items-center gap-[4px] text-[26px] font-[500] text-textBlack sm:text-[18px] lg:text-[26px] xl:text-[26px]">
-                  <img
-                    src="/icon/success-icon.svg"
-                    width={30}
-                    height={30}
-                    alt=""
-                    style={{ marginLeft: "-36px" }}
-                  />
-                  {type} Successful
-                </span>
-                {type !== "Swap" && (
-                  <p className="text-[20px] font-[400] text-textBlack opacity-50 sm:text-[12px] lg:text-[20px] xl:text-[20px]">
-                    Hash: {hash}
-                  </p>
+            ) : (
+              <div
+                className="flex items-center gap-[8px]"
+                style={{ marginLeft: "-20px" }}
+              >
+                {Array.isArray(iconSrc) ? (
+                  <div className={stylesWallet["token-pool-logo"]}>
+                    <div className={stylesWallet["token-pool-logo-item-first"]}>
+                      {renderIcon(
+                        iconSrc[0],
+                        "",
+                        stylesWallet["pool-logo-item"],
+                      )}
+                    </div>
+                    <div
+                      className={stylesWallet["token-pool-logo-item-second"]}
+                    >
+                      {renderIcon(
+                        iconSrc[1],
+                        "",
+                        stylesWallet["pool-logo-item"],
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ marginTop: "-24px" }}>
+                    {renderIcon(iconSrc, "", stylesWallet["img-toast"], 18, 18)}
+                  </div>
                 )}
-                {type === "Swap" && (
-                  <p className="text-[20px] font-[400] text-textBlack opacity-50 sm:text-[12px] lg:text-[20px] xl:text-[20px]">
-                    {type} {dataTransaction?.tokenIn_amount}{" "}
-                    {tokens[dataTransaction?.tokenIn_token]?.ticker || ""} for{" "}
-                    {dataTransaction?.tokenOut_amount}{" "}
-                    {tokens[dataTransaction?.tokenOut_token]?.ticker || ""}
-                  </p>
-                )}
-                <div className="flex items-center gap-[4px]">
-                  <a
-                    href={urlTransaction}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="cursor-pointer text-[20px] font-[600] text-textBlack hover:underline sm:text-[12px] lg:text-[20px] xl:text-[20px]"
-                  >
-                    View transaction details
-                  </a>
-                  <Image
-                    src="/icon/icon-link.svg"
-                    width={24}
-                    height={24}
-                    alt=""
-                  />
+                <div className="flex flex-col items-start gap-[5px] sm:gap-[5px] lg:gap-[6px] xl:gap-[10px]">
+                  <span className="flex h-[12px] items-center gap-[4px] text-[12px] font-[500] text-textBlack">
+                    {message}
+                  </span>
+                  {renderAmountDetails()}
+                  {type !== TRANSACTION_TYPES.ADD &&
+                    type !== TRANSACTION_TYPES.REMOVE &&
+                    type !== TRANSACTION_TYPES.CREATE &&
+                    renderTransactionDetails()}
+                  {renderCloseIcon()}
                 </div>
-                <Image
-                  src="/icon/Close-icon.svg"
-                  width={30}
-                  height={30}
-                  alt=""
-                  className="absolute cursor-pointer"
-                  style={{ top: 9, right: 13 }}
-                />
               </div>
-            );
-          case "FAILURE":
-            return (
-              <div className="flex flex-col items-start gap-[10px]">
-                <span className="flex items-center gap-[4px] text-[26px] font-[500] text-textBlack sm:text-[18px] lg:text-[26px] xl:text-[26px]">
-                  <img
-                    src="/icon/failed-ico.svg"
-                    width={30}
-                    height={30}
-                    alt=""
-                    style={{ marginLeft: "-36px" }}
-                  />
-                  {type} Failed
-                </span>
-                {type !== "Swap" && (
-                  <p className="text-[20px] font-[400] text-textBlack opacity-50 sm:text-[12px] lg:text-[20px] xl:text-[20px]">
-                    Hash: {hash}
-                  </p>
-                )}
-                {type === "Swap" && (
-                  <p className="text-[20px] font-[400] text-textBlack opacity-50 sm:text-[12px] lg:text-[20px] xl:text-[20px]">
-                    {type} {dataTransaction?.tokenIn_amount}{" "}
-                    {tokens[dataTransaction?.tokenIn_token]?.ticker || ""} for{" "}
-                    {dataTransaction?.tokenOut_amount}{" "}
-                    {tokens[dataTransaction?.tokenOut_token]?.ticker || ""}
-                  </p>
-                )}
-                <div className="flex items-center gap-[4px]">
-                  <a
-                    href={urlTransaction}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="cursor-pointer text-[20px] font-[600] text-textBlack hover:underline sm:text-[12px] lg:text-[20px] xl:text-[20px]"
-                  >
-                    View transaction details
-                  </a>
-                  <Image
-                    src="/icon/icon-link.svg"
-                    width={24}
-                    height={24}
-                    alt=""
-                  />
-                </div>
-                <Image
-                  src="/icon/Close-icon.svg"
-                  width={30}
-                  height={30}
-                  alt=""
-                  className="absolute cursor-pointer"
-                  style={{ top: 9, right: 13 }}
-                />
-              </div>
-            );
-        }
+            )}
+          </>
+        );
       }
 
       toast({
         title: "",
         description: description(),
-        className:
-          "bg-bgWhiteColor text-textBlack border-[2px] rounded-[20px] border-borderOrColor w-full pt-[20px] pr-[24px] pb-[12px]",
+        className: `bg-bgWhiteColor text-textBlack border-none shadow-content rounded-[12px] w-full ${stylesWallet["toast-container"]}`,
       });
     },
     [client.client, wallet.type, wallet.dataTransaction],

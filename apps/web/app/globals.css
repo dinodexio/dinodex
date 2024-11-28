@@ -156,6 +156,14 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+body {
+  background: #FFFBF7;
+  height: 100%;
+  /* font-family: SF Pro Display, sans-serif; */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* loading */
 
 /* HTML: <div class="loader"></div> */

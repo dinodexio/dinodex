@@ -11,6 +11,8 @@ import { getTokenID, Tokens } from "@/tokens";
 import { usePoolKey } from "../xyk/usePoolKey";
 import { LPTokenId } from "chain";
 import BigNumber from "bignumber.js";
+import { dataSubmitProps } from "@/types";
+import { TRANSACTION_TYPES } from "@/constants";
 
 export interface BalancesState {
   loading: boolean;
@@ -181,9 +183,9 @@ export const useBalancesStore = create<
 
 export const useBalance = (tokenId?: string, address?: string) => {
   const balances = useBalancesStore();
-
   return useMemo(() => {
-    if (!address || !tokenId) return;
+    if (!address || !tokenId || Object.keys(balances.balances).length === 0)
+      return;
 
     return balances.balances[address]?.[tokenId];
   }, [balances.balances, address, tokenId]);
@@ -350,7 +352,12 @@ export const useTransfer = () => {
   const wallet = useWalletStore();
 
   return useCallback(
-    async (tokenId: string, recipient: string, amount: string) => {
+    async (
+      tokenId: string,
+      recipient: string,
+      amount: string,
+      data: dataSubmitProps,
+    ) => {
       if (!client.client || !wallet.wallet) return;
 
       const pendingTransaction = await balances.transfer(
@@ -361,7 +368,11 @@ export const useTransfer = () => {
         amount,
       );
 
-      wallet.addPendingTransaction(pendingTransaction, "Transfer");
+      wallet.addPendingTransaction(
+        pendingTransaction,
+        TRANSACTION_TYPES.TRANSFER,
+        data,
+      );
     },
     [client.client, wallet.wallet],
   );

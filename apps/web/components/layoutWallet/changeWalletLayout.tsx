@@ -8,7 +8,7 @@ import { useClientStore } from "@/lib/stores/client";
 import BigNumber from "bignumber.js";
 import { precision } from "../ui/balance";
 import { PRICE_MINA, PRICE_USD } from "@/constants";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, formatPriceUSD } from "@/lib/utils";
 
 export interface changeWalletLayoutProps {
   onClose: () => void;
@@ -56,7 +56,9 @@ export function ChangeWalletLayout({
   const result = useMemo(
     () =>
       balance
-        ? BigNumber(balance).dividedBy(10 ** precision).toNumber()
+        ? BigNumber(balance)
+            .dividedBy(10 ** precision)
+            .toNumber()
         : 0,
     [balance],
   );
@@ -64,7 +66,7 @@ export function ChangeWalletLayout({
     () => ({
       address: wallet,
       name: "Account 1",
-      value_price: formatNumber(result * PRICE_MINA),
+      value_price: formatPriceUSD(result, "MINA"),
       mina_coin: formatNumber(result),
     }),
     [wallet, result],
@@ -81,7 +83,7 @@ export function ChangeWalletLayout({
       style={{ zIndex: 102 }}
     >
       <div className="flex items-center justify-between px-[6px] py-[7px]">
-        <span className="text-textBlack text-[20px] font-[500]">
+        <span className="text-[20px] font-[500] text-textBlack">
           Select an account
         </span>
         <Image
@@ -105,10 +107,10 @@ export function ChangeWalletLayout({
                   className={`h-[35px] w-[2px] rounded-[8px] ${address === item.address ? "bg-borderOrColor" : "bg-transparent"}`}
                 />
                 <div className="flex flex-col gap-1">
-                  <span className="text-textBlack text-[14px] font-[500]">
+                  <span className="text-[14px] font-[500] text-textBlack">
                     {item.name}
                   </span>
-                  <span className="text-textBlack text-[12px] font-[400] opacity-50">
+                  <span className="text-[12px] font-[400] text-textBlack opacity-50">
                     {item.address
                       ? item.address.slice(0, 5) +
                         "..." +
@@ -118,12 +120,12 @@ export function ChangeWalletLayout({
                 </div>
               </div>
               <div className="flex flex-col gap-1 text-right">
-                <span className="text-textBlack text-[12px] font-[500] opacity-60">
+                <span className="text-[12px] font-[500] text-textBlack opacity-60">
                   ${BigNumber(item?.value_price || 0)?.toFixed(2)} USD
                 </span>
                 <div className="flex items-center gap-[3px]">
                   <Image src="/tokens/mina.svg" width={15} height={15} alt="" />
-                  <span className="text-textBlack text-[14px] font-[400]">
+                  <span className="text-[14px] font-[400] text-textBlack">
                     {item?.mina_coin} MINA
                   </span>
                 </div>

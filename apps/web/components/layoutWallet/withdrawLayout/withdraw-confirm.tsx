@@ -2,7 +2,7 @@ import { useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import stylesButton from "../../css/button.module.css";
-import { truncateAddress } from "@/lib/utils";
+import { formatPriceUSD, truncateAddress } from "@/lib/utils";
 import { USDBalance } from "@/components/ui/usd-balance";
 import { tokens } from "@/tokens";
 import { Balance } from "@/components/ui/balance";
@@ -11,10 +11,14 @@ import { PRICE_MINA } from "@/constants";
 export interface TransferConfirmProps {
   loading: boolean;
   onClose?: () => void;
-  onSubmit: any
+  onSubmit: any;
 }
 
-export function WithdrawConfirm({ loading, onClose, onSubmit }: TransferConfirmProps) {
+export function WithdrawConfirm({
+  loading,
+  onClose,
+  onSubmit,
+}: TransferConfirmProps) {
   const form = useFormContext();
   const fields = form.getValues();
   return (
@@ -54,13 +58,15 @@ export function WithdrawConfirm({ loading, onClose, onSubmit }: TransferConfirmP
               </div>
             </div>
           </div>
-          <span className="text-[9.202px] font-[500] italic text-textBlack opacity-50 mt-[-7px]">
+          <span className="mt-[-7px] text-[9.202px] font-[500] italic text-textBlack opacity-50">
             <USDBalance
-              balance={(0.01 * fields.amountValue * PRICE_MINA)
-                .toFixed(2)
-                .toString()}
+              balance={formatPriceUSD(
+                fields.amountValue,
+                tokens[fields.amount_token]?.ticker ?? "",
+              )}
               type="USD"
-            /></span>
+            />
+          </span>
           <div className="flex items-center justify-between">
             <span className="text-[14.56px] font-[600] text-textBlack">
               Receipent
@@ -96,9 +102,10 @@ export function WithdrawConfirm({ loading, onClose, onSubmit }: TransferConfirmP
                 </span>
                 <span className="text-[10.484px] font-[500] text-textBlack opacity-60">
                   <USDBalance
-                    balance={(0.01 * fields.amountValue * PRICE_MINA)
-                      .toFixed(2)
-                      .toString()}
+                    balance={formatPriceUSD(
+                      fields.amountValue,
+                      tokens[fields.amount_token]?.ticker ?? "",
+                    )}
                     type="USD"
                   />
                 </span>

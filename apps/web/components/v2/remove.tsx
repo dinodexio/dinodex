@@ -5,7 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogOverlay,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { tokens } from "@/tokens";
@@ -16,7 +19,7 @@ import { useObserveBalancePool, useObservePooled } from "@/lib/stores/balances";
 import { LPTokenId, TokenPair } from "chain";
 import { useSpotPrice } from "@/lib/xyk/useSpotPrice";
 import BigNumber from "bignumber.js";
-import { Balance, precision, removeTrailingZeroes } from "../ui/balance";
+import { precision, removeTrailingZeroes } from "../ui/balance";
 import { notFound, useRouter } from "next/navigation";
 import { Card, CardHeader } from "../ui/card";
 import Link from "next/link";
@@ -29,6 +32,10 @@ import styles from "../css/pool.module.css";
 import stylesModal from "../css/modal.module.css";
 import { Footer } from "../footer";
 import dynamic from "next/dynamic";
+import { formatBigNumber } from "@/lib/utils";
+import { dataSubmitProps } from "@/types";
+import { Input } from "../ui/input";
+import useClickOutside from "@/hook/useClickOutside";
 const Header = dynamic(() => import("@/components/header"), {
   ssr: false,
 });
@@ -47,11 +54,17 @@ const valueDeposit = [
 ];
 
 export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
-  const router = useRouter();
+  // const router = useRouter();
   const [loading, setLoading] = useState(false);
   const removeLiquidity = useRemoveLiquidity();
 
   const [valueRange, setValueRange] = useState(0);
+
+  const [openSetting, setOpenSetting] = useState(false);
+
+  const settingRef = useClickOutside<HTMLDivElement>(() => {
+    setOpenSetting(false);
+  });
 
   const { poolKey } = usePoolKey(
     tokenParams?.tokenA?.value,
@@ -109,10 +122,10 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
 
   const valueTokenPool = useMemo(() => {
     const tokenA_amount = dataPooled?.first
-      ? parseFloat(String(dataPooled.first)) * (valueRange / 100)
+      ? BigNumber(dataPooled.first).multipliedBy(valueRange / 100)
       : 0;
     const tokenB_amount = dataPooled?.second
-      ? parseFloat(String(dataPooled.second)) * (valueRange / 100)
+      ? BigNumber(dataPooled.second).multipliedBy(valueRange / 100)
       : 0;
 
     return {
@@ -121,12 +134,28 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
     };
   }, [valueRange, dataPooled]);
 
-  const handleCloseRemovePool = () => {
-    setValueRange(0);
+  const handleCloseRemovePool = (isClear?: boolean) => {
+    isClear && setValueRange(0);
   };
 
   const handleRemoveLiquidity = async () => {
     setLoading(true);
+    const data: dataSubmitProps = {
+      logoA: tokens[firstTokenValue]?.logo,
+      logoB: tokens[secondTokenValue]?.logo,
+      tickerA: tokens[firstTokenValue]?.ticker,
+      tickerB: tokens[secondTokenValue]?.ticker,
+      amountA: formatBigNumber(
+        BigNumber(valueTokenPool?.tokenA_amount || 0).dividedBy(
+          10 ** precision,
+        ),
+      ),
+      amountB: formatBigNumber(
+        BigNumber(valueTokenPool?.tokenB_amount || 0).dividedBy(
+          10 ** precision,
+        ),
+      ),
+    };
     try {
       if (pool?.exists) {
         const tokenLP_amount = balances?.[lpToken]
@@ -149,11 +178,11 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
           )
             ? Math.floor(Number(tokenA_amount.toString())).toString()
             : Math.floor(Number(tokenB_amount.toString())).toString(),
+          data,
         );
         return true;
       }
     } catch (error: any) {
-      console.log("error", error);
       return error;
     } finally {
       setLoading(false);
@@ -175,10 +204,9 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
             <Header />
             <div className="mx-auto mt-[40px] flex w-full max-w-[1065px] flex-col items-center justify-center gap-[25px] sm:mt-[40px] lg:mt-[100px] xl:mt-[113.74px]">
               <Card
-                className={`mx-auto flex w-full bg-bgWhiteColor max-w-[605px] flex-col gap-[10px] rounded-[24px] border-none px-[8px] py-[8px] sm:gap-[10px] sm:px-[8px] sm:py-[8px] lg:gap-[15px] lg:px-[15px] lg:py-[25px] xl:gap-[15px] xl:px-[15px] xl:py-[25px] ${styles["pool-container"]}`}
-                style={{boxShadow: "0px 2px 8px 0px rgba(0, 0, 0, 0.25)"}}
+                className={`mx-auto flex w-full max-w-[605px] flex-col gap-[15px] rounded-[24px] border-none bg-bgWhiteColor px-[8px] py-[8px] shadow-popup sm:px-[8px] sm:py-[8px] lg:px-[15px] lg:pt-[25px] lg:pb-[20px] xl:px-[15px] xl:pt-[25px] xl:pb-[20px]`}
               >
-                <CardHeader className="mb-[10px] flex-row items-center justify-between p-0 px-[10px]">
+                <CardHeader className="flex-row items-center justify-between p-0 px-[10px]">
                   <Link href="/pool">
                     {" "}
                     <Image
@@ -188,23 +216,103 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                       height={20}
                     />
                   </Link>
-                  <span className="text-[24px] font-[600] text-textBlack">
+                  <span className="text-[20px] font-[600] text-textBlack">
                     Remove liquidity
                   </span>
-                  <Image
-                    src="/icon/icon-setting.svg"
-                    alt=""
-                    width={30}
-                    height={30}
-                  />
+                  <div
+                    className="relative flex h-[42px] items-center gap-1 p-[6px]"
+                    ref={settingRef}
+                  >
+                    <span className="text-[20px] font-[400] text-textBlack opacity-60">
+                      {/* {fields.slippage_custom
+                        ? `${truncateString(fields.slippage_custom, precision)}%`
+                        : null} */}
+                    </span>
+                    <Image
+                      src="/images/swap/setting-icon.svg"
+                      width={25}
+                      height={25}
+                      alt=""
+                      className="cursor-pointer"
+                      onClick={() => setOpenSetting(!openSetting)}
+                    />
+                    <div
+                      className={`${styles["popup-setting"]} ${openSetting ? styles["popup-setting-open"] : ""}`}
+                    >
+                      {/* <span className={`text-center text-[20px] font-[500] text-textBlack sm:text-[20px] lg:text-[20px] xl:text-[24px] ${styles["popup-setting-title"]}`}>
+                      Swap setting
+                    </span> */}
+                      <div className="flex w-full items-center justify-between">
+                        <span
+                          className={`text-[18px] font-[400] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[20px] ${styles["popup-setting-label"]}`}
+                        >
+                          Max Slippage
+                        </span>
+                        <div className="flex items-center gap-[12px] rounded-[12px] bg-[#EBEBEB] pr-[12px] shadow-content">
+                          <div
+                            className={`flex cursor-pointer items-center justify-center rounded-[12px] bg-bgWhiteColor px-3 py-[6px] text-[16px] font-[400]
+                       shadow-content transition duration-300 ease-in-out hover:bg-[#EBEBEB] sm:text-[16px] lg:text-[18px] xl:text-[18px] text-borderOrColor
+                      `}
+                            onClick={() => {}}
+                          >
+                            Auto
+                          </div>
+                          <div className="flex items-center gap-[2px]">
+                            <Input
+                              className="= mr-[2px] h-full w-[50px] border-0 border-none bg-transparent p-0 text-right text-[18px] font-[400] text-textBlack opacity-50 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-[18px] lg:text-[18px] xl:text-[18px]"
+                              placeholder="0.5"
+                              type="text"
+                              inputMode="decimal"
+                            />
+                            <span className="text-[20px] font-[400] text-textBlack opacity-50 ">
+                              %
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex w-full items-center justify-between">
+                        <span
+                          className={`text-[18px] font-[400] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[20px] ${styles["popup-setting-label"]}`}
+                        >
+                          Transaction deadline
+                        </span>
+                        <div
+                          className="flex items-center gap-[2px] rounded-[18.118px] bg-bgWhiteColor px-[18px] py-[6px]"
+                          style={{
+                            boxShadow:
+                              "0px 1px 4px 0px rgba(26, 26, 26, 0.30) inset",
+                          }}
+                        >
+                          <Input
+                            type="number"
+                            min={0}
+                            max={4320}
+                            className="padding-0 h-full w-[70px] border-0 border-none bg-transparent text-[18px] font-[500] text-textBlack outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-[18px] lg:text-[18px] xl:text-[18px]"
+                          />
+                          <span className="text-[18px] font-[400] text-textBlack opacity-50 sm:text-[18px] lg:text-[18px] xl:text-[18px]">
+                            Minutes
+                          </span>
+                        </div>
+                      </div>
+                      <div
+                        className={stylesButton["button-close-setting-swap"]}
+                        onClick={() => setOpenSetting(false)}
+                      >
+                        Close
+                      </div>
+                    </div>
+                  </div>
                 </CardHeader>
                 <div className="flex flex-col gap-[15px] p-0">
                   <div
-                    className="rounded-[12px] border-none px-5 py-6 shadow-content"
-                    style={{ background: "rgba(255, 96, 59, 0.25)" }}
+                    className="rounded-[12px] px-5 py-[15px]"
+                    style={{
+                      background: "rgba(255, 96, 59, 0.25)",
+                      boxShadow: "0px 2px 8px 0px rgba(0, 0, 0, 0.25)",
+                    }}
                   >
                     <span
-                      className="text-[16px] font-[400] text-textBlack sm:text-[16px] lg:text-[24px] xl:text-[24px]"
+                      className={`text-[16px] font-[400] text-textBlack ${styles["tip-text"]}`}
                       style={{ lineHeight: "normal" }}
                     >
                       <strong className="font-[600]">Tip:</strong>Removing pool
@@ -215,16 +323,16 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                     </span>
                   </div>
                 </div>
-                <div className="flex w-full flex-col items-start gap-[30px] rounded-[20px] border-none shadow-content px-[20px] pb-[20px] pt-[30px]">
+                <div className="flex w-full flex-col items-start gap-[30px] rounded-[12px] border-none px-[20px] pb-[15px] pt-[20px] shadow-content">
                   <div className="flex w-full items-center justify-between">
-                    <span className="text-[18px] font-[600] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[20px]">
+                    <span className="text-[16px] font-[600] text-textBlack sm:text-[16px] lg:text-[18px] xl:text-[18px]">
                       Withdraw Amounts
                     </span>
-                    {/* <span className="text-[18px] font-[600] text-borderOrColor sm:text-[18px] lg:text-[20px] xl:text-[20px]">
+                    {/* <span className="text-[16px] font-[600] text-borderOrColor sm:text-[16px] lg:text-[18px] xl:text-[18px]">
                       Detailed
                     </span> */}
                   </div>
-                  <span className="text-[64px] font-[400] text-textBlack sm:text-[64px] lg:text-[96px] xl:text-[96px]">
+                  <span className="text-[50px] font-[400] text-textBlack sm:text-[50px] lg:text-[64px] xl:text-[64px] h-[74px] flex items-center">
                     {valueRange}%
                   </span>
                   <div className="h-[31px] w-full">
@@ -237,12 +345,11 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                       className={styles["slider"]}
                     />
                   </div>
-                  <div className="mt-[-10px] flex w-full items-center justify-between sm:mt-[-10px] lg:mt-0 xl:mt-0">
+                  <div className="mt-[-15px] flex w-full items-center justify-between sm:mt-[-10px] lg:mt-[-15px] xl:mt-[-15px]">
                     {valueDeposit?.map((item: any) => {
                       return (
                         <div
-                          className="w-max cursor-pointer rounded-[8px] border-none shadow-content px-[19px] py-[10px] text-[20px] font-[600] text-textBlack hover:bg-[#E8E8E8] sm:w-max sm:px-[19px] sm:py-[10px] sm:text-[20px] lg:w-[105px] lg:px-[28px] lg:py-[18px] lg:text-[24px] xl:w-[105px] xl:px-[28px] xl:py-[18px] xl:text-[24px]"
-                          style={{ transition: "all 0.3s ease" }}
+                          className={styles['button-withdraw']}
                           onClick={() => setValueRange(item?.value)}
                           key={item.value}
                         >
@@ -252,7 +359,7 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                     })}
                   </div>
                 </div>
-                <div className="my-[5px] flex w-full items-center justify-center">
+                <div className="my-[3px] flex w-full items-center justify-center">
                   <Image
                     src={"/icon/Arrow-2.svg"}
                     alt=""
@@ -261,12 +368,14 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                     style={{ transform: "rotate(-90deg)" }}
                   />
                 </div>
-                <div className="flex w-full flex-col items-start gap-[15px] rounded-[20px] border-none shadow-content px-[20px] py-[20px]">
+                <div className="flex w-full flex-col items-start gap-[12px] rounded-[12px] border-none px-[20px] py-[15px] shadow-content">
                   <div className="flex w-full items-center justify-between">
-                    <span className="text-[16px] font-[600] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                      {BigNumber(valueTokenPool?.tokenA_amount || 0)
-                        .dividedBy(10 ** precision)
-                        .toString()}
+                    <span className="text-[16px] font-[600] text-textBlack sm:text-[16px] lg:text-[18px] xl:text-[18px]">
+                      {formatBigNumber(
+                        BigNumber(valueTokenPool?.tokenA_amount || 0).dividedBy(
+                          10 ** precision,
+                        ),
+                      )}
                     </span>
                     <div className="flex items-center gap-[5px]">
                       <Image
@@ -274,18 +383,20 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                         width={28}
                         height={28}
                         alt=""
-                        className="h-5 w-5 sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
+                        className="h-9 w-5 sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
                       />
-                      <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
+                      <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[18px] xl:text-[18px]">
                         {tokenParams?.tokenA?.label}
                       </span>
                     </div>
                   </div>
                   <div className="flex w-full items-center justify-between">
-                    <span className="text-[16px] font-[600] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                      {BigNumber(valueTokenPool?.tokenB_amount || 0)
-                        .dividedBy(10 ** precision)
-                        .toString()}
+                    <span className="text-[16px] font-[600] text-textBlack sm:text-[16px] lg:text-[18px] xl:text-[18px]">
+                      {formatBigNumber(
+                        BigNumber(valueTokenPool?.tokenB_amount || 0).dividedBy(
+                          10 ** precision,
+                        ),
+                      )}
                     </span>
                     <div className="flex items-center gap-[5px]">
                       <Image
@@ -295,7 +406,7 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                         alt=""
                         className="h-5 w-5 sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
                       />
-                      <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
+                      <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[18px] xl:text-[18px]">
                         {tokenParams?.tokenB?.label}
                       </span>
                     </div>
@@ -306,19 +417,19 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                     </div>
                   </div> */}
                 </div>
-                <div className="flex w-full items-start justify-between rounded-[20px] px-[20px] py-[20px]">
-                  <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
+                <div className="flex w-full items-start justify-between rounded-[12px] px-[20px] py-[15px]">
+                  <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[18px] xl:text-[18px]">
                     Rates
                   </span>
                   <div className="flex flex-col items-end gap-[20px]">
-                    <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
+                    <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[18px] xl:text-[18px]">
                       1 {tokenParams?.tokenA?.label} ={" "}
                       {isFinite(parseFloat(valuePer?.perB))
                         ? valuePer?.perB
                         : "~"}{" "}
                       {tokenParams?.tokenB?.label}
                     </span>
-                    <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[20px]">
+                    <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[18px] xl:text-[18px]">
                       1 {tokenParams?.tokenB?.label} ={" "}
                       {isFinite(parseFloat(valuePer?.perA))
                         ? valuePer?.perA
@@ -349,19 +460,36 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                   <DialogTrigger
                     asChild
                     disabled={
-                      Number(valueTokenPool?.tokenA_amount) / 100 === 0 &&
-                      Number(valueTokenPool?.tokenB_amount) / 100 === 0
+                      formatBigNumber(
+                        BigNumber(valueTokenPool?.tokenA_amount || 0).dividedBy(
+                          10 ** precision,
+                        ),
+                      ) === "0" &&
+                      formatBigNumber(
+                        BigNumber(valueTokenPool?.tokenB_amount || 0).dividedBy(
+                          10 ** precision,
+                        ),
+                      ) === "0"
                     }
                   >
                     <Button
                       loading={false}
                       type={"submit"}
                       disabled={
-                        Number(valueTokenPool?.tokenA_amount) / 100 === 0 &&
-                        Number(valueTokenPool?.tokenB_amount) / 100 === 0
+                        formatBigNumber(
+                          BigNumber(
+                            valueTokenPool?.tokenA_amount || 0,
+                          ).dividedBy(10 ** precision),
+                        ) === "0" &&
+                        formatBigNumber(
+                          BigNumber(
+                            valueTokenPool?.tokenB_amount || 0,
+                          ).dividedBy(10 ** precision),
+                        ) === "0"
                       }
                       className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]} w-full`}
-                      // onClick={handleRemoveLiquidity}
+                      style={{ fontSize: 22, height: 56 }}
+                    // onClick={handleRemoveLiquidity}
                     >
                       <span>Remove</span>
                     </Button>
@@ -383,6 +511,10 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
         <DialogContent
           className={`${stylesModal["modal-container"]} ${stylesModal["modal-pool"]} w-[99%] max-w-[625px] border-none bg-white px-[20px] pb-[20px] pt-[27px] sm:px-[20px] sm:pt-[27px] lg:px-[30px] lg:pt-[35px] xl:px-[30px] xl:pt-[35px]`}
         >
+          <DialogHeader>
+            <DialogTitle />
+            <DialogDescription />
+          </DialogHeader>
           <ModalRemovePool
             onConfirm={handleRemoveLiquidity}
             valueTokenPool={valueTokenPool}

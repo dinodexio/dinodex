@@ -1,11 +1,7 @@
 "use client"
 import React, { useEffect } from 'react';
 import { DoubleBarChart } from './chart';
-
-
-export interface ChartDouBarProps {
-    onHover?: (dataHover: any) => void
-}
+import { ChartDouBarProps } from '@/types';
 
 
 const ChartDouBar = ({

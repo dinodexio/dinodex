@@ -1,0 +1,409 @@
+.header-pool-container {
+  padding: 32px 41px 0 41px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.button-header {
+  height: 52.264px;
+  width: 115.829px;
+  flex-shrink: 0;
+  border-radius: 19.38px;
+  background: var(--white-color-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--black-color-text);
+  text-align: center;
+  font-size: 18.605px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  text-decoration: none !important;
+  box-shadow: 0px 5.426px 0px 0px var(--black-color-text);
+  border: 1.55px solid var(--black-color-text);
+  position: relative;
+  cursor: pointer;
+}
+
+.button-header-active {
+  background-color: var(--orange-color-bg);
+  color: var(--white-color-bg);
+}
+
+.button-connect-wallet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 211px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 19.38px;
+  border: 1.55px solid var(--black-color-text);
+  background: var(--purple-color-bg);
+  box-shadow: 0px 5.426pvar (--black-color-text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button-connect-wallet:hover {
+  transition: all 0.3s ease;
+  background: linear-gradient(
+    180deg,
+    var(--green-color-bg) 0%,
+    var(--purple-color-bg) 100%
+  );
+}
+
+.button-connected-wallet-text {
+  color: var(--white-color-bg);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 18.605px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+/* content */
+
+.containerContentSwap {
+  display: flex;
+  width: 592px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 30px;
+  margin: 68.75px auto 68px;
+  /* margin-top: 136.75px; */
+}
+
+.headerContentSwap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+.titleHeaderSwap {
+  display: flex;
+  width: 49px;
+  height: 25px;
+  padding: 6px 21px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+  /* text */
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.boxSetting {
+  display: flex;
+  height: 25px;
+  padding: 6px;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+}
+
+.textBoxSetting {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  opacity: 0.6;
+}
+
+.bodyContentSwap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+}
+
+.containerInput {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 50px;
+  align-self: stretch;
+  position: relative;
+}
+
+.boxInput {
+  display: flex;
+  padding: 20px 10px 15px 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+}
+
+.titleContainerInput {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  opacity: 0.6;
+}
+
+.lineInput {
+  opacity: 0.6;
+  border: 1px solid var(--black-color-text);
+  width: 100%;
+}
+
+.boxContentInput {
+  width: 100%;
+  max-width: 562px;
+  display: flex;
+  padding: 12px 8px 15px 0px;
+  justify-content: space-between;
+  align-items: flex-end;
+  align-self: stretch;
+}
+
+.input {
+  width: 366px;
+  height: 80px;
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 76.923px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  border: none;
+  outline: 0;
+  opacity: 0.5;
+}
+
+.textUSD {
+  width: max-content;
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  opacity: 0.6;
+}
+
+.boxBtnInput {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.btnInput {
+  display: flex;
+  padding: 6px 18px;
+  align-items: center;
+  gap: 4px;
+  border-radius: 18.118px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 1px 4px 0px rgba(26, 26, 26, 0.3);
+  border: none;
+  /* text */
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.textBalance {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  opacity: 0.6;
+}
+
+.iconSwap {
+  position: absolute;
+  top: 186px;
+  left: 254px;
+}
+
+.btnSelectToken {
+  width: 572px;
+  display: flex;
+  padding: 20px 10px;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  border-radius: 20px;
+  opacity: 0.3;
+  background: var(--orange-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+  /* text */
+  color: var(--white-color-bg);
+  font-family: "SF Pro Display";
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+/* select a token */
+.containerModalSelectToken {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--black-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.boxModalSelectToken {
+  display: flex;
+  width: 470px;
+  padding: 20px 10px 15px 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 25px;
+  border-radius: 12px;
+  background-color: var(--white-color-bg);
+}
+
+.headerModal {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.textTitleModal {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.boxInputModalSelect {
+  display: flex;
+  padding: 15px 0px 15px 40px;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow);
+}
+
+.inputModalSelect {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 19.835px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  opacity: 0.3;
+  border: none;
+  outline: 0;
+}
+
+.headerTopTokens {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  align-self: stretch;
+  height: 39px;
+}
+
+.textTopTokens {
+  padding-left: 25px;
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 19.835px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.contentTopTokens {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.boxItemToken {
+  display: flex;
+  padding: 12px 0px 12px 25px;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.boxItemToken:hover {
+  border-radius: 12px;
+  background: var(--black-color-text);
+  box-shadow: 0px 2px 8px 0px var(--black-color-shadow-item-token);
+}
+
+.boxItemToken:hover .nameToken,
+.boxItemToken:hover .symbolToken {
+  color: var(--white-color-bg);
+}
+
+.boxInfoToken {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.nameToken {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 19.835px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.symbolToken {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 13.223px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  opacity: 0.6;
+}

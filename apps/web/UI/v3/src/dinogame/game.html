@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dino Game</title>
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+}
+
+.game-over {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+  font-family: 'Press Start 2P', cursive;
+  color: #888;
+  display: none;
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<canvas id="gameCanvas" width="800" height="200"></canvas>
+<div class="game-over">Game Over</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const gameOverText = document.querySelector('.game-over');
+
+// Game variables
+let dinoY = canvas.height - 30;
+let dinoX = 10;
+let dinoWidth = 20;
+let dinoHeight = 30;
+let isJumping = false;
+let dinoDY = 0;
+let gravity = 0.5;
+
+let obstacleX = canvas.width;
+let obstacleY = canvas.height - 20;
+let obstacleWidth = 10;
+let obstacleHeight = 20;
+let obstacleSpeed = 5;
+
+let score = 0;
+
+// Dino image
+const dinoImg = new Image();
+dinoImg.src = 'images/dino_run1.png'; // Replace with your dino image path
+
+// Obstacle image (cactus)
+const obstacleImg = new Image();
+obstacleImg.src = 'images/cactus_1.png'; // Replace with your cactus image path
+
+// Event listeners
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && !isJumping) {
+    isJumping = true;
+    dinoDY = -10;
+  }
+});
+
+// Game loop
+function gameLoop() {
+  // Clear canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Update Dino
+  if (isJumping) {
+    dinoY += dinoDY;
+    dinoDY += gravity;
+    if (dinoY >= canvas.height - dinoHeight) {
+      isJumping = false;
+      dinoY = canvas.height - dinoHeight;
+    }
+  }
+
+  // Update obstacle
+  obstacleX -= obstacleSpeed;
+  if (obstacleX + obstacleWidth < 0) {
+    obstacleX = canvas.width;
+    score++;
+    obstacleSpeed += 0.2; // Increase speed gradually
+  }
+
+  // Collision detection
+  if (
+    dinoX < obstacleX + obstacleWidth &&
+    dinoX + dinoWidth > obstacleX &&
+    dinoY < obstacleY + obstacleHeight &&
+    dinoY + dinoHeight > obstacleY
+  ) {
+    gameOver();
+  }
+
+  // Draw Dino
+  //ctx.fillStyle = 'green';
+  //ctx.fillRect(dinoX, dinoY, dinoWidth, dinoHeight);
+  ctx.drawImage(dinoImg, dinoX, dinoY, dinoWidth, dinoHeight);
+
+  // Draw obstacle
+  //ctx.fillStyle = 'red';
+  //ctx.fillRect(obstacleX, obstacleY, obstacleWidth, obstacleHeight);
+  ctx.drawImage(obstacleImg, obstacleX, obstacleY, obstacleWidth, obstacleHeight);
+
+  // Draw score
+  ctx.font = '16px Press Start 2P';
+  ctx.fillStyle = 'black';
+  ctx.fillText('Score: ' + score, 10, 20);
+
+  requestAnimationFrame(gameLoop);
+}
+
+// Game over function
+function gameOver() {
+  gameOverText.style.display = 'block';
+  obstacleSpeed = 0;
+  dinoDY = 0;
+}
+
+// Start the game
+gameLoop();
+</script>
+
+</body>
+</html>

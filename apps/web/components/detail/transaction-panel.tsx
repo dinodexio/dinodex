@@ -1,139 +1,133 @@
-import { formatLargeNumber, formatterInteger } from "@/lib/utils";
+import {
+  capitalizeFirstLetter,
+  formatNumberWithPrice,
+  formatTimeAgo,
+  truncateString,
+} from "@/lib/utils";
 import { Table } from "../table/table";
 import Image from "next/image";
-import styles from '../css/table.module.css'
-
-export interface TransactionPanelProps {
-    token: object | undefined
-}
-
-let dataTokenTransaction = [
-    {
-        id: 1,
-        timeStamp: '2024-02-01 10:00:00',
-        token: {
-            logo: 'images/swap/logo-token-default.svg',
-            name: 'ethereum',
-            symbol: 'ETH',
-            value: 0.021,
-        },
-        value: 1000.02,
-        action: 'buy',
-        address: '0x1234567890123456789012345678901234567890',
-    },
-    {
-        id: 2,
-        timeStamp: '2024-02-01 10:00:00',
-        token: {
-            logo: 'images/swap/logo-token-default.svg',
-            name: 'ethereum',
-            symbol: 'ETH',
-            value: 1,
-        },
-        value: 320.10,
-        action: 'sell',
-        address: '0x1234567890123456789012345678901234567890',
-    },
-    {
-        id: 3,
-        timeStamp: '2024-02-01 10:00:00',
-        token: {
-            logo: 'images/swap/logo-token-default.svg',
-            name: 'ethereum',
-            symbol: 'ETH',
-            value: 1.88,
-        },
-        value: 1000.02,
-        action: 'buy',
-        address: '0x1234567890123456789012345678901234567890',
-    },
-    {
-        id: 4,
-        timeStamp: '2024-02-01 10:00:00',
-        token: {
-            logo: 'images/swap/logo-token-default.svg',
-            name: 'ethereum',
-            symbol: 'ETH',
-            value: 1.02,
-        },
-        value: 2907.01,
-        action: 'sell',
-        address: '0x1234567890123456789012345678901234567890',
-    },
-]
+import styles from "../css/table.module.css";
+import { precision } from "../ui/balance";
+import { DataTokenTransactionPanel, TokenTransactionPanelProps } from "@/types";
+import { SkeletonLoading } from "./SkeletonLoading";
 
 
-export function TransactionPanel({ token }: TransactionPanelProps) {
-    let columnTableTransactionTokenInfo = [
-        {
-            id: 1,
-            title: 'Time',
-            key: 'time-transaction',
-            width: 100,
-            render: (_: any) => {
-                return <span>19m ago</span>
-            }
-        },
-        {
-            id: 2,
-            title: 'Type',
-            key: 'Type-transaction',
-            width: 90,
-            render: (data: any) => {
-                return <span className={`${data?.action === 'sell' ? styles['text-red'] : styles['text-green']} ${styles['text-action']}`}>{data?.action} </span>
-            }
-        },
-        {
-            id: 3,
-            title: '$USDT',
-            key: 'usdt-transaction',
-            width: 120,
-            render: (data: any) => {
-                return <span>{formatterInteger(data?.value)}</span>
-            }
-        },
-        {
-            id: 4,
-            title: 'For',
-            key: 'for-transaction',
-            width: 145,
-            render: (data: any) => {
-                return (
-                    <div className={styles["token-item"]}>
-                        <span>{formatterInteger(data?.token?.value)}</span>
-                        <Image src={'/' + data?.token?.logo} alt="token" width={20} height={20} />
-                        <span>{data?.token?.symbol}</span>
-                    </div>
-                )
-            }
-        },
-        {
-            id: 5,
-            title: 'USD',
-            key: 'usd-transaction',
-            width: 120,
-            render: (data: any) => {
-                return <span>{formatterInteger(Number((Number(data?.value) * 1.01).toFixed(2)))}</span>
-            }
-        },
-        {
-            id: 6,
-            title: 'Wallet',
-            key: 'wallet-transaction',
-            width: 150,
-            render: (data: any) => {
-                return <span>{data?.address.slice(0, 6)}...${data?.address.slice(-4)}</span>
-            }
-        },
-    ]
-    return (
-        <>
-            <Table
-                data={dataTokenTransaction}
-                column={columnTableTransactionTokenInfo}
-                onClickTr={() => { }}
-                classTable="table-layout"
+export function TransactionPanel({
+  data = [],
+  titleToken = "",
+  loading
+}: TokenTransactionPanelProps) {
+  let columnTableTransactionTokenInfo = [
+    {
+      id: 1,
+      title: "Time",
+      key: "time-transaction",
+      width: 140,
+      render: (data: DataTokenTransactionPanel) => {
+        return <span>{formatTimeAgo(data?.timestamp)}</span>;
+      },
+    },
+    {
+      id: 2,
+      title: "Type",
+      key: "Type-transaction",
+      width: 90,
+      render: (data: DataTokenTransactionPanel) => {
+        return (
+          <span
+            className={`${data?.action === "sell" ? styles["text-red"] : styles["text-green"]} ${styles["text-action"]}`}
+          >
+            {capitalizeFirstLetter(data?.action || "")}{" "}
+          </span>
+        );
+      },
+    },
+    {
+      id: 3,
+      title: loading ? <SkeletonLoading loading={loading} className="w-[98%] h-[20px]" /> : `$${titleToken || "Token"}`,
+      key: "usdt-transaction",
+      width: 120,
+      render: (data: DataTokenTransactionPanel) => {
+        return (
+          <span>
+            {truncateString(
+              formatNumberWithPrice(
+                data?.tokenAmount || 0,
+                false,
+                precision,
+              )?.toString(),
+              6,
+            )}
+          </span>
+        );
+      },
+    },
+    {
+      id: 4,
+      title: "For",
+      key: "for-transaction",
+      width: 145,
+      render: (data: DataTokenTransactionPanel) => {
+        return (
+          <div className={styles["token-item"]}>
+            <span>
+              {formatNumberWithPrice(
+                data.tokenCounterpartAmount || 0,
+                false,
+                precision,
+              )}
+            </span>
+            <Image
+              src={data.logoCounterpart || ""}
+              alt="token"
+              width={20}
+              height={20}
             />
-        </>
-    );
+            <span>{truncateString(data?.tickerCounterpart, 5)}</span>
+          </div>
+        );
+      },
+    },
+    {
+      id: 5,
+      title: "USD",
+      key: "usd-transaction",
+      width: 120,
+      render: (data: DataTokenTransactionPanel) => {
+        return (
+          <span>
+            {truncateString(
+              formatNumberWithPrice(data?.price || 0)?.toString(),
+              6,
+            )}
+          </span>
+        );
+      },
+    },
+    {
+      id: 6,
+      title: "Wallet",
+      key: "wallet-transaction",
+      width: 150,
+      render: (data: DataTokenTransactionPanel) => {
+        const address = data?.creator || "";
+        return (
+          <span>
+            {address.slice(0, 6)}...{address.slice(-4)}
+          </span>
+        );
+      },
+    },
+  ];
+  return (
+    <>
+      <Table
+        data={data}
+        column={columnTableTransactionTokenInfo}
+        onClickTr={() => {}}
+        classTable="table-layout"
+        loading={loading}
+      />
+    </>
+  );
 }

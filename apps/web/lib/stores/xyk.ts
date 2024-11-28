@@ -10,6 +10,8 @@ import { PendingTransaction } from "@proto-kit/sequencer";
 import { PoolKey, TokenIdPath } from "chain";
 import { resolve } from "path";
 import { useChainStore } from "./chain";
+import { TRANSACTION_TYPES } from "@/constants";
+import { dataSubmitProps } from "@/types";
 
 export interface XYKState {
   createPool: (
@@ -66,9 +68,19 @@ export const useXYKStore = create<XYKState, [["zustand/immer", never]]>(
           exists: state.pools[key]?.exists ?? false,
         };
       });
-      const pool = (await client.query.runtime.XYK.pools.get(
-        PoolKey.fromBase58(key),
-      )) as Bool | undefined;
+      // const pool = (await client.query.runtime.XYK.pools.get(
+      //   PoolKey.fromBase58(key),
+      // )) as Bool | undefined;
+
+      let pool: Bool | undefined = undefined;
+      try {
+        const poolKey = PoolKey.fromBase58(key);
+        pool = (await client.query.runtime.XYK.pools.get(poolKey)) as
+          | Bool
+          | undefined;
+      } catch (error: any) {
+        console.error("Error retrieving pool:", error?.message);
+      }
 
       await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -205,6 +217,7 @@ export const useCreatePool = () => {
       tokenBId: string,
       tokenAAmount: string,
       tokenBAmount: string,
+      data: dataSubmitProps,
     ) => {
       if (!client.client || !wallet.wallet) return;
       const pendingTransaction = await createPool(
@@ -216,7 +229,11 @@ export const useCreatePool = () => {
         tokenBAmount,
       );
 
-      wallet.addPendingTransaction(pendingTransaction, "Create Pool");
+      wallet.addPendingTransaction(
+        pendingTransaction,
+        TRANSACTION_TYPES.CREATE,
+        data,
+      );
     },
     [client.client, wallet.wallet],
   );
@@ -233,6 +250,7 @@ export const useAddLiquidity = () => {
       tokenBId: string,
       tokenAAmount: string,
       tokenBAmountLimit: string,
+      data: dataSubmitProps,
     ) => {
       if (!client.client || !wallet.wallet) return;
       const pendingTransaction = await addLiquidity(
@@ -244,7 +262,11 @@ export const useAddLiquidity = () => {
         tokenBAmountLimit,
       );
 
-      wallet.addPendingTransaction(pendingTransaction, "Add Liquidity");
+      wallet.addPendingTransaction(
+        pendingTransaction,
+        TRANSACTION_TYPES.ADD,
+        data,
+      );
     },
     [client.client, wallet.wallet],
   );
@@ -262,6 +284,7 @@ export const useRemoveLiquidity = () => {
       lpTokenAmount: string,
       tokenAAmountLimit: string,
       tokenBAmountLimit: string,
+      data: dataSubmitProps,
     ) => {
       if (!client.client || !wallet.wallet) return;
       const pendingTransaction = await removeLiquidity(
@@ -274,7 +297,11 @@ export const useRemoveLiquidity = () => {
         tokenBAmountLimit,
       );
 
-      wallet.addPendingTransaction(pendingTransaction, "Remove Liquidity");
+      wallet.addPendingTransaction(
+        pendingTransaction,
+        TRANSACTION_TYPES.REMOVE,
+        data,
+      );
     },
     [client.client, wallet.wallet],
   );
@@ -289,7 +316,7 @@ export const useSellPath = () => {
       path: string[],
       amountIn: string,
       amountOutMinLimit: string,
-      data?: any,
+      data?: dataSubmitProps,
     ) => {
       if (!client.client || !wallet.wallet) return;
       const pendingTransaction = await sellPath(
@@ -300,7 +327,11 @@ export const useSellPath = () => {
         amountOutMinLimit,
       );
 
-      wallet.addPendingTransaction(pendingTransaction, "Swap", data);
+      wallet.addPendingTransaction(
+        pendingTransaction,
+        TRANSACTION_TYPES.SWAP,
+        data,
+      );
     },
     [client.client, wallet.wallet],
   );

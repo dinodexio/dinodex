@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:image" content="assets/images/logo.png" />
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
+    <title>DinoDEX</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="js/chart.js"></script>
+    <script src="js/ChartPool.js"></script>
+    <script src="js/dataDummyToken.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/listRenderModal.js"></script>
+    <script src="js/Modal.js"></script>
+    <script src="js/Pool.js"></script>
+    <script src="js/renderDataToken.js"></script>
+    <script src="js/renderListDataPool.js"></script>
+    <script src="js/renderModalPreviewPool.js"></script>
+    <script src="js/renderTable.js"></script>
+    <script src="js/Swap.js"></script>
+    <script src="js/token.js"></script>
+    <script src="js/tokenLayout.js"></script>
+</head>
+
+<body>
+    <div class="bg-body">
+        <img src='./assets/images/home/bg-web.png' />
+    </div>
+    <div class="header-pool-container">
+        <div class="header-content">
+            <a href="index.html" class="button-header"><span>Home</span></a>
+            <a href="swap.html" class="button-header"><span>Trade</span></a>
+            <a href="pool.html" class="button-header"><span>Pool</span></a>
+            <a class="button-header button-header-active"><span>Token</span></a>
+        </div>
+        <div class="header-menu-mobile">
+            <div class="menu button-menu" onclick="togglePopupMenu()"><span></span></div>
+            <img src="assets/images/home/dex.svg" alt="dex" width="30" height="30" style="margin-left: 10px;" />
+
+            <div class="popup-menu-mobile">
+                <div class="popup-menu-content">
+                    <a href="index.html" class="menu-item"><span>Home</span></a>
+                    <a href="swap.html" class="menu-item "><span>Trade</span></a>
+                    <a href="pool.html" class="menu-item"><span>Pool</span></a>
+                    <a class="menu-item menu-item-active"><span>Token</span></a>
+                </div>
+                <div class="content-social-menu-mobile">
+                    <a href="https://twitter.com/dinodex" target="_blank"><img src="assets/images/social/git.svg"
+                            width="28" height="28"></a>
+                    <a href="https://t.me/dinodex" target="_blank"><img src="assets/images/social/x.svg" width="28"
+                            height="28"></a>
+                    <a href="https://discord.com/invite/9nXbJX5" target="_blank"><img
+                            src="assets/images/social/discord.svg" width="28" height="28"></a>
+                </div>
+            </div>
+        </div>
+        <div class="button-connect-wallet">
+            <span class="button-connected-wallet-text">Connect Wallet</span>
+        </div>
+    </div>
+    <div class="token-layout-container">
+        <div class="container-token-layout">
+            <div class="token-info-container">
+                <div class="token-info-logo">
+                    <img src="assets/images/swap/logo-token-default.svg" alt="token-1" width="40" height="40">
+                </div>
+                <span class="token-info-name-text">Ethereum</span>
+                <span class="token-info-symbol-text">ETH</span>
+            </div>
+            <div class="token-chart-container">
+                <div class="token-chart-price">
+                    <span class="token-chart-price-text">$1.00</span>
+                    <span class="token-chart-change-text text-red">
+                        <img src="assets/images/token/change-down.svg" alt="token-1">
+                        -0.01%
+                    </span>
+                </div>
+                <div class="bg-chart">
+                </div>
+                <canvas width="734" height="325" id="chart-line-token"></canvas>
+            </div>
+            <div class="token-layout-menu">
+                <div class="token-layout-menu-time-price">
+                    <span class="token-layout-menu-time-price-item" data-time="1h">1h</span>
+                    <span class="token-layout-menu-time-price-item token-layout-menu-time-price-item-active"
+                        data-time="1d">1d</span>
+                    <span class="token-layout-menu-time-price-item" data-time="1w">1w</span>
+                    <span class="token-layout-menu-time-price-item" data-time="1m">1m</span>
+                    <span class="token-layout-menu-time-price-item" data-time="1y">1y</span>
+                </div>
+                <div class="token-layout-menu-item">
+                    <div class="network-content">
+                        <img src="assets/images/icon/network-icon.svg" alt="network">
+                        <img src="assets/images/icon/drop-down-icon.svg" alt="network">
+                        <div class="network-content-menu">
+                            <!-- <div class="network-content-menu-header">
+                                <img src="assets/images/icon/network-icon.svg" alt="network">
+                                <span class="network-content-menu-header-text">All networks</span>
+                            </div> -->
+                            <div class="network-content-menu-item" data-network="ethereum">
+                                <img src="assets/images/token/eth-logo.svg" alt="network">
+                                <span class="network-content-menu-item-text">Ethereum</span>
+                            </div>
+                            <div class="network-content-menu-item" data-network="optimism">
+                                <img src="assets/images/token/op-token.svg" alt="network">
+                                <span class="network-content-menu-item-text">Optimism</span>
+                            </div>
+                            <div class="network-content-menu-item" data-network="polygon">
+                                <img src="assets/images/token/polygon-token.svg" alt="network">
+                                <span class="network-content-menu-item-text">Polygon</span>
+                            </div>
+                            <div class="network-content-menu-item" data-network="zksync">
+                                <img src="assets/images/token/zksync-token.svg" alt="network">
+                                <span class="network-content-menu-item-text">Zksync</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="price-menu-container">
+                        Price
+                        <img src="assets/images/icon/drop-down-icon.svg" alt="network">
+                    </div>
+                </div>
+            </div>
+            <div class="stats-token-container">
+                <span class="stats-token-title">Stats</span>
+                <div class="stats-token-info">
+                    <div class="stats-token-info-item">
+                        <span class="stats-token-info-item-title">TVL</span>
+                        <span class="stats-token-info-item-value">$165.3M</span>
+                    </div>
+                    <div class="stats-token-info-item">
+                        <span class="stats-token-info-item-title">Market Cap</span>
+                        <span class="stats-token-info-item-value">$118.8B</span>
+                    </div>
+                    <div class="stats-token-info-item">
+                        <span class="stats-token-info-item-title">FDV</span>
+                        <span class="stats-token-info-item-value">$118.8B</span>
+                    </div>
+                    <div class="stats-token-info-item">
+                        <span class="stats-token-info-item-title">1 day volume</span>
+                        <span class="stats-token-info-item-value">$99.9M</span>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-token" style="margin: 25px 0;">
+                <span class="menu-token-item menu-token-item-active"
+                    data-token="transactionTokenInfo">Transactions</span>
+                <span class="menu-token-item" data-token="poolTokenInfo">Pools</span>
+            </div>
+            <div class="table-container table-layout" id="tableWrapper">
+                <table id="dataTable" class="container-table">
+                    <thead class="table-head">
+                        <tr class="table-head-row"></tr>
+                    </thead>
+                    <tbody class="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="swap-layout token-layout-swap">
+            <div class="swap-container token-swap-container pc-swap-token">
+                <span class="swap-text">Swap</span>
+                <div class="swap-content token-swap-content">
+                    <div class="swap-container-form token-swap-form">
+                        <div class="swap-content-item swap-item-first">
+                            <span class="swap-item-header">Sell</span>
+                            <div class="line-swap-item"></div>
+                            <div class="swap-item-content">
+                                <input class="swap-item-input" type="text" placeholder="0" id="input-first"
+                                    oninput="handleChangeInput('first', event)">
+                                <div class="swap-item-select"
+                                    onclick="Modal.open('modalSelectToken','swap'); saveTypeSelectToken('sell')"
+                                    data-select="sell">
+                                    <span>Select</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="20" viewBox="0 0 19 20"
+                                        fill="none">
+                                        <path d="M5.70703 8.28906L9.61635 12.1984L13.5257 8.28906" stroke="black"
+                                            stroke-width="1.29412" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                                <span class="value-price">$933.45</span>
+                            </div>
+                            <div class="swap-item-footer">
+                                <span class="swap-item-footer-text">Balance: 1 ETH</span>
+                            </div>
+                        </div>
+                        <div class="swap-button" onclick="changeSwap()">
+                            <img src="assets/images/swap/swap-button-icon.svg" alt="swap-button">
+                        </div>
+                        <div class="swap-content-item swap-item-second">
+                            <span class="swap-item-header">Buy</span>
+                            <div class="line-swap-item"></div>
+                            <div class="swap-item-content">
+                                <input class="swap-item-input" type="text" placeholder="0" id="input-second"
+                                    oninput="handleChangeInput('second', event)">
+                                <div class="swap-item-select" data-select="buy"
+                                    onclick="Modal.open('modalSelectToken','swap'); saveTypeSelectToken('buy')">
+                                    <span>Select</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="20" viewBox="0 0 19 20"
+                                        fill="none">
+                                        <path d="M5.70703 8.28906L9.61635 12.1984L13.5257 8.28906" stroke="black"
+                                            stroke-width="1.29412" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                                <span class="value-price">$933.45</span>
+                            </div>
+                            <div class="swap-item-footer">
+                                <span class="swap-item-footer-text">Balance: 1 ETH</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="button-swap button-swap-disabled" style="margin-top: -12px;">
+                        <span>Select a token</span>
+                    </div>
+                </div>
+                <div class="slippage-container">
+                    <div class="slippage-head">Slippage</div>
+                    <div class="slippage-item" data-slippage="0.1">0.1%</div>
+                    <div class="slippage-item" data-slippage="0.2">0.2%</div>
+                    <div class="slippage-item slippage-item-active" data-slippage="0.5">0.5%</div>
+                    <div class="slippage-item" data-slippage="1">1%</div>
+                </div>
+            </div>
+            <div class="swap-token-container">
+                <div class="swap-container token-swap-container mobile-swap-token">
+                    <div class="swap-token-header">
+                        <span class="swap-token-text">Swap</span>
+                        <div class="close close-swap-popup" onclick="hideSwapPopup()">
+                            <img src="assets/images/swap/close-icon-modal.svg" />
+                        </div>
+                    </div>
+                    <span class="swap-text">Swap</span>
+                    <div class="swap-content token-swap-content">
+                        <div class="swap-container-form token-swap-form">
+                            <div class="swap-content-item swap-item-first">
+                                <span class="swap-item-header">Sell</span>
+                                <div class="line-swap-item"></div>
+                                <div class="swap-item-content">
+                                    <input class="swap-item-input" type="text" placeholder="0" id="input-first"
+                                        oninput="handleChangeInput('first', event)">
+                                    <div class="swap-item-select"
+                                        onclick="Modal.open('modalSelectToken','swap'); saveTypeSelectToken('sell')"
+                                        data-select="sell">
+                                        <span>Select</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="20"
+                                            viewBox="0 0 19 20" fill="none">
+                                            <path d="M5.70703 8.28906L9.61635 12.1984L13.5257 8.28906" stroke="black"
+                                                stroke-width="1.29412" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <span class="value-price">$933.45</span>
+                                </div>
+                                <div class="swap-item-footer">
+                                    <span class="swap-item-footer-text">Balance: 1 ETH</span>
+                                </div>
+                            </div>
+                            <div class="swap-button" onclick="changeSwap()">
+                                <img src="assets/images/swap/swap-button-icon.svg" alt="swap-button">
+                            </div>
+                            <div class="swap-content-item swap-item-second">
+                                <span class="swap-item-header">Buy</span>
+                                <div class="line-swap-item"></div>
+                                <div class="swap-item-content">
+                                    <input class="swap-item-input" type="text" placeholder="0" id="input-second"
+                                        oninput="handleChangeInput('second', event)">
+                                    <div class="swap-item-select" data-select="buy"
+                                        onclick="Modal.open('modalSelectToken','swap'); saveTypeSelectToken('buy')">
+                                        <span>Select</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="20"
+                                            viewBox="0 0 19 20" fill="none">
+                                            <path d="M5.70703 8.28906L9.61635 12.1984L13.5257 8.28906" stroke="black"
+                                                stroke-width="1.29412" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <span class="value-price">$933.45</span>
+                                </div>
+                                <div class="swap-item-footer">
+                                    <span class="swap-item-footer-text">Balance: 1 ETH</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="button-swap button-swap-disabled" style="margin-top: -12px;">
+                            <span>Select a token</span>
+                        </div>
+                    </div>
+                    <div class="slippage-container">
+                        <div class="slippage-head">Slippage</div>
+                        <div class="slippage-item" data-slippage="0.1">0.1%</div>
+                        <div class="slippage-item" data-slippage="0.2">0.2%</div>
+                        <div class="slippage-item slippage-item-active" data-slippage="0.5">0.5%</div>
+                        <div class="slippage-item" data-slippage="1">1%</div>
+                    </div>
+                </div>
+            </div>
+            <div class="swap-container-info">
+                <span class="swap-text">Info</span>
+                <div class="swap-info-content">
+                    <div class="swap-info-item copy-btn" data-address="0xFd08as123u8asy348123FCbb9">
+                        <img src="assets/images/icon/icon-copy.svg" alt="info">
+                        <span class="swap-info-item-text">0xFd08...FCbb9</span>
+                    </div>
+                    <div class="swap-info-item">
+                        <img src="assets/images/icon/icon-explorer.svg" alt="info">
+                        <span class="swap-info-item-text">Explorer</span>
+                    </div>
+                    <div class="swap-info-item">
+                        <img src="assets/images/icon/web-icon.svg" alt="info">
+                        <span class="swap-info-item-text">Website</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="btn-fixed btn-swap-mobile" onclick="showPopupSwap()">
+        Swap
+    </div>
+    <div class="btn-fixed btn-return-to-top" onclick="returnToTop()">
+        <div class="btn-return-to-top-content">
+            <img src="assets/images/icon/return-to-top-icon.svg" alt="return-to-top">
+            <span> Return to top</span>
+        </div>
+    </div>
+    <div class="footer-container">
+        <img src="assets/images/home/dex.svg" alt="dex" width="84" height="84">
+    </div>
+    <script>
+        const element = document.querySelector('body');
+        const svgPath = 'assets/images/home/logo_icon_28x28.svg';
+        const cursorUrl = `url(${svgPath}), auto`;
+        element.style.cursor = cursorUrl;
+    </script>
+</body>
+
+</html>

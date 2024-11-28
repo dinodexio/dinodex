@@ -1,0 +1,93 @@
+/* theme.css */
+
+/* Light Theme */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --background-color: #fff;
+  --text-color: #333;
+  --border-color: #ccc;
+  --header-background-color: #f8f9fa;
+  --footer-background-color: #343a40;
+  --hero-background-color: #e9ecef;
+  --header-button-color: radial-gradient(1465.72% 50% at 60.91% 50%, #FF603B 0%, #F83B28 100%);
+  --black-text-color: #000;
+  --white-text-color: #FFF;
+  --red-text-color: #F83B28;
+  --green-text-color: #45B272;
+  --bg-button-active-color: #FF603B;
+  --bg-button-color: #FFCABD;
+  --button-connect-wallet-color: #C5B4E3;
+  --button-connect-wallet-hover-color: linear-gradient(180deg, #9FE4C9 0%, #C5B4E3 100%);
+  --button-header-hover-color: linear-gradient(90deg, #FF603B 0%, #6A16FF 100%);
+  --button-connected-wallet-color: #9FE4C9;
+  --bg-overlay-color:rgba(217, 217, 217, 0.48);
+  --bg-overlay-black-color:rgba(0, 0, 0, 0.5);
+  --border-black-color:rgba(0, 0, 0, 0.3);
+  --shadow-popup-color:rgba(0, 0, 0, 0.25);
+  --bg-pool-color:rgba(255, 255, 255, 0.50);
+  --bg-switch-range-color: #EBEBEB;
+  --bg-fixed-color: #FCCDC2;
+  --bg-chart-color:#6A16FF
+}
+
+/* Dark Theme */
+.dark-theme {
+  --primary-color: #28a745;
+  --secondary-color: #ffc107;
+  --background-color: #343a40;
+  --text-color: #fff;
+  --border-color: #6c757d;
+  --header-background-color: #343a40;
+  --footer-background-color: #f8f9fa;
+  --hero-background-color: #495057;
+}
+
+/* Áp dụng các biến CSS cho các component */
+
+/* Button */
+.button--primary {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.button--secondary {
+  background-color: var(--secondary-color);
+  color: #fff;
+}
+
+/* Card */
+.card {
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Form */
+.form__input,
+.form__textarea {
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Layout */
+.header {
+  background-color: var(--header-background-color);
+}
+
+.header .nav a {
+  color: var(--text-color);
+}
+
+.hero {
+  background-color: var(--hero-background-color);
+  color: var(--text-color);
+}
+
+.footer {
+  background-color: var(--footer-background-color);
+  color: var(--text-color);
+}
+
+/* ... áp dụng cho các component và layout khác ... */

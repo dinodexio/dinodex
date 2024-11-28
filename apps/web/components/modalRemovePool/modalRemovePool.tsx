@@ -10,7 +10,7 @@ export interface ModalRemovePoolProps {
   tokenParams?: any;
   valuePer?: any;
   loading?: boolean;
-  onCloseRemovePool?: () => void;
+  onCloseRemovePool?: (value?: boolean) => void;
 }
 
 export function ModalRemovePool({
@@ -59,20 +59,20 @@ export function ModalRemovePool({
     }
   };
 
-  const handleCloseRmovePool = () => {
-    onCloseRemovePool && onCloseRemovePool();
+  const handleCloseRmovePool = (isClear?: boolean) => {
+    onCloseRemovePool && onCloseRemovePool(isClear);
   };
 
-  let dataPool = {
-    tokenPool: {
-      first: {
-        value: tokenParams?.tokenA?.value,
-      },
-      second: {
-        value: tokenParams?.tokenB?.value,
-      },
-    },
-  };
+  // let dataPool = {
+  //   tokenPool: {
+  //     first: {
+  //       value: tokenParams?.tokenA?.value,
+  //     },
+  //     second: {
+  //       value: tokenParams?.tokenB?.value,
+  //     },
+  //   },
+  // };
 
   useEffect(() => {
     if (layoutModalRemovePool.waiting) {

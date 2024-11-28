@@ -8,7 +8,7 @@ import {
   useObserveTotalSupply,
 } from "@/lib/stores/balances";
 import { useWalletStore } from "@/lib/stores/wallet";
-import { findTokenByParams } from "@/tokens";
+import { findTokenByParams, tokens } from "@/tokens";
 import BigNumber from "bignumber.js";
 import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
@@ -27,6 +27,7 @@ import { precision, removeTrailingZeroes } from "@/components/ui/balance";
 import { Form } from "@/components/ui/form";
 import { UInt64 } from "o1js";
 import { EMPTY_DATA } from "@/constants";
+import { dataSubmitProps } from "@/types";
 
 export const initCheckForm = {
   isComfirmed: false,
@@ -35,6 +36,8 @@ export const initCheckForm = {
   isError: false,
   message: "",
 };
+
+const INIT_SLIPPAGE = 0.5;
 
 export default function Pool({ params }: { params?: any }) {
   const [loading, setLoading] = useState(false);
@@ -67,14 +70,24 @@ export default function Pool({ params }: { params?: any }) {
           invalid_type_error: "Invalid pair",
         })
         .min(1, { message: "Invalid pair" }),
-      tokenA_amount: z.string().min(1, { message: "Enter an amount" }),
+      tokenA_amount: z
+        .string()
+        .min(1, { message: "Enter an amount" })
+        .refine((value) => BigNumber(value).gt(0), {
+          message: "Amount must be greater than 0",
+        }),
       tokenB_token: z
         .string({
           required_error: "Invalid pair",
           invalid_type_error: "Invalid pair",
         })
         .min(1, { message: "Invalid pair" }),
-      tokenB_amount: z.string().min(1, { message: "Enter an amount" }),
+      tokenB_amount: z
+        .string()
+        .min(1, { message: "Enter an amount" })
+        .refine((value) => BigNumber(value).gt(0), {
+          message: "Amount must be greater than 0",
+        }),
       tokenLP_amount: z.any(),
       shareOfPool: z.any().optional(),
       isComfirmed: z.boolean().default(false),
@@ -82,6 +95,9 @@ export default function Pool({ params }: { params?: any }) {
       isWaiting: z.boolean().default(false),
       isError: z.boolean().default(false),
       messsage: z.string().optional(),
+      slippage: z.any().optional(),
+      slippage_custom: z.any().optional(),
+      transactionDeadline: z.any().optional(),
     })
     .refine((data) => data.tokenA_token !== data.tokenB_token, {
       message: "Tokens must be different",
@@ -114,6 +130,9 @@ export default function Pool({ params }: { params?: any }) {
     defaultValues: {
       shareOfPool: "0",
       tokenLP_amount: null,
+      slippage: INIT_SLIPPAGE,
+      slippage_custom: "",
+      transactionDeadline: 30,
     },
     reValidateMode: "onChange",
     mode: "onChange",
@@ -131,7 +150,6 @@ export default function Pool({ params }: { params?: any }) {
   const tokenBReserve = useObserveBalancePool(fields.tokenB_token, poolKey);
   const userTokenABalance = useBalance(fields.tokenA_token, wallet);
   const userTokenBBalance = useBalance(fields.tokenB_token, wallet);
-
   const userTokenLpBalance = useBalance(
     LPTokenId.fromTokenPair(tokenPair).toString(),
     wallet,
@@ -145,7 +163,7 @@ export default function Pool({ params }: { params?: any }) {
       shouldDirty: true,
     });
     form.trigger();
-  }, [tokenParams]);
+  }, [params, tokenParams]);
 
   useEffect(() => {
     if (!userTokenABalance || !userTokenBBalance) return;
@@ -187,12 +205,27 @@ export default function Pool({ params }: { params?: any }) {
       "calculated lp tokens",
       removePrecision(lpTokensToMint, precision),
     );
+    if (pool?.exists && tokenAReserve === "0" && tokenBReserve === "0") {
+      if (Number(fields.tokenA_token) > Number(fields.tokenB_token)) {
+        return form.setValue("tokenLP_amount", fields.tokenA_amount);
+      } else {
+        return form.setValue("tokenLP_amount", fields.tokenB_amount);
+      }
+    }
     form.setValue("tokenLP_amount", removePrecision(lpTokensToMint, precision));
-  }, [pool, tokenAReserve, fields.tokenA_token, lpTotalSupply]);
+  }, [
+    pool,
+    tokenAReserve,
+    tokenBReserve,
+    fields.tokenA_token,
+    fields.tokenB_token,
+    lpTotalSupply,
+  ]);
 
   // calculate amount B
   useEffect(() => {
-    if (fields.tokenA_amount === "") {
+    if (pool?.exists && tokenAReserve === "0" && tokenBReserve === "0") return;
+    if (fields.tokenA_amount === "" || BigNumber(fields.tokenA_amount).lte(0)) {
       form.setValue("tokenB_amount", "");
       return;
     }
@@ -207,17 +240,63 @@ export default function Pool({ params }: { params?: any }) {
     }
   }, [fields.tokenA_amount, pool, lpTotalSupply, spotPrice]);
 
+  function calculateAmountWithSlippage(
+    amount: number | string,
+    slippage: number | string,
+    customSlippage?: number | string,
+  ): number | null | string {
+    // Ensure inputs are converted to numbers
+    const parsedAmount = Number(amount);
+    const parsedSlippage = Number(customSlippage) || Number(slippage) || 0; // Default slippage is 0.5%
+
+    // Validate parsed values
+    if (isNaN(parsedAmount) || parsedAmount < 0) {
+      console.error("Invalid amount. Amount must be a positive number.");
+      return null;
+    }
+    // Calculate adjusted amount
+    const adjustedAmount = (parsedAmount * (100 - parsedSlippage)) / 100;
+
+    return adjustedAmount.toFixed(precision).toString();
+  }
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     form.setValue("isWaiting", true);
     form.setValue("isComfirmed", false);
+    // Slippage adjustment for amountB
+    // const adjustedAmountB = calculateAmountWithSlippage(
+    //   values.tokenB_amount,
+    //   values.slippage,
+    //   values.slippage_custom,
+    // )?.toString();
+    const data: dataSubmitProps = {
+      logoA: tokens[values.tokenA_token]?.logo,
+      logoB: tokens[values.tokenB_token]?.logo,
+      tickerA: tokens[values.tokenA_token]?.ticker,
+      tickerB: tokens[values.tokenB_token]?.ticker,
+      amountA: values.tokenA_amount,
+      amountB: values.tokenB_amount,
+    };
     try {
       if (pool?.exists) {
         await addLiquidity(
           values.tokenA_token,
           values.tokenB_token,
           addPrecision(values.tokenA_amount, precision),
-          addPrecision(values.tokenB_amount, precision),
+          addPrecision(
+            BigNumber(values.tokenB_amount)
+              .multipliedBy(
+                BigNumber(1).plus(
+                  BigNumber(
+                    values.slippage_custom || values.slippage,
+                  ).dividedBy(100),
+                ),
+              )
+              .toString(),
+            precision,
+          ),
+          data,
         );
       } else {
         await createPool(
@@ -225,6 +304,7 @@ export default function Pool({ params }: { params?: any }) {
           values.tokenB_token,
           addPrecision(values.tokenA_amount, precision),
           addPrecision(values.tokenB_amount, precision),
+          data,
         );
       }
       form.setValue("isSuccess", true);
@@ -272,7 +352,9 @@ export default function Pool({ params }: { params?: any }) {
     if (
       (pool && pool?.exists && lpTotalSupplyValue.isNaN()) ||
       fields.tokenA_amount === "" ||
-      fields.tokenB_amount === ""
+      fields.tokenB_amount === "" ||
+      BigNumber(fields.tokenA_amount).lte(0) ||
+      BigNumber(fields.tokenB_amount).lte(0)
     ) {
       form.setValue("shareOfPool", "0");
       return;
@@ -336,7 +418,9 @@ export default function Pool({ params }: { params?: any }) {
             tokenParams={tokenParams}
             balances={ownBalances}
             handleMax={handleMax}
-            poolExists={pool?.exists ?? true}
+            poolExists={
+              pool?.exists && tokenAReserve !== "0" && tokenBReserve !== "0"
+            }
             loading={loading}
             tokenA_One_amount={tokenA_One_amount.toNumber() || 0}
             tokenB_One_amount={tokenB_One_amount.toNumber() || 0}

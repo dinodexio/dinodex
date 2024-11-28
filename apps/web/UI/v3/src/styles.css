@@ -1,0 +1,44 @@
+/* import fonts */
+@import url('https://fonts.cdnfonts.com/css/sf-pro-display');
+
+/* Import Base CSS */
+@import "./css/base.css";
+
+/* Import Components CSS */
+@import "./css/components/button.css";
+@import "./css/components/card.css";
+@import "./css/components/input.css";
+
+/* Import Layout CSS */
+@import "./css/layout.css";
+
+/* Import Theme CSS */
+@import "./css/theme.css";
+
+/* import style home */
+
+@import "./css/home.css";
+@import "./css/homeB.css";
+
+/* import style pool */
+
+@import "./css/pool.css";
+@import "./css/poolJoin.css";
+
+/* import style swap */
+
+@import "./css/swap.css";
+/* import style token */
+
+@import "./css/token.css";
+@import "./css/table.css";
+@import "./css/tokenLayout.css";
+@import "./css/viewPool.css";
+/* import style modal select token */
+
+@import "./css/modalSelectToken.css";
+@import "./css/modalPreviewPool.css";
+
+/* import css responsive */
+
+@import "./css/responsive.css"

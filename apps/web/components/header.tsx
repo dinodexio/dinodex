@@ -1,3 +1,4 @@
+'use client';
 import Link from "next/link";
 import "./style.css";
 import Image from "next/image";
@@ -82,7 +83,7 @@ export default function Header({ type }: { type?: string }) {
     setShowMenuMobile(false);
   });
 
-  let path = window.location.pathname.slice(1);
+  let path = window && window?.location?.pathname.slice(1);
 
   return (
     <>
@@ -94,28 +95,27 @@ export default function Header({ type }: { type?: string }) {
             {dataHeader.map((item, index) => {
               return (
                 <Link
-                  href={item.path}
+                  href={item?.path}
                   key={index}
-                  className={`${stylesButton["button-header"]} ${
-                    item.value !== "tokens"
-                      ? item.value === "pool" &&
+                  className={`${stylesButton["button-header"]} ${item?.value !== "tokens"
+                      ? item?.value === "pool" &&
                         (path === "pool" ||
                           path.includes("add") ||
                           path.includes("remove"))
                         ? stylesButton["button-header-active"]
-                        : path === item.value
+                        : path === item?.value
                           ? stylesButton["button-header-active"]
                           : ""
                       : path === "pools" ||
-                          path === "tokens" ||
-                          path === "transactions" ||
-                          path.includes("info")
+                        path === "tokens" ||
+                        path === "transactions" ||
+                        path.includes("info")
                         ? stylesButton["button-header-active"]
                         : ""
-                  }`}
+                    }`}
                   prefetch={true}
                 >
-                  <span>{item.label}</span>
+                  <span>{item?.label}</span>
                 </Link>
               );
             })}
@@ -135,9 +135,8 @@ export default function Header({ type }: { type?: string }) {
               className="ml-[10px]"
             />
             <div
-              className={`${stylesHeader["popup-menu-mobile"]} ${
-                showMenuMobile ? stylesHeader["popup-menu-mobile-show"] : ""
-              }`}
+              className={`${stylesHeader["popup-menu-mobile"]} ${showMenuMobile ? stylesHeader["popup-menu-mobile-show"] : ""
+                }`}
               ref={refMenuMobile}
             >
               <div className={stylesHeader["popup-menu-content"]}>
@@ -146,11 +145,22 @@ export default function Header({ type }: { type?: string }) {
                     <Link
                       href={item.path}
                       key={index}
-                      className={` ${stylesHeader["menu-item"]} ${
-                        path.includes(item.value)
-                          ? stylesHeader["menu-item-active"]
-                          : ""
-                      }`}
+                      className={` ${stylesHeader["menu-item"]} ${item.value !== "tokens"
+                          ? item.value === "pool" &&
+                            (path === "pool" ||
+                              path.includes("add") ||
+                              path.includes("remove"))
+                            ? stylesHeader["menu-item-active"]
+                            : path === item.value
+                              ? stylesHeader["menu-item-active"]
+                              : ""
+                          : path === "pools" ||
+                            path === "tokens" ||
+                            path === "transactions" ||
+                            path.includes("info")
+                            ? stylesHeader["menu-item-active"]
+                            : ""
+                        }`}
                       prefetch={true}
                     >
                       <span>{item.label}</span>
@@ -192,7 +202,14 @@ export default function Header({ type }: { type?: string }) {
               !wallet ? await connectWallet() : setIsWalletOpen(true)
             }
           >
-            <span>{wallet ? truncateAddress(wallet) : "Connect wallet"}</span>
+            {wallet ? (
+              <div className="flex items-center gap-[8px]">
+                <Image src="/icon/wallet-icon.svg" width={29} height={29} alt='' />
+                <span className="text-[18px] font-[500] text-textBlack">{truncateAddress(wallet)}</span>
+              </div>
+            ) : (
+              <span>Connect wallet</span>
+            )}
           </div>
         </div>
       </div>

@@ -15,7 +15,7 @@ export interface modalSupplyComfirmProps {
   valuePer?: any;
   loading?: boolean;
   onClickAddPool?: any;
-  onClosePool?: () => void;
+  onClosePool?: (value?: boolean) => void;
   poolExists?: boolean;
   shareOfPool?: JSX.Element;
   lpAmount?: JSX.Element;
@@ -83,8 +83,8 @@ export function ModalSupplyComfirm({
     }
   };
 
-  const handleClosePool = () => {
-    onClosePool && onClosePool();
+  const handleClosePool = (isClear?: boolean) => {
+    onClosePool && onClosePool(isClear);
   };
 
   useEffect(() => {
@@ -109,7 +109,7 @@ export function ModalSupplyComfirm({
               You will revieve
             </span>
             <DialogClose
-              className="absolute right-[-6px] top-[-10px]"
+              className="absolute right-0 top-0"
               onClick={() => handleClosePool()}
             >
               <svg

@@ -28,7 +28,8 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
   const router = useRouter();
   const [activeItems, setActiveItems] = useState<any>([]);
   const [valueTicker, setValueTicker] = useState<any>(null);
-  const { setLoadBalances } = useBalancesStore();
+  // const { setLoadBalances } = useBalancesStore();
+
 
   const toggleActiveItem = (item: any) => {
     if (activeItems.includes(item?.id)) {
@@ -43,10 +44,9 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
     });
   };
 
-  const handleActionPool = (type: string) => {
-    if (!valueTicker?.first || !valueTicker?.second) {
-      router.push(`/${type}`);
-      return;
+  const handleActionPool = (type: string, isPooled: boolean = false) => {
+    if (!valueTicker?.first || !valueTicker?.second || isPooled) {
+      return router.push(`/${type}`);
     }
     router.push(`/${type}/${valueTicker?.first}/${valueTicker?.second}`);
   };
@@ -108,19 +108,22 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
   let dataPool: PoolBalance[] =
     poolBalances && poolBalances.length > 0
       ? poolBalances
-        .filter((el: PoolBalance | null) => el !== null)
-        ?.map((el: PoolBalance | null, index: number) => ({
-          ...el,
-          id: index + 1,
-        }))
+          .filter((el: PoolBalance | null) => el !== null)
+          ?.map((el: PoolBalance | null, index: number) => ({
+            ...el,
+            id: index + 1,
+          }))
       : [];
 
   return (
     <>
       <Card className="border-transparent bg-transparent shadow-none">
         <Card
-          className="relative h-max w-full rounded-[12px] bg-transparent border-none px-[18px] pb-5 pt-[18px] sm:h-max lg:h-[139px] xl:h-[139px] shadow-content"
-          style={{ marginBottom: 25, boxShadow: '0px 2px 4px 0px rgba(0, 0, 0, 0.25)' }}
+          className="relative h-max w-full rounded-[12px] border-none bg-transparent px-[18px] pb-5 pt-[18px] shadow-content sm:h-max lg:h-[139px] xl:h-[139px]"
+          style={{
+            marginBottom: 25,
+            boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.25)",
+          }}
         >
           <Image
             src={"/images/pool/bg-pool.svg"}
@@ -155,7 +158,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
           </div>
         </Card>
         <div
-          className="mt-[-10px] flex flex-col items-center justify-between gap-[10px] sm:mt-[-10px] sm:flex-col sm:gap-[10px] lg:mt-0 lg:flex-row lg:gap-0 xl:mt-0 xl:flex-row xl:gap-0"
+          className="flex flex-col items-center justify-between gap-[10px] sm:mt-[-10px] sm:flex-col sm:gap-[10px] lg:mt-0 lg:flex-row lg:gap-0 xl:mt-0 xl:flex-row xl:gap-0"
           style={{ marginBottom: 12 }}
         >
           <span className="text-[24px] font-[600] text-textBlack">
@@ -163,8 +166,8 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
           </span>
           <div className="flex items-center gap-2">
             <div
-              className={`flex items-center justify-center rounded-[12px] hover:bg-[#EBEBEB] ${stylesButton["btn-pool"]}`}
-              onClick={() => handleActionPool("add")}
+              className={`flex items-center justify-center rounded-[12px] ${stylesButton["btn-pool"]}`}
+              onClick={() => handleActionPool("add", true)}
             >
               <span>Create a Pair</span>
             </div>
@@ -176,7 +179,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
             </div> */}
             <div
               className={`flex items-center justify-center rounded-[12px] ${stylesButton["button-swap"]} ${stylesButton["btn-pool-active"]}`}
-              onClick={() => handleActionPool("add")}
+              onClick={() => handleActionPool("add", true)}
             >
               <span>Add liquidity</span>
             </div>
@@ -187,7 +190,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
             <Loader w={6} h={6} />
           </div>
         ) : dataPool?.length === 0 ? (
-          <div className="flex items-center justify-center rounded-[12px] border-none pb-[12px] pt-[12px] text-[16px] font-[400] text-textBlack sm:pb-[12px] sm:pt-[12px] sm:text-[16px] lg:pb-[15px] lg:pt-[15px] lg:text-[20px] xl:pb-[15px] xl:pt-[15px] xl:text-[20px] shadow-content">
+          <div className="flex items-center justify-center rounded-[12px] border-none pb-[12px] pt-[12px] text-[16px] font-[400] text-textBlack shadow-content sm:pb-[12px] sm:pt-[12px] sm:text-[16px] lg:pb-[15px] lg:pt-[15px] lg:text-[20px] xl:pb-[15px] xl:pt-[15px] xl:text-[20px]">
             No liquidity found
           </div>
         ) : (
@@ -230,7 +233,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                   <CardHeader
                     className="flex w-full flex-row items-center justify-between p-0"
                     onClick={() => {
-                      setLoadBalances(isActive ? false : true);
+                      // setLoadBalances(isActive ? false : true);
                       toggleActiveItem(item);
                     }}
                   >
@@ -340,10 +343,10 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                           Accrued fees
                         </span>
                         <span className={styles["info-content-value"]}>
-                          {"< 0.1%"}
+                          {"<0.1%"}
                         </span>
                       </div>
-                      <div className="mt-[2px] flex items-center justify-center">
+                      {/* <div className="mt-[2px] flex items-center justify-center">
                         <span className={styles["text-or"]}>
                           View accrued fees and analytics
                           <Image
@@ -353,12 +356,12 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                             alt="arrow icon"
                           />
                         </span>
-                      </div>
+                      </div> */}
                     </div>
                     <div className={styles["content-item-button"]}>
                       {/* <div
-                        className="button-swap btn-pool-info"
-                        onClick={() => handleActionPool("migrate")}
+                        className={`${stylesButton["button-swap"]} ${stylesButton["btn-pool-info"]}`}
+                        onClick={() => handleActionPool("add")}
                       >
                         <span>Migrate</span>
                       </div> */}

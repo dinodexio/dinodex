@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+      ,
+      user-scalable="no"
+      ,
+      maximum-scale="1"
+    />
+    <title>Dino Game</title>
+    <style>
+      @font-face {
+        font-family: 'PPMondwest';
+        src: url('fonts/PPMondwest-Regular.otf') format('opentype');
+      }
+
+      * {
+        padding: 0px;
+        margin: 0px;
+        font-family: 'PPMondwest';
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        height: 100vh;
+        user-select: none;
+        touch-action: none;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        outline: none;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+        background-image: url('images/bg-web.png');
+        /* Thay bằng đường dẫn ảnh của bạn */
+        background-size: cover;
+        /* Điều chỉnh kích thước ảnh cho phù hợp */
+        background-repeat: no-repeat;
+        /* Không lặp lại ảnh */
+        overflow: hidden;
+      }
+
+      /* canvas {
+        border: 0.1px solid grey;
+      } */
+
+      a {
+        color: rgb(161, 157, 157);
+      }
+
+      .links {
+        margin-bottom: 20px;
+        font-weight: normal;
+        font-size: 1.2em;
+      }
+
+      .separator {
+        color: grey;
+      }
+
+      .loading-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100%;
+      }
+
+      .loading {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+      }
+
+      /* Firefox */
+      @-moz-keyframes spin {
+        0% {
+          -moz-transform: rotate(0deg);
+        }
+        100% {
+          -moz-transform: rotate(360deg);
+        }
+      }
+
+      /* Safari */
+      @-webkit-keyframes spin {
+        0% {
+          -webkit-transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+        }
+      }
+
+      /* Standard syntax */
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      #canvas-game {
+        display: none; /* Ẩn canvas lúc đầu */
+      }
+    </style>
+     <script type="text/javascript">
+      // Chờ 3 giây rồi mới hiển thị canvas
+      setTimeout(function () {
+        document.getElementById('loading-container').style.display = 'none';
+        document.getElementById('canvas-game').style.display = 'block';
+      }, 500);
+    </script>
+    <script src="index.js" defer type="module"></script>
+  </head>
+
+  <body>
+    <div class="loading-container" id="loading-container">
+      <div class="loading" id="loading"></div>
+    </div>
+    <div id="canvas-game">
+      <canvas id="game"></canvas>
+    </div>
+
+  </body>
+</html>

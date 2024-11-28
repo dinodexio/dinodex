@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:image" content="assets/images/logo.png" />
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
+    <title>DinoDEX</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/ChartPool.js"></script>
+    <script src="js/dataDummyToken.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/listRenderModal.js"></script>
+    <script src="js/Modal.js"></script>
+    <script src="js/Pool.js"></script>
+    <script src="js/renderDataToken.js"></script>
+    <script src="js/renderListDataPool.js"></script>
+    <script src="js/renderModalPreviewPool.js"></script>
+    <script src="js/renderTable.js"></script>
+    <script src="js/Swap.js"></script>
+    <script src="js/token.js"></script>
+    <script src="js/tokenLayout.js"></script>
+</head>
+
+<body>
+    <div class="bg-body">
+        <img src='./assets/images/home/bg-web.png' />
+    </div>
+    <div class="header-pool-container">
+        <div class="header-content">
+            <a href="index.html" class="button-header"><span>Home</span></a>
+            <a href="swap.html" class="button-header"><span>Trade</span></a>
+            <a href="pool.html" class="button-header"><span>Pool</span></a>
+            <a class="button-header button-header-active"><span>Token</span></a>
+        </div>
+        <div class="header-menu-mobile">
+            <div class="menu button-menu" onclick="togglePopupMenu()"><span></span></div>
+            <img src="assets/images/home/dex.svg" alt="dex" width="30" height="30" style="margin-left: 10px;" />
+
+            <div class="popup-menu-mobile">
+                <div class="popup-menu-content">
+                    <a href="index.html" class="menu-item"><span>Home</span></a>
+                    <a href="swap.html" class="menu-item"><span>Trade</span></a>
+                    <a href="pool.html" class="menu-item"><span>Pool</span></a>
+                    <a class="menu-item menu-item-active"><span>Token</span></a>
+                </div>
+                <div class="content-social-menu-mobile">
+                    <a href="https://twitter.com/dinodex" target="_blank"><img src="assets/images/social/git.svg"
+                            width="28" height="28"></a>
+                    <a href="https://t.me/dinodex" target="_blank"><img src="assets/images/social/x.svg" width="28"
+                            height="28"></a>
+                    <a href="https://discord.com/invite/9nXbJX5" target="_blank"><img
+                            src="assets/images/social/discord.svg" width="28" height="28"></a>
+                </div>
+            </div>
+        </div>
+        <div class="button-connect-wallet">
+            <span class="button-connected-wallet-text">Connect Wallet</span>
+        </div>
+    </div>
+    <div class="content-tokens-container">
+        <div class="container-chart">
+            <div style="position: relative;">
+                <div class="chart-content-text">
+                    <span class="chart-content-text-title">Minaswap TVL</span>
+                    <span class="chart-content-text-value" id="dou-area-value">$2.56B</span>
+                    <span class="chart-content-text-time" id="dou-area-time">Mar28, 2022, 7:00 AM</span>
+                </div>
+                <!-- <div class="char-container"></div> -->
+                <canvas width="548" height="325" id="chart-dou-area-pool"></canvas>
+                <div class="box-info-data-hover-chart" id="box-chart-dou-area">
+                    <div class="box-info-data-hover-chart-item">
+                        <span>V1</span>
+                        <div class="box-color-item"></div>
+                        <span id="value1"></span>
+                    </div>
+                    <div class="box-info-data-hover-chart-item">
+                        <span>V2</span>
+                        <div class="box-color-item"></div>
+                        <span id="value2"></span>
+                    </div>
+                </div>
+            </div>
+            <div style="position: relative;">
+                <div class="chart-content-text">
+                    <span class="chart-content-text-title">Minaswap TVL</span>
+                    <span class="chart-content-text-value" id="dou-bars-value">$2.56B</span>
+                    <span class="chart-content-text-time" id="dou-bars-time">Mar28, 2022, 7:00 AM</span>
+                </div>
+                <canvas width="548" height="325" id="chart-dou-bars-pool"></canvas>
+                <div class="box-info-data-hover-chart" id="box-chart-dou-bars">
+                    <div class="box-info-data-hover-chart-item">
+                        <span>V1</span>
+                        <div class="box-color-item"></div>
+                        <span id="value1-dou-bars"></span>
+                    </div>
+                    <div class="box-info-data-hover-chart-item">
+                        <span>V2</span>
+                        <div class="box-color-item"></div>
+                        <span id="value2-dou-bars"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-mobile-chart">
+            <div class="info-mobile-chart-item">
+                <span class="info-mobile-chart-item-title">DinoDEX TVL</span>
+                <span class="info-mobile-chart-item-value">$3.22B</span>
+            </div>
+            <div class="info-mobile-chart-item">
+                <span class="info-mobile-chart-item-title">DinoDEX TVL</span>
+                <span class="info-mobile-chart-item-value">$3.22B</span>
+                <span class="info-mobile-chart-item-desc">Past month</span>
+            </div>
+        </div>
+        <div class="token-content-menu">
+            <div class="menu-token">
+                <span class="menu-token-item menu-token-item-active" data-token="token">Tokens</span>
+                <span class="menu-token-item" data-token="pool">Pools</span>
+                <span class="menu-token-item" data-token="transaction">Transactions</span>
+            </div>
+            <div class="content-menu-right">
+                <div class="network-content">
+                    <img src="assets/images/icon/network-icon.svg" alt="network">
+                    <img src="assets/images/icon/drop-down-icon.svg" alt="network">
+                    <div class="network-content-menu">
+                        <!-- <div class="network-content-menu-header">
+                            <img src="assets/images/icon/network-icon.svg" alt="network">
+                            <span class="network-content-menu-header-text">All networks</span>
+                        </div> -->
+                        <div class="network-content-menu-item" data-network="ethereum">
+                            <img src="assets/images/token/eth-logo.svg" alt="network">
+                            <span class="network-content-menu-item-text">Ethereum</span>
+                        </div>
+                        <div class="network-content-menu-item" data-network="optimism">
+                            <img src="assets/images/token/op-token.svg" alt="network">
+                            <span class="network-content-menu-item-text">Optimism</span>
+                        </div>
+                        <div class="network-content-menu-item" data-network="polygon">
+                            <img src="assets/images/token/polygon-token.svg" alt="network">
+                            <span class="network-content-menu-item-text">Polygon</span>
+                        </div>
+                        <div class="network-content-menu-item" data-network="zksync">
+                            <img src="assets/images/token/zksync-token.svg" alt="network">
+                            <span class="network-content-menu-item-text">Zksync</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="network-content volumn-menu-container">
+                    <span class="volumn-value">1D volume</span>
+                    <img src="assets/images/icon/drop-down-icon.svg" alt="network">
+                    <div class="volume-menu">
+                        <div class="volume-menu-item" data-volume="1H">
+                            <span class="network-content-menu-item-text">1H volume</span>
+                            <img src="assets/images/icon/tick-icon.svg" class="img-active-volume" alt="network">
+                        </div>
+                        <div class="volume-menu-item network-content-menu-item-active" data-volume="1D">
+                            <span class="network-content-menu-item-text">1D volume</span>
+                            <img src="assets/images/icon/tick-icon.svg" class="img-active-volume" alt="network">
+                        </div>
+                        <div class="volume-menu-item" data-volume="1W">
+                            <span class="network-content-menu-item-text">1W volume</span>
+                            <img src="assets/images/icon/tick-icon.svg" class="img-active-volume" alt="network">
+                        </div>
+                        <div class="volume-menu-item" data-volume="1M">
+                            <span class="network-content-menu-item-text">1M volume</span>
+                            <img src="assets/images/icon/tick-icon.svg" class="img-active-volume" alt="network">
+                        </div>
+                        <div class="volume-menu-item" data-volume="1Y">
+                            <span class="network-content-menu-item-text">1Y volume</span>
+                            <img src="assets/images/icon/tick-icon.svg" class="img-active-volume" alt="network">
+                        </div>
+                    </div>
+                </div>
+                <div class="search-token-container">
+                    <img src="assets/images/icon/btn-search.svg" alt="search">
+                    <input type="text" class="input-search-token" placeholder="Search Token">
+                </div>
+            </div>
+        </div>
+        <div class="table-container" id="tableWrapper">
+            <table id="dataTable" class="container-table">
+                <thead class="table-head">
+                    <tr class="table-head-row"></tr>
+                </thead>
+                <tbody class="table-body"></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="btn-fixed btn-return-to-top" onclick="returnToTop()">
+        <div class="btn-return-to-top-content">
+            <img src="assets/images/icon/return-to-top-icon.svg" alt="return-to-top">
+            <span> Return to top</span>
+        </div>
+    </div>
+    <div class="footer-container">
+        <img src="assets/images/home/dex.svg" alt="dex" width="84" height="84">
+    </div>
+    <script>
+        const element = document.querySelector('body');
+        const svgPath = 'assets/images/home/logo_icon_28x28.svg';
+        const cursorUrl = `url(${svgPath}), auto`;
+        element.style.cursor = cursorUrl;
+    </script>
+</body>
+
+</html>

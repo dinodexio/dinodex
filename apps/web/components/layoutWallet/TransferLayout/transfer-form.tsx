@@ -2,7 +2,7 @@ import { useFormContext } from "react-hook-form";
 import Image from "next/image";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, formatBigNumber, formatPriceUSD } from "@/lib/utils";
 import { USDBalance } from "@/components/ui/usd-balance";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { useBalance } from "@/lib/stores/balances";
@@ -10,6 +10,7 @@ import BigNumber from "bignumber.js";
 import { precision } from "@/components/ui/balance";
 import { amout, PRICE_MINA } from "@/constants";
 import { TokenSelector } from "@/components/ui/token-selector";
+import { tokens } from "@/tokens";
 
 export interface TransferFormProps {
   onClose?: () => void;
@@ -56,7 +57,7 @@ export function TransferForm({
                   disabled={disabled}
                   placeholder={"B62.."}
                   className={cn([
-                    "h-auto w-full text-textBlack border-0 bg-bgWhiteColor p-0  text-[14.8px] font-[400] focus-visible:ring-0 focus-visible:ring-offset-0",
+                    "h-auto w-full border-0 bg-bgWhiteColor p-0 text-[14.8px]  font-[400] text-textBlack focus-visible:ring-0 focus-visible:ring-offset-0",
                   ])}
                 />
 
@@ -68,27 +69,56 @@ export function TransferForm({
           </div>
           <div className="flex items-center justify-between rounded-[8px] p-2 shadow-content">
             <div className="flex items-center justify-between">
-              <div className="flex flex-col gap-[4px] items-start">
+              <div className="flex flex-col items-start gap-[4px]">
                 <span className="text-[12px] font-[400] text-textBlack opacity-60">
                   Amount
                 </span>
                 <div className="flex flex-row items-center justify-center">
                   <Input
-                    {...form.register("amountValue")}
+                    {...form.register("amountValue", {
+                      onChange: (e) => {
+                        setAmoutPercent(null);
+                        let value = e.target.value;
+
+                        // Step 1: Remove invalid characters (e/E)
+                        value = value.replace(/[eE]/g, "");
+
+                        // Step 2: Replace ',' with '.' for decimal formatting
+                        value = value.replace(/,/g, ".");
+
+                        // Step 3: Remove all invalid characters except digits and '.'
+                        value = value.replace(/[^0-9.]/g, "");
+
+                        // Step 4: Ensure only one '.'
+                        const parts = value.split(".");
+                        if (parts.length > 2) {
+                          value = parts[0] + "." + parts[1]; // Keep the first two parts
+                        }
+
+                        // Step 5: Add '0' before '.' if it starts with '.'
+                        if (value.startsWith(".")) {
+                          value = `0${value}`;
+                        }
+
+                        // Step 6: Update the form value
+                        form.setValue("amountValue", value);
+                      },
+                    })}
                     placeholder="0"
                     className={cn([
                       "h-auto border-0 bg-bgWhiteColor p-0 text-[16.774px] font-[400] text-textBlack outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
                     ])}
-                    onChange={(e) => {
-                      setAmoutPercent(null);
-                      form.setValue("amountValue", e.target.value);
-                      form.trigger("amountValue");
-                    }}
+                    type="text"
+                    maxLength={30} // Enforces maximum input length at the browser level
+                    inputMode="decimal" // Suggests a numeric keyboard on mobile devices
                   />
                 </div>
-                <span className="text-[9.202px] font-[500] italic text-textBlack opacity-50 mt-[-4px]">
+                <span className="mt-[-4px] text-[9.202px] font-[500] italic text-textBlack opacity-50">
                   <USDBalance
-                    balance={(parseFloat(fields.amountValue || 0) * PRICE_MINA)?.toFixed(2)}
+                    balance={formatPriceUSD(
+                      fields.amountValue,
+                      tokens[fields.amount_token]?.ticker ?? "",
+                    )}
                     type="USD"
                   />
                 </span>
@@ -100,7 +130,7 @@ export function TransferForm({
             {amout?.map((item: any, index) => {
               return (
                 <div
-                  className={`flex w-[39px] cursor-pointer items-center justify-center rounded-[4.553px] px-[9.53px] py-[2.73px] transition-all shadow-content duration-300 ease-in-out ${amountPercent === item.value ? "bg-textBlack hover:bg-textBlack" : "bg-white hover:bg-[#EBEBEB]"}`}
+                  className={`flex w-[39px] cursor-pointer items-center justify-center rounded-[4.553px] px-[9.53px] py-[2.73px] shadow-content transition-all duration-300 ease-in-out ${amountPercent === item.value ? "bg-textBlack hover:bg-textBlack" : "bg-white hover:bg-[#EBEBEB]"}`}
                   key={index}
                   onClick={() => {
                     if (fields?.amount_token) {
@@ -133,7 +163,7 @@ export function TransferForm({
           </div>
         </div>
         <div
-          className="mt-[6px] flex cursor-pointer items-center justify-center rounded-[8px] shadow-content bg-white px-4 py-2 transition-all duration-300 ease-in-out hover:bg-[#EBEBEB]"
+          className="mt-[6px] flex cursor-pointer items-center justify-center rounded-[8px] bg-white px-4 py-2 shadow-content transition-all duration-300 ease-in-out hover:bg-[#EBEBEB]"
           onClick={() => {
             if (!error) {
               handleChangeStatusLayout?.({

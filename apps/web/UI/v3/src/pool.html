@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DinoDEX</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="js/chart.js"></script>
+  <script src="js/ChartPool.js"></script>
+  <script src="js/dataDummyToken.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/listRenderModal.js"></script>
+  <script src="js/Modal.js"></script>
+  <script src="js/Pool.js"></script>
+  <script src="js/renderDataToken.js"></script>
+  <script src="js/renderListDataPool.js"></script>
+  <script src="js/renderModalPreviewPool.js"></script>
+  <script src="js/renderTable.js"></script>
+  <script src="js/Swap.js"></script>
+  <script src="js/token.js"></script>
+  <script src="js/tokenLayout.js"></script>
+  <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
+  <link rel="icon" href="assets/images/logo.png" type="image/png">
+</head>
+
+<body>
+  <div class="bg-body">
+    <img src='./assets/images/home/bg-web.png' />
+  </div>
+  <div class="header-pool-container">
+    <div class="header-content">
+      <a href="index.html" class="button-header"><span>Home</span></a>
+      <a href="swap.html" class="button-header"><span>Trade</span></a>
+      <a class="button-header  button-header-active"><span>Pool</span></a>
+      <a href="token.html" class="button-header"><span>Token</span></a>
+    </div>
+    <div class="header-menu-mobile">
+      <div class="menu button-menu" onclick="togglePopupMenu()"><span></span></div>
+      <img src="assets/images/home/dex.svg" alt="dex" width="30" height="30" style="margin-left: 10px;" />
+
+      <div class="popup-menu-mobile">
+        <div class="popup-menu-content">
+          <a href="index.html" class="menu-item"><span>Home</span></a>
+          <a href="swap.html" class="menu-item"><span>Trade</span></a>
+          <a class="menu-item menu-item-active"><span>Pool</span></a>
+          <a href="token.html" class="menu-item"><span>Token</span></a>
+          <div class="content-social-menu-mobile">
+            <a href="https://twitter.com/dinodex" target="_blank"><img src="assets/images/social/git.svg" width="28"
+                height="28"></a>
+            <a href="https://t.me/dinodex" target="_blank"><img src="assets/images/social/x.svg" width="28"
+                height="28"></a>
+            <a href="https://discord.com/invite/9nXbJX5" target="_blank"><img src="assets/images/social/discord.svg"
+                width="28" height="28"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="button-connect-wallet">
+      <span class="button-connected-wallet-text">Connect Wallet</span>
+    </div>
+  </div>
+  <div class="pool-default-content">
+    <div class="content-pool-container">
+      <div class="header-pool-content">
+        <span class="swap-text">Pool</span>
+        <div style="position: relative;">
+          <div class="button-open-popup">
+            + New Position
+          </div>
+          <div class="popup-container">
+            <a href="poolJoin.html" class="popup-content-item" data-type="join">
+              Join Pool
+            </a>
+            <a href="poolCreate.html" class="popup-content-item" data-type="create">
+              Create Pool
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="content-active-info">
+        <span class="content-active-info-title" onclick="hideListDataPool()">Hide closed positions</span>
+        <div class="active-pool-container">
+          <div class="active-pool-info"></div>
+        </div>
+        <div class="content-active-info-btn">
+          <div class="content-active-info-btn-item">
+            <span class="content-active-info-btn-item-head">Learn More ></span>
+            <span class="content-active-info-btn-item-desc">Check out our MINA LP walkthrough and
+              documentations.</span>
+          </div>
+          <div class="content-active-info-btn-item">
+            <span class="content-active-info-btn-item-head">Top Pools ></span>
+            <span class="content-active-info-btn-item-desc">Explore MiDEX Analytics.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-container">
+    <img src="assets/images/home/dex.svg" alt="dex" width="84" height="84">
+  </div>
+  <script>
+    const element = document.querySelector('body');
+    const svgPath = 'assets/images/home/logo_icon_28x28.svg';
+    const cursorUrl = `url(${svgPath}), auto`;
+    element.style.cursor = cursorUrl;
+  </script>
+</body>
+
+</html>

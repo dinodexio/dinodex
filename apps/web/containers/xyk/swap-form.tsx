@@ -159,7 +159,7 @@ export function SwapForm() {
     let amountIn = fields.tokenIn_amount;
     let amountOut = "0";
 
-    console.log("fields.route", fields.route);
+    // console.log("fields.route", fields.route);
 
     fields.route.forEach((token, index) => {
       const tokenIn = token;

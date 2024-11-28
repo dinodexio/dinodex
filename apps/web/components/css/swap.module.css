@@ -8,25 +8,23 @@
 .swap-container {
     display: flex;
     flex-direction: column;
-    gap: 29px;
+    gap: 20px;
 }
 
 .swap-text {
     display: flex;
-    width: 91px;
-    height: 37px;
-    padding: 6px 21px;
+    padding: 6px 15px;
     justify-content: center;
     align-items: center;
     gap: var(--100625-rem, 10px);
     border-radius: 10px;
-    background: var(--white-text-color);
-    color: var(--black-text-color);
-    font-size: 20px;
+    background: #FFF;
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.25);
+    color: #000;
+    font-size: 16px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.25);
 }
 
 .swap-content {
@@ -36,15 +34,15 @@
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    gap: 43px;
+    gap: 20px;
 }
 
 .swap-content-item {
-    height: 210px;
+    height: 164px;
     width: 100%;
     border-radius: 12px;
     background: var(--white-text-color);
-    padding: 20px 18px 24px 21px;
+    padding: 18px 10px 12px 20px;
     position: relative;
     box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.25);
 }
@@ -60,25 +58,35 @@
     top: 50%;
     z-index: 10;
     transform: translate(50%, -50%);
+    border-radius: 999px;
     cursor: pointer;
+    background-color: var(--white-text-color);
+}
+
+.swap-button > img{
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.swap-button:hover > img, .swap-button > img:hover{
+    opacity: 0.7;
 }
 
 .swap-item-header {
     color: var(--black-text-color);
-    font-size: 20px;
+    font-size: 18px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
     opacity: 0.6;
-    padding-left: 4px;
 }
 
 .line-swap-item {
     width: 100%;
-    height: 2px;
+    height: 1px;
     background: var(--black-text-color);
     opacity: 0.6;
-    margin: 10px 0;
+    margin: 4px 0 8px 0;
 }
 
 .bg-overlay {
@@ -87,21 +95,19 @@
 
 .value-price {
     color: var(--black-text-color);
-    font-size: 20px;
+    font-size: 18px;
+    line-height: 21.48px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
     opacity: 0.6;
-    position: absolute;
-    bottom: 12%;
-    left: 5%;
 }
 
 .swap-item-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 8px 15px 0
+    padding: 6px 8px 0px 0px;
 }
 
 .swap-item-select {
@@ -115,9 +121,9 @@
     background: var(--white-text-color);
     cursor: pointer;
     color: var(--black-text-color);
-    font-size: 20px;
+    font-size: 18px;
     font-style: normal;
-    font-weight: 600;
+    font-weight: 500;
     line-height: normal;
     transition: all 0.3s ease;
     box-shadow: 0px 1px 4px 0px rgba(26, 26, 26, 0.30) inset;
@@ -127,26 +133,28 @@
     background-color: #EEEEEE;
 }
 
-.swap-item-select-have-token {
+.swap-item-select-have-token,
+.swap-item-select-have-token:hover {
     padding: 5.471px 11px 5.471px 10px;
     width: max-content;
-    background-color: var(--button-connected-wallet-color);
+    background-color: #9FE4C9;
 }
 
 .swap-item-footer {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content:space-between;
     color: var(--black-text-color);
     font-size: 20px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
     opacity: 0.6;
-    margin-top: -30px;
     padding-right: 8px;
     width: 100%;
     position: relative;
+    margin-bottom: 10px;
+    margin-top: 6px;
 }
 
 .slippage-container {
@@ -214,7 +222,7 @@
 .swap-container-form {
     display: flex;
     flex-direction: column;
-    gap: 50px;
+    gap: 25px;
     position: relative;
 }
 
@@ -227,8 +235,8 @@
 
 .swap-item-footer-text {
     color: var(--black-text-color);
-    opacity: 0.6;
-    font-size: 20px;
+    opacity: 0.8;
+    font-size: 18px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -236,7 +244,7 @@
 
 .popup-setting {
     display: flex;
-    width: 450px;
+    width: min(90vw, 450px);
     padding: var(--20125-rem, 20px) var(--100625-rem, 10px) 15px var(--20125-rem, 20px);
     flex-direction: column;
     align-items: center;
@@ -258,15 +266,30 @@
     visibility: visible;
 }
 
+.swap-header{
+    height: 42px;
+}
+
 /* swap token layout */
 .token-swap-container {
     margin: 0;
     gap: 22.2px;
-    width: min(100%, 426.429px);
+    width: min(100%, 400px);
+}
+
+.token-swap-container .popup-setting{
+    width: min(90vw, 400px);
+}
+
+.token-swap-container .popup-setting-title{
+    font-size: 24px;
+}
+.token-swap-container .popup-setting-label{
+    font-size: 20px;
 }
 
 .token-swap-content {
-    width: min(100%, 427px);
+    width: min(100%, 400px);
     height: 410.218px;
     gap: 20px;
 }
@@ -280,7 +303,8 @@
 }
 
 .token-swap-form .swap-item-footer {
-    margin-top: -10px;
+    margin-top: 10px;
+    margin-bottom: 0;
 }
 
 .token-swap-form .swap-content-item {
@@ -329,8 +353,6 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    bottom: 0;
-    left: 0;
 }
 
 .token-swap-form .swap-item-footer-text {
@@ -401,13 +423,14 @@
     border: 0;
     outline: none;
     color: var(--black-text-color);
-    font-size: 76.923px;
+    font-size: 64px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
     background-color: transparent;
-    height: 92px;
+    height: 58px;
     margin-right: 8px;
+    padding-left: 0;
 }
 
 .swap-item-input::placeholder {
@@ -425,7 +448,7 @@
     }
 
     .swap-content-item {
-        height: 170px;
+        height: max-content;
     }
 
     .slippage-container {
@@ -439,7 +462,7 @@
     }
 
     .swap-item-content {
-        padding: 6px 8px 9px 0;
+        padding: 6px 8px 0px 0;
     }
 
     .swap-item-input {
@@ -447,8 +470,8 @@
         font-size: 60px;
     }
 
-    .swap-item-footer {
-        margin-top: -14px;
+    .popup-setting {
+        gap: 20px;
     }
 }
 
@@ -458,17 +481,19 @@
         gap: 20px;
     }
 
-    .swap-container.token-swap-container{
-        margin: 0;
+    .swap-container.token-swap-container {
+        margin: auto;
+        width: min(100%, 400px);
     }
 
     .swap-content-item {
-        height: 160px;
+        height: max-content;
         padding-bottom: 12px;
     }
 
-    .value-price {
-        bottom: 13px;
+    .swap-item-input {
+        height: 57px;
+        font-size: 60px;
     }
 
     .swap-container-form {
@@ -504,7 +529,7 @@
     }
 
     .swap-content {
-        padding: 15px;
+        padding: 0;
         height: max-content;
         gap: 24px;
     }
@@ -552,15 +577,15 @@
         background: rgba(0, 0, 0, 0.60);
     }
 
-    .swap-item-content{
-        padding: 6px 0;
+    .swap-item-content {
+        padding: 6px 0 0 0;
     }
 
-    .popup-setting{
-        width: 350px;
+    .popup-setting {
+        width: max(90%, 350px);
     }
 
-    .swap-item-footer{
+    .swap-item-footer {
         margin-top: 0;
     }
 }

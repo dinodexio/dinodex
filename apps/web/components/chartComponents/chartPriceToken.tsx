@@ -2,10 +2,9 @@
 import React, { useEffect } from 'react';
 import { SingleAreaChart } from './chart';
 import { DATA_DUMMY_PRICE_TOKEN } from '@/constants';
+import { ChartDouBarProps } from '@/types';
 
-export interface ChartDouBarProps {
-  onHover?: (dataHover: any) => void
-}
+
 
 const ChartPriceToken = ({
   onHover

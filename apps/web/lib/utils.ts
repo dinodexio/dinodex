@@ -10,6 +10,7 @@ import {
 } from "@/constants";
 import BigNumber from "bignumber.js";
 import { type ClassValue, clsx } from "clsx";
+import moment from "moment";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -44,28 +45,47 @@ export function formatterInteger(number: number) {
   return parts.join(".");
 }
 
-export function formatNumber(
-  num: number | string,
-  isPrice: boolean = false,
-): string {
-  // Convert the input to a number if it's a string
+export function formatNumber(num: number | string): string {
+  const EMPTY_DATA = "--"; // Define EMPTY_DATA if not already defined
   const value = typeof num === "string" ? parseFloat(num) : num;
 
   if (isNaN(value)) {
     return EMPTY_DATA;
   }
 
-  if (value >= 1e9) {
-    return (value / 1e9).toFixed(2) + "B";
-  } else if (value >= 1e6) {
-    return (value / 1e6).toFixed(2) + "M";
-  } else if (value >= 1e3) {
-    return (value / 1e3).toFixed(2) + "K";
-  } else if (value > 0 && value < 1e-2) {
-    return "< 0.01";
-  } else {
-    return value.toFixed(2).toString();
+  const thresholds = [
+    { limit: 1e12, suffix: "T" },
+    { limit: 1e9, suffix: "B" },
+    { limit: 1e6, suffix: "M" },
+    { limit: 1e3, suffix: "K" },
+  ];
+
+  for (const { limit, suffix } of thresholds) {
+    if (value >= limit) {
+      return (value / limit).toFixed(2) + suffix;
+    }
   }
+
+  if (value > 0 && value < 0.01) {
+    return "<0.01";
+  }
+
+  return value.toFixed(2).toString();
+}
+
+export function formatBigNumber(value: BigNumber): string {
+  // Check if the BigNumber value is 0 or NaN
+  if (value.isZero() || value.isNaN()) {
+    return "0";
+  }
+
+  // Check if the value is less than 1 and greater than 0
+  if (value.isGreaterThan(0) && value.isLessThan(1)) {
+    return value.toFixed(5); // Apply toFixed(5) for small decimal values
+  }
+
+  // For values greater than or equal to 1, apply toFixed(5)
+  return value.toFixed(5);
 }
 
 export function formatPersion(num: number | string) {
@@ -78,6 +98,41 @@ export function formatPersion(num: number | string) {
 
   return value * 1e9 + "%";
 }
+
+export function formatFullValue(value: string): string {
+  if (!value.includes("e") && !value.includes("E")) {
+    return value;
+  }
+
+  let [base, exponent] = value.split(/[eE]/);
+  let exp = parseInt(exponent, 10);
+
+  if (exp < 0) {
+    value = "0." + "0".repeat(Math.abs(exp) - 1) + base.replace(".", "");
+  } else {
+    const [integerPart, decimalPart = ""] = base.split(".");
+    value = integerPart + decimalPart.padEnd(exp, "0");
+  }
+
+  return value;
+}
+
+export function validateValue(value: string | number | null | undefined): any {
+  if (
+    value === null ||
+    value === undefined ||
+    isNaN(Number(value)) ||
+    !isFinite(Number(value))
+  ) {
+    return 0;
+  }
+  return value;
+}
+
+export const capitalizeFirstLetter = (string: string) => {
+  if (!string) return EMPTY_DATA;
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
 
 export function truncateAddress(
   address: string | any[],
@@ -130,41 +185,27 @@ export const dataTokenDefault = {
   amount: 0,
 };
 
-export function formatPriceUSD(amount: number | string, ticket: string) {
-  switch (ticket) {
-    case "BTC":
-      return typeof amount === "number"
-        ? amount * TOKEN_PRICES.BTC
-        : parseFloat(amount) * TOKEN_PRICES.BTC;
-    case "ETH":
-      return typeof amount === "number"
-        ? amount * TOKEN_PRICES.ETH
-        : parseFloat(amount) * TOKEN_PRICES.ETH;
-    case "USDC":
-      return typeof amount === "number"
-        ? amount * TOKEN_PRICES.USDC
-        : parseFloat(amount) * TOKEN_PRICES.USDC;
-    case "USDT":
-      return typeof amount === "number"
-        ? amount * TOKEN_PRICES.USDT
-        : parseFloat(amount) * TOKEN_PRICES.USDT;
-    case "DAI":
-      return typeof amount === "number"
-        ? amount * TOKEN_PRICES.DAI
-        : parseFloat(amount) * TOKEN_PRICES.DAI;
-    case "MINA":
-      return typeof amount === "number"
-        ? amount * TOKEN_PRICES.MINA
-        : parseFloat(amount) * TOKEN_PRICES.MINA;
-    case "BNB":
-      return typeof amount === "number"
-        ? amount * TOKEN_PRICES.BNB
-        : parseFloat(amount) * TOKEN_PRICES.BNB;
-    default:
-      return typeof amount === "number" ? amount * 1 : parseFloat(amount) * 1;
-  }
-}
+export function formatPriceUSD(
+  amount: number | string,
+  ticker: string,
+): string {
+  // Convert the amount to a number
+  const parsedAmount = typeof amount === "number" ? amount : Number(amount);
 
+  // Ensure parsedAmount is a valid number
+  if (isNaN(parsedAmount) || !ticker) {
+    return "~";
+  }
+
+  // Fetch the token price; default to 1 if the ticker is unknown
+  const tokenPrice = TOKEN_PRICES[ticker] ?? 1;
+
+  // Calculate the price in USD
+  const priceInUSD = parsedAmount * tokenPrice;
+
+  // Format the price for large numbers
+  return formatNumber(priceInUSD);
+}
 export function truncateString(str: string = "", maxLength: number): string {
   if (str && str?.length > maxLength) {
     return str.slice(0, maxLength) + "...";
@@ -237,7 +278,7 @@ export function addPrecision(value: string, precision: number) {
 }
 
 export function removePrecision(
-  value: string,
+  value: string | number,
   precision: number,
   decimalPlaces: number = 5,
 ) {
@@ -245,3 +286,61 @@ export function removePrecision(
     ? new BigNumber(value).div(10 ** precision).toFixed(decimalPlaces)
     : new BigNumber(value).div(10 ** precision);
 }
+
+export function formatNumberWithPrice(
+  value: string | number,
+  isPrice: boolean = false,
+  precision: number = 0,
+) {
+  if (!value || value === Infinity || value === -Infinity) {
+    return isPrice ? `$0` : 0;
+  }
+  const numericValue = new BigNumber(value);
+  const priceResult = formatNumber(
+    removePrecision(numericValue.toNumber(), precision).toString(),
+  );
+
+  // Check if priceResult is less than 0.01
+  const threshold = new BigNumber(0.01);
+  const isLessThanThreshold = numericValue.isLessThan(threshold);
+
+  // Format output based on isPrice and threshold comparison
+  if (isLessThanThreshold) {
+    return isPrice ? "<$0.01" : "<0.01";
+  }
+
+  return isPrice ? `$${priceResult}` : priceResult;
+}
+
+export const formatTimeAgo = (
+  timestamp: string | number | Date | null | undefined,
+): string => {
+  if (!timestamp) return EMPTY_DATA; // Handle cases where timestamp is not provided
+
+  const timeAgo = moment(timestamp)
+    .startOf("minute")
+    .fromNow(true)
+    .replace(/\sminutes?/, "m")
+    .replace(/\shours?/, "h")
+    .replace(/\sdays?/, "d")
+    .replace(/\smonths?/, "mo")
+    .replace(/\syears?/, "y");
+
+  return /\d/.test(timeAgo) ? `${timeAgo} ago` : "24h ago";
+};
+
+export const generatePriceData = (basePrice: number) => {
+  const days = 30;
+  const today = new Date();
+
+  const priceData = Array.from({ length: days }, (_, i) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - (days - i - 1));
+    return {
+      date: date.toISOString(),
+      price: basePrice + (Math.random() - 1) * basePrice,
+    };
+  });
+
+  return priceData;
+};

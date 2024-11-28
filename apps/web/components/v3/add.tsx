@@ -3,12 +3,15 @@ import Header from "../header";
 import { Toaster } from "@/components/ui/toaster";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
-import stylesModal from '../css/modal.module.css'
+import stylesModal from "../css/modal.module.css";
 import { LIST_FEE_TIER } from "@/constants";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogOverlay,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ModalListToken } from "../modalListToken/modalListToken";
@@ -36,6 +39,7 @@ import {
 } from "@/containers/xyk/add-liquidity-form";
 import { precision, removeTrailingZeroes } from "../ui/balance";
 import { useRouter } from "next/navigation";
+import { dataSubmitProps } from "@/types";
 
 export interface PoolAddProps {
   walletElement?: JSX.Element;
@@ -191,8 +195,8 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
     let text = null;
 
     if (!dataPoolCreate.tokenPool?.first || !dataPoolCreate.tokenPool?.second) {
-      text = 'Invalid pair'
-      return text
+      text = "Invalid pair";
+      return text;
     }
 
     // Check if either deposit amount is null
@@ -285,6 +289,14 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
     setLoading(true);
     const { deposit_amount } = dataPoolCreate;
     const { first_token, second_token, first, second } = deposit_amount;
+    const data: dataSubmitProps = {
+      logoA: tokens[first_token]?.logo,
+      logoB: tokens[second_token]?.logo,
+      tickerA: tokens[first_token]?.ticker,
+      tickerB: tokens[second_token]?.ticker,
+      amountA: first,
+      amountB: second,
+    };
     try {
       if (pool?.exists) {
         await addLiquidity(
@@ -292,6 +304,7 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
           second_token,
           addPrecision(first),
           addPrecision(second),
+          data,
         );
       } else {
         await createPool(
@@ -299,6 +312,7 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
           second_token,
           addPrecision(first),
           addPrecision(second),
+          data,
         );
       }
     } finally {
@@ -368,10 +382,11 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                     <DialogTrigger
                       className={`flex w-[48%] max-w-[250px] cursor-pointer items-center justify-between 
                     rounded-[18.118px] border-[1px] border-black bg-white px-[12px] py-[15px] text-[20px] font-[400] 
-                    leading-none text-black hover:bg-[#EBEBEB] ${dataPoolCreate.tokenPool.first
-                          ? "content-left-select-token-item-have-token"
-                          : ""
-                        }
+                    leading-none text-black hover:bg-[#EBEBEB] ${
+                      dataPoolCreate.tokenPool.first
+                        ? "content-left-select-token-item-have-token"
+                        : ""
+                    }
                     `}
                       style={{ transition: "all 0.3s ease" }}
                       onClick={() => setTypeOpenModal("first")}
@@ -380,7 +395,8 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                         <div className="flex items-center gap-[8px]">
                           <Image
                             src={
-                              tokens[dataPoolCreate.tokenPool.first.value]?.logo || ''
+                              tokens[dataPoolCreate.tokenPool.first.value]
+                                ?.logo || ""
                             }
                             alt="logo"
                             width={24}
@@ -402,10 +418,11 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                       className={`flex w-[48%] max-w-[250px] cursor-pointer items-center justify-between 
                     rounded-[18.118px] border-[1px] border-black bg-white px-[12px] py-[15px] text-[20px] font-[400] 
                     leading-none text-black hover:bg-[#EBEBEB]
-                    ${dataPoolCreate.tokenPool.second
-                          ? "content-left-select-token-item-have-token"
-                          : ""
-                        }
+                    ${
+                      dataPoolCreate.tokenPool.second
+                        ? "content-left-select-token-item-have-token"
+                        : ""
+                    }
                     `}
                       style={{ transition: "all 0.3s ease" }}
                       onClick={() => setTypeOpenModal("second")}
@@ -414,7 +431,8 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                         <div className="flex items-center gap-[8px]">
                           <Image
                             src={
-                              tokens[dataPoolCreate.tokenPool.second.value]?.logo || ''
+                              tokens[dataPoolCreate.tokenPool.second.value]
+                                ?.logo || ""
                             }
                             alt="logo"
                             width={24}
@@ -436,7 +454,13 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                     </DialogTrigger>
                   </div>
                   <DialogOverlay className="bg-overlay" />
-                  <DialogContent className={`bg-white px-[19.83px] pb-[33.88px] pt-[21.49px] ${stylesModal['modal']}`}>
+                  <DialogContent
+                    className={`bg-white px-[19.83px] pb-[33.88px] pt-[21.49px] ${stylesModal["modal"]}`}
+                  >
+                    <DialogHeader>
+                      <DialogTitle />
+                      <DialogDescription />
+                    </DialogHeader>
                     <ModalListToken
                       tokenSelected={dataPoolCreate.tokenPool[typeOpenModal]}
                       onClickToken={(token) =>
@@ -457,11 +481,12 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                   </DialogContent>
                 </Dialog>
                 <div
-                  className={`mt-[15px] flex h-[92px] w-full items-center justify-between rounded-[21px] border-[1px] border-black bg-white py-[12px] pl-[20px] pr-[10px] ${!dataPoolCreate.tokenPool.first ||
-                      !dataPoolCreate.tokenPool.second
+                  className={`mt-[15px] flex h-[92px] w-full items-center justify-between rounded-[21px] border-[1px] border-black bg-white py-[12px] pl-[20px] pr-[10px] ${
+                    !dataPoolCreate.tokenPool.first ||
+                    !dataPoolCreate.tokenPool.second
                       ? "content-pool-hide"
                       : ""
-                    }`}
+                  }`}
                 >
                   <div className="flex flex-col gap-[10px]">
                     <span className="text-[24px] font-[400] leading-none text-black">
@@ -490,15 +515,17 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                 </div>
               </div>
               <div
-                className={`choose-fee-tier-content ${showFeeTier ? "choose-fee-tier-content-show" : ""
-                  }`}
+                className={`choose-fee-tier-content ${
+                  showFeeTier ? "choose-fee-tier-content-show" : ""
+                }`}
               >
                 {LIST_FEE_TIER.map((item, index) => (
                   <div
-                    className={`choose-fee-tier-item ${Number(dataPoolCreate.feeTier) === item.value
+                    className={`choose-fee-tier-item ${
+                      Number(dataPoolCreate.feeTier) === item.value
                         ? "choose-fee-tier-active"
                         : ""
-                      }`}
+                    }`}
                     key={index}
                     onClick={() => {
                       setDataPoolCreate({
@@ -540,11 +567,12 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                 ))}
               </div>
               <div
-                className={`${!dataPoolCreate.tokenPool.first ||
-                    !dataPoolCreate.tokenPool.second
+                className={`${
+                  !dataPoolCreate.tokenPool.first ||
+                  !dataPoolCreate.tokenPool.second
                     ? "content-pool-hide"
                     : ""
-                  }`}
+                }`}
               >
                 <span className="content-left-header">Deposit Amounts</span>
                 <div className="content-deposit-amounts">
@@ -565,7 +593,8 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                       >
                         <Image
                           src={
-                            tokens[dataPoolCreate.tokenPool.first?.value]?.logo || ''
+                            tokens[dataPoolCreate.tokenPool.first?.value]
+                              ?.logo || ""
                           }
                           width={24}
                           height={24}
@@ -636,11 +665,12 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
               </div>
             </div>
             <div
-              className={`content-right ${!dataPoolCreate.tokenPool.first ||
-                  !dataPoolCreate.tokenPool.second
+              className={`content-right ${
+                !dataPoolCreate.tokenPool.first ||
+                !dataPoolCreate.tokenPool.second
                   ? "content-pool-hide"
                   : ""
-                }`}
+              }`}
             >
               <div className="header-content-right">
                 <span className="content-left-header">Set Starting Price</span>
@@ -652,75 +682,170 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
                   your liquidity price range and deposit amount. Gas fees will
                   be higher than usual due to the initialization transaction.
                 </div>
-                <input className="input-value-current" value="100" data-type-input="current" />
+                <input
+                  className="input-value-current"
+                  value="100"
+                  data-type-input="current"
+                />
                 <div className="content-current-price">
-                  <span className="content-current-price-text">Current ETH Price:</span>
+                  <span className="content-current-price-text">
+                    Current ETH Price:
+                  </span>
                   <span className="content-current-price-text">100 DRM</span>
                 </div>
               </div>
-              <span className="content-left-header">
-                Set Price Range
-              </span>
+              <span className="content-left-header">Set Price Range</span>
               <div className="content-min-price-join-pool">
                 <div className="min-price-join-pool-item">
-                  <span className="min-price-join-pool-item-title">Min Price</span>
+                  <span className="min-price-join-pool-item-title">
+                    Min Price
+                  </span>
                   <div className="min-price-join-pool-item-content">
-                    <div className="btn-min-price-join-pool-item" data-type="remove-first" onClick={() => handleChangeValueMinPrice('first', Number(dataPoolCreate?.valueMinPrice?.first) - 0.0001)}>
-                      <Image src="/icon/btn-remove.svg" width={26} height={26} alt="btn-add" />
+                    <div
+                      className="btn-min-price-join-pool-item"
+                      data-type="remove-first"
+                      onClick={() =>
+                        handleChangeValueMinPrice(
+                          "first",
+                          Number(dataPoolCreate?.valueMinPrice?.first) - 0.0001,
+                        )
+                      }
+                    >
+                      <Image
+                        src="/icon/btn-remove.svg"
+                        width={26}
+                        height={26}
+                        alt="btn-add"
+                      />
                     </div>
-                    <input className="input-min-join-pool-item" data-type-input="first" value={dataPoolCreate?.valueMinPrice?.first} onChange={(e) => {
-                      e.target.value = e.target.value.replace(/[^0-9.]/g, '');
-                      handleChangeValueMinPrice('first', e.target.value)
-                    }} />
-                    <div className="btn-min-price-join-pool-item" data-type="add-first" onClick={() => handleChangeValueMinPrice('first', Number(dataPoolCreate?.valueMinPrice?.first) + 0.0001)}>
-                      <Image src="/icon/btn-add.svg" width={26} height={26} alt="btn-add" />
+                    <input
+                      className="input-min-join-pool-item"
+                      data-type-input="first"
+                      value={dataPoolCreate?.valueMinPrice?.first}
+                      onChange={(e) => {
+                        e.target.value = e.target.value.replace(/[^0-9.]/g, "");
+                        handleChangeValueMinPrice("first", e.target.value);
+                      }}
+                    />
+                    <div
+                      className="btn-min-price-join-pool-item"
+                      data-type="add-first"
+                      onClick={() =>
+                        handleChangeValueMinPrice(
+                          "first",
+                          Number(dataPoolCreate?.valueMinPrice?.first) + 0.0001,
+                        )
+                      }
+                    >
+                      <Image
+                        src="/icon/btn-add.svg"
+                        width={26}
+                        height={26}
+                        alt="btn-add"
+                      />
                     </div>
                   </div>
-                  <span className="min-price-join-pool-item-text">{dataPoolCreate?.tokenPool?.first?.symbol} per {dataPoolCreate?.tokenPool?.second?.symbol}</span>
+                  <span className="min-price-join-pool-item-text">
+                    {dataPoolCreate?.tokenPool?.first?.symbol} per{" "}
+                    {dataPoolCreate?.tokenPool?.second?.symbol}
+                  </span>
                 </div>
                 <div className="min-price-join-pool-item">
-                  <span className="min-price-join-pool-item-text">Min Price</span>
+                  <span className="min-price-join-pool-item-text">
+                    Min Price
+                  </span>
                   <div className="min-price-join-pool-item-content">
-                    <div className="btn-min-price-join-pool-item" data-type="remove-second" onClick={() => handleChangeValueMinPrice('second', Number(dataPoolCreate?.valueMinPrice?.second) - 0.0001)}>
-                      <Image src="/icon/btn-remove.svg" width={26} height={26} alt="btn-add" />
+                    <div
+                      className="btn-min-price-join-pool-item"
+                      data-type="remove-second"
+                      onClick={() =>
+                        handleChangeValueMinPrice(
+                          "second",
+                          Number(dataPoolCreate?.valueMinPrice?.second) -
+                            0.0001,
+                        )
+                      }
+                    >
+                      <Image
+                        src="/icon/btn-remove.svg"
+                        width={26}
+                        height={26}
+                        alt="btn-add"
+                      />
                     </div>
-                    <input className="input-min-join-pool-item" data-type-input="second" value={dataPoolCreate?.valueMinPrice?.second} onChange={(e) => {
-                      e.target.value = e.target.value.replace(/[^0-9.]/g, '');
-                      handleChangeValueMinPrice('second', e.target.value)
-                    }} />
-                    <div className="btn-min-price-join-pool-item" data-type="add-second" onClick={() => handleChangeValueMinPrice('second', Number(dataPoolCreate?.valueMinPrice?.second) + 0.0001)}>
-                      <Image src="/icon/btn-add.svg" width={26} height={26} alt="btn-add" />
+                    <input
+                      className="input-min-join-pool-item"
+                      data-type-input="second"
+                      value={dataPoolCreate?.valueMinPrice?.second}
+                      onChange={(e) => {
+                        e.target.value = e.target.value.replace(/[^0-9.]/g, "");
+                        handleChangeValueMinPrice("second", e.target.value);
+                      }}
+                    />
+                    <div
+                      className="btn-min-price-join-pool-item"
+                      data-type="add-second"
+                      onClick={() =>
+                        handleChangeValueMinPrice(
+                          "second",
+                          Number(dataPoolCreate?.valueMinPrice?.second) +
+                            0.0001,
+                        )
+                      }
+                    >
+                      <Image
+                        src="/icon/btn-add.svg"
+                        width={26}
+                        height={26}
+                        alt="btn-add"
+                      />
                     </div>
                   </div>
-                  <span className="min-price-join-pool-item-text">{dataPoolCreate?.tokenPool?.second?.symbol} per {dataPoolCreate?.tokenPool?.first?.symbol}</span>
+                  <span className="min-price-join-pool-item-text">
+                    {dataPoolCreate?.tokenPool?.second?.symbol} per{" "}
+                    {dataPoolCreate?.tokenPool?.first?.symbol}
+                  </span>
                 </div>
               </div>
-              <div className={`btn-approve ${approve.active ? 'btn-approve-active' : ''}`} onClick={() => ClickApprove()}>
-                {approve.active ? 'Approved' : 'Approve'} {dataPoolCreate?.tokenPool?.second?.symbol} {approve.loading ? <div className="loader"></div> : null}
+              <div
+                className={`btn-approve ${approve.active ? "btn-approve-active" : ""}`}
+                onClick={() => ClickApprove()}
+              >
+                {approve.active ? "Approved" : "Approve"}{" "}
+                {dataPoolCreate?.tokenPool?.second?.symbol}{" "}
+                {approve.loading ? <div className="loader"></div> : null}
               </div>
               <Dialog>
                 {!approve.active ? (
                   <div
-                    className={`button-swap btn-prview ${approve.active ? "" : "button-swap-disabled"
-                      }`}
+                    className={`button-swap btn-prview ${
+                      approve.active ? "" : "button-swap-disabled"
+                    }`}
                   >
                     <span>Preview</span>
                   </div>
                 ) : (
                   <DialogTrigger asChild>
                     <div
-                      className={`button-swap btn-prview ${approve.active ? "" : "button-swap-disabled"
-                        }`}
+                      className={`button-swap btn-prview ${
+                        approve.active ? "" : "button-swap-disabled"
+                      }`}
                     >
                       <span>Preview</span>
                     </div>
                   </DialogTrigger>
                 )}
                 <DialogOverlay className="overlayPreview" />
-                <DialogContent className={`${stylesModal['modal-container']} w-[95%] max-w-[533px] rounded-[27px] bg-white px-[24px] pb-[36px] pt-[28px]`}>
+                <DialogContent
+                  className={`${stylesModal["modal-container"]} w-[95%] max-w-[533px] rounded-[27px] bg-white px-[24px] pb-[36px] pt-[28px]`}
+                >
+                  <DialogHeader>
+                    <DialogTitle />
+                    <DialogDescription />
+                  </DialogHeader>
                   <ModalPreviewPool
                     dataPool={dataPoolCreate}
-                    onClickAddPool={() => { }}
+                    onClickAddPool={() => {}}
                   />
                 </DialogContent>
 
@@ -756,6 +881,5 @@ export function PoolAdd({ walletElement }: PoolAddProps) {
       </div>
       {walletElement}
     </>
-
   );
 }

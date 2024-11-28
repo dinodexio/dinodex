@@ -1,0 +1,587 @@
+@media (max-width: 1120px) {
+  .token-layout-container {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 1024px) {
+  .token-layout-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .view-pool-left {
+    width: min(100%, 734px);
+  }
+
+  .view-pool-container,
+  .view-pool-container .token-swap-container,
+  .view-pool-container .swap-content-item,
+  .view-pool-container .token-swap-container .token-swap-content {
+    width: min(100%, 734px);
+  }
+
+  .container-chart {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  .header-content {
+    display: none;
+  }
+
+  .button-connect-wallet {
+    padding: 8px 20px;
+    height: 32px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    border-radius: 8px;
+    border: 1px solid var(--black-text-color);
+    box-shadow: 0px 2px 0px 0px var(--black-text-color);
+    border-radius: 8px;
+    width: max-content;
+  }
+
+  .button-connect-wallet::after {
+    border-radius: 8px;
+  }
+
+  .header-menu-mobile {
+    display: block;
+  }
+
+  .footer-container {
+    display: none;
+  }
+
+  /* pool layout */
+
+  .pool-content {
+    flex-direction: column;
+    margin-top: 49px;
+    gap: 12px;
+    margin-bottom: 34px;
+    padding: 0 20px;
+  }
+
+  .content-left {
+    width: 100%;
+  }
+
+  .min-price-join-pool-item,
+  .content-left-select-token-item {
+    width: 49%;
+  }
+
+  .container-chart {
+    display: none;
+  }
+
+  .info-mobile-chart {
+    display: flex;
+  }
+}
+
+@media (max-width: 600px) {
+  .header-pool-container {
+    padding: 22px 20px;
+  }
+
+  .swap-text {
+    padding: 6px 21px;
+    font-size: 16px;
+  }
+
+  .swap-container {
+    gap: 20px;
+    margin-top: 50px;
+  }
+
+  .slippage-container {
+    justify-content: space-between;
+    gap: unset !important;
+  }
+
+  .slippage-head,
+  .slippage-item {
+    padding: 6px 12px;
+    height: 37px;
+    font-size: 16px;
+  }
+
+  .swap-container-form {
+    gap: 20px;
+  }
+
+  .swap-button > img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .swap-content {
+    padding: 15px;
+    height: max-content;
+    gap: 24px;
+  }
+
+  .swap-content-item {
+    padding: 15px 10px 12px 10px !important;
+    height: 173px !important;
+  }
+
+  .swap-item-header {
+    font-size: 17px;
+  }
+
+  .line-swap-item {
+    margin-bottom: 10px;
+  }
+
+  .swap-item-content {
+    padding-top: 16px;
+  }
+
+  .swap-item-input {
+    height: 60px !important;
+    font-size: 50px !important;
+  }
+
+  .choose-fee-tier-content {
+    gap: 3.33px;
+  }
+
+  .choose-fee-tier-item {
+    padding: 12px 8px;
+  }
+
+  .choose-fee-tier-item-text {
+    font-size: 20px;
+  }
+
+  .fee-tier-desc {
+    font-size: 12px;
+  }
+
+  .swap-item-footer-text,
+  .value-price,
+  .choose-fee-tier-item-desc {
+    font-size: 14px;
+  }
+
+  .value-price {
+    bottom: 35px;
+  }
+
+  .button-swap {
+    width: 100%;
+    padding: 16px 0px;
+    font-size: 22px;
+    height: max-content;
+  }
+
+  .list-token-content {
+    height: 80%;
+  }
+
+  .modal-select-token {
+    width: 100%;
+    height: 80%;
+  }
+
+  .list-token {
+    height: 85%;
+  }
+
+  .modal {
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+
+  .modal-select-token {
+    bottom: 0;
+    top: unset;
+    transform: translate(-50%, 0);
+  }
+
+  /* pool */
+
+  .content-active-info {
+    padding: 0;
+  }
+
+  .content-active-info-title {
+    display: none !important;
+  }
+
+  .item-active-pool-info-text {
+    font-size: 14px;
+  }
+
+  .item-active-pool-info-img > img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .content-active-info-btn-item {
+    width: 49%;
+    padding: 12px 10px;
+    gap: 4px;
+  }
+
+  .header-pool-content {
+    padding: 0;
+  }
+
+  .content-active-info-btn-item-head {
+    font-size: 16px;
+  }
+
+  .content-active-info-btn-item-desc,
+  .item-active-pool-fee-tier,
+  .item-active-pool-status-text {
+    font-size: 12px;
+  }
+
+  .item-active-pool-status-info {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* layout pool create and join*/
+
+  .content-left-select-token {
+    gap: 8px;
+  }
+
+  .deposit-amounts-item-left {
+    flex: 1;
+  }
+
+  .token-select-deposit-amount > img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .content-deposit-amounts,
+  .content-right {
+    gap: 12px;
+  }
+
+  .content-deposit-amounts {
+    margin-top: 12px;
+  }
+
+  .fee-tier-text,
+  .btn-prview > span {
+    font-size: 20px;
+  }
+
+  .content-left-header {
+    font-size: 18px;
+  }
+
+  .join-create-text,
+  .input-value-current {
+    font-size: 16px;
+  }
+
+  .btn-edit-fee-tier,
+  .token-symbol-deposit-amount,
+  .btn-max-deposit-amount,
+  .value-price-desc,
+  .min-price-join-pool-item-title,
+  .min-price-join-pool-item-text,
+  .content-current-price-text,
+  .balance-deposit-amount {
+    font-size: 14px;
+  }
+
+  .popup-hide {
+    width: 90%;
+  }
+
+  /* modal preview pool */
+
+  .modal-preview-pool-container {
+    height: auto;
+    width: 100%;
+    top: unset;
+    bottom: 0;
+    transform: translate(-50%, 0);
+    border-radius: 27px 27px 0 0;
+    padding: 27px 20px 59px 20px;
+  }
+
+  .content-modal-preview-pool {
+    gap: 12px;
+  }
+
+  .content-preview-pool-token {
+    margin-top: 3px;
+    padding: 12px 10px 12px 20px;
+  }
+
+  .preview-pool-token-item:nth-child(2) {
+    margin-top: -4px;
+  }
+
+  .preview-pool-token-item:last-child,
+  .selected-range-content {
+    margin: 0;
+  }
+
+  .switch-select-range {
+    border-radius: 8px;
+  }
+
+  .content-min-price-item {
+    gap: 4px;
+    width: 49%;
+  }
+
+  .content-min-price-item-desc {
+    font-size: 12px;
+  }
+
+  .preview-header-text,
+  .preview-header-fee-tier-text,
+  .content-min-price-item-title,
+  .switch-select-range-item,
+  .preview-header-text {
+    font-size: 14px;
+  }
+
+  .selected-range-content-header {
+    font-size: 18px;
+  }
+
+  .btn-modal-preview-pool > span {
+    font-size: 20px;
+  }
+
+  .btn-modal-preview-pool {
+    height: 48px;
+  }
+
+  /* token */
+  .content-tokens-container {
+    margin-top: 28px;
+    width: 100%;
+    padding: 0 20px;
+    gap: 22px;
+  }
+
+  .token-content-menu {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .table-container {
+    border: 1px solid var(--black-text-color);
+    border-radius: 12px;
+  }
+
+  .container-table {
+    border: 0;
+  }
+
+  .info-mobile-chart {
+    display: flex;
+  }
+
+  /* token layout */
+  .token-layout-container {
+    flex-direction: column;
+    width: 100%;
+    padding: 0 20px;
+    margin: 8px 0 30px 0;
+    gap: 15px;
+  }
+
+  .token-info-logo {
+    margin: 0;
+  }
+
+  .token-info-logo > img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .token-chart-change-text {
+    font-size: 14px;
+  }
+
+  .token-info-symbol-text,
+  .stats-token-info-item-title {
+    font-size: 16px;
+  }
+
+  .menu-token-item {
+    font-size: 18px;
+  }
+
+  .token-info-name-text {
+    font-size: 20px;
+  }
+
+  .token-chart-price-text {
+    font-size: 32px;
+  }
+
+  .token-layout-menu {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .token-layout-menu-time-price {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .token-layout-menu-time-price-item {
+    padding: 5px 26px;
+    font-size: 14px;
+  }
+
+  .stats-token-container {
+    gap: 10px;
+  }
+
+  .stats-token-info {
+    max-width: 305px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .swap-container-info {
+    margin-top: 0;
+    gap: 12px;
+  }
+
+  .btn-swap-mobile,
+  .mobile-swap-token {
+    display: block;
+  }
+
+  .pc-swap-token {
+    display: none;
+  }
+
+  .mobile-swap-token {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    padding: 27px 20px 73px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-radius: 12px 12px 0 0;
+    background-color: var(--white-text-color);
+    border: 0.826px solid var(--black-text-color);
+  }
+
+  .swap-token-container {
+    display: block;
+  }
+
+  .token-layout-menu-item {
+    width: 100%;
+  }
+
+  .price-menu-container {
+    flex: 1;
+  }
+
+  .view-pool-left-header {
+    display: none !important;
+  }
+
+  .view-pool-link-item-name {
+    font-size: 14px;
+  }
+
+  .view-pool-link-item-text .token-info-logo span {
+    height: 18px !important;
+    width: 9px !important;
+  }
+
+  .view-pool-link-item-text .token-info-logo span img {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .view-pool-link-item-text > img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .view-pool-link-item-icon > img {
+    width: 8px;
+    height: 10px;
+  }
+
+  .view-pool-link {
+    gap: 6px;
+  }
+
+  .swap-info-item-text {
+    font-size: 14px;
+  }
+
+  .view-pool-container {
+    display: none !important;
+  }
+
+  /* view pool */
+
+  .view-pool-left-stats {
+    border: 0;
+    padding: 0;
+  }
+
+  .view-pool-left-stats-item,
+  .view-pool-left-stats-item:first-child {
+    gap: 5px;
+  }
+
+  .view-pool-left-stats-item-title,
+  .view-pool-item-info-token-item-name,
+  .view-pool-left-stats-item-info-change,
+  .view-pool-item-info-token-item-value {
+    font-size: 14px;
+  }
+
+  .view-pool-left-stats-item-info-value {
+    font-size: 24px;
+  }
+
+  .view-pool-left-stats-item-info-container {
+    flex-direction: row;
+    gap: 12px 24px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .view-pool-stats {
+    display: none;
+  }
+
+  .stats-mobile {
+    display: block !important;
+  }
+
+  .view-pool-left-stats {
+    display: none;
+  }
+
+  .show-btn-return-to-top {
+    z-index: -1;
+    opacity: 0;
+  }
+}

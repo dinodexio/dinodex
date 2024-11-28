@@ -1,0 +1,144 @@
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: var(--bg-overlay-color);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-select-token {
+    height: min(98%,815.702px);
+    width: 500px;
+    flex-shrink: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 8.264px;
+    border: 1.653px solid var(--black-text-color);
+    background: var(--white-text-color);
+    padding: 21.49px 19.83px 33.88px
+}
+
+.header-content-modal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.header-text {
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 26.446px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.list-token-content {
+    margin-top: 25px;
+}
+
+.list-token-head {
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 19.835px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    margin-left: 33.88px;
+    opacity: 0.6;
+}
+
+.line-list-token {
+    height: 1.653px;
+    width: 100%;
+    background-color: var(--black-text-color);
+    opacity: 0.6;
+    margin-top: 13.19px;
+}
+
+.list-token {
+    display: flex;
+    flex-direction: column;
+    height: 550px;
+    gap: 12px;
+    margin-top: 33px;
+    overflow-y: scroll;
+}
+
+.list-token::-webkit-scrollbar{
+    display: none;
+}
+
+.list-token-item {
+    display: flex;
+    padding: 11.57px 0 9.09px 19.01px;
+    cursor: pointer;
+    align-items: center;
+    border-radius: 8.264px;
+    border: 1.653px solid #FFF;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.list-token-item:hover{
+    border-color: var(--black-text-color);
+}
+
+.list-token-item-content {
+    display: flex;
+    align-items: center;
+    gap: 12.4px;
+}
+
+.list-token-item-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.list-token-item-name {
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 19.835px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.list-token-item-symbol {
+    color: var(--black-text-color);
+    font-family: "SF Pro Display";
+    font-size: 13.223px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.list-token-item-active {
+    border-radius: 8.264px;
+    background: #000;
+}
+
+.list-token-item-active .list-token-item-name,
+.list-token-item-active .list-token-item-symbol {
+    color: #FFF;
+}
+
+.close {
+    cursor: pointer;
+}
+
+@media (max-height: 800px) {
+    .list-token {
+        height: calc(78vh / 2 + 100px);
+    }
+}

@@ -12,6 +12,7 @@ export interface BalanceProps {
   tokenId?: string;
   type?: "number" | "default"; // Added 'type' parameter to the interface
   loading?: boolean;
+  decimals?: number;
 }
 
 export function removeTrailingZeroes(balance: string) {
@@ -36,19 +37,24 @@ export function formatBigNumber(num: number | string) {
   return BigNumber(num).dividedBy(10 ** precision);
 }
 
-
-export function Balance({ balance, tokenId, type = "default" }: BalanceProps) {
+export function Balance({
+  balance,
+  tokenId,
+  type = "default",
+  decimals = 2,
+}: BalanceProps) {
   const formattedBalance = useMemo(() => {
-    if (!balance) return;
+    if (!balance) return "~";
 
-    const result = BigNumber(balance).div(10 ** precision).toFixed(2);
-    const resultTrimmed = BigNumber(result).toString()
-    return (
-      <>
-        {resultTrimmed}
-      </>
-    )
-
+    const result = BigNumber(balance)
+      .div(10 ** precision)
+      .toFixed(decimals);
+    // Check if result is NaN
+    if (isNaN(Number(result))) {
+      return "~";
+    }
+    const resultTrimmed = BigNumber(result).toString();
+    return <>{resultTrimmed}</>;
   }, [balance, type]);
 
   // If the type is 'number', only return the formatted number

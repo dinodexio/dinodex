@@ -1,14 +1,14 @@
-import { convertSmallNumberToPercent, formatLargeNumber, formatNumber, formatPersion } from "@/lib/utils";
+import { convertSmallNumberToPercent, formatNumber } from "@/lib/utils";
 import { Table } from "../table/table";
 import Image from "next/image";
-import styles from '../css/table.module.css'
+import styles from "../css/table.module.css";
 import { Balances } from "../pool/v2/list-pool";
 import { EMPTY_DATA } from "@/constants";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { useAggregatorStore, usePollPools } from "@/lib/stores/aggregator";
 import BigNumber from "bignumber.js";
-import { removePrecision } from "@/lib/utils";
-import { precision } from "../ui/balance";
+// import { removePrecision } from "@/lib/utils";
+// import { precision } from "../ui/balance";
 import { useRouter } from "next/navigation";
 import { PoolKey, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
@@ -18,8 +18,36 @@ export interface PoolPanelProps {
   valueSearch?: string;
 }
 
-function formatNumberPrecisionVol(value: string) {
-  return formatNumber(BigNumber(removePrecision(value, precision)).toNumber())
+// function formatNumberPrecisionVol(value: string | number, isPrice: boolean = false) {
+//   if (!value) return 0
+
+//   const priceResult = formatNumber(BigNumber(removePrecision(value, precision)).toNumber())
+//   console.log('priceResult',priceResult , typeof priceResult)
+//   return `${priceResult == '<0.01'
+//     ? (isPrice ? "< $0.01" : priceResult)
+//     : ( isPrice ? `$${priceResult}` : priceResult
+//   )}`
+// }
+
+function formatNumberPrecisionVol(
+  value: string | number,
+  isPrice: boolean = false,
+) {
+  if (!value || value === Infinity || value === -Infinity) return 0;
+
+  const numericValue = new BigNumber(value);
+  const priceResult = formatNumber(numericValue.toNumber());
+
+  // Check if priceResult is less than 0.01
+  const threshold = new BigNumber(0.01);
+  const isLessThanThreshold = numericValue.isLessThan(threshold);
+
+  // Format output based on isPrice and threshold comparison
+  if (isLessThanThreshold) {
+    return isPrice ? "<$0.01" : "<0.01";
+  }
+
+  return isPrice ? `$${priceResult}` : priceResult;
 }
 
 let columTablePool = [
@@ -76,7 +104,11 @@ let columTablePool = [
     key: "tvl",
     width: 163,
     render: (data: any) => {
-      return <span className={styles["price-text"]}>{formatNumberPrecisionVol(data?.tvl)}</span>;
+      return (
+        <span className={styles["price-text"]}>
+          {formatNumberPrecisionVol(data?.tvl, true)}
+        </span>
+      );
     },
   },
   {
@@ -95,7 +127,9 @@ let columTablePool = [
     width: 163,
     render: (data: any) => {
       return (
-        <span className={styles["price-text"]}>${formatNumberPrecisionVol(data?.volume1d)}</span>
+        <span className={styles["price-text"]}>
+          {formatNumberPrecisionVol(data?.volume1d, true)}
+        </span>
       );
     },
   },
@@ -106,7 +140,9 @@ let columTablePool = [
     width: 163,
     render: (data: any) => {
       return (
-        <span className={styles["price-text"]}>{formatNumberPrecisionVol(data?.volume7d)}</span>
+        <span className={styles["price-text"]}>
+          {formatNumberPrecisionVol(data?.volume7d, true)}
+        </span>
       );
     },
   },
@@ -116,23 +152,34 @@ let columTablePool = [
     key: "volume1d-tvl",
     width: 163,
     render: (data: any) => {
-      return <span className={styles["price-text"]}>{formatNumberPrecisionVol(BigNumber(data?.volume1d || 0).dividedBy(data?.tvl).toString())}</span>;
+      return (
+        <span className={styles["price-text"]}>
+          {formatNumberPrecisionVol(
+            BigNumber(data?.volume1d || 0)
+              .dividedBy(data?.tvl)
+              .toNumber(),
+          )}
+        </span>
+      );
     },
   },
 ];
 
-export function PoolPanel({ balances, valueSearch }: PoolPanelProps) {
+const PoolPanelComponent = ({ balances, valueSearch }: PoolPanelProps) => {
   const router = useRouter();
-  const { pools: poolBalances = [], loading } = useAggregatorStore()
-  usePollPools()
+  const { pools: poolBalances = [], loading } = useAggregatorStore();
+
+  usePollPools();
 
   const filterDataPool = useMemo(() => {
     if (!valueSearch) return poolBalances;
 
     const lowerValueSearch = valueSearch.toLowerCase();
     return poolBalances.filter((item: any) => {
-      const tokenFirstSymbol = item?.tokenselected?.first?.ticker?.toLowerCase();
-      const tokenSecondSymbol = item?.tokenselected?.second?.ticker?.toLowerCase();
+      const tokenFirstSymbol =
+        item?.tokenselected?.first?.ticker?.toLowerCase();
+      const tokenSecondSymbol =
+        item?.tokenselected?.second?.ticker?.toLowerCase();
       return (
         tokenFirstSymbol?.includes(lowerValueSearch) ||
         tokenSecondSymbol?.includes(lowerValueSearch)
@@ -145,15 +192,18 @@ export function PoolPanel({ balances, valueSearch }: PoolPanelProps) {
         data={filterDataPool || []}
         column={columTablePool}
         onClickTr={(dataPool) => {
-          console.log('dataPool', dataPool)
           const poolKey = PoolKey.fromTokenPair(
-            TokenPair.from(TokenId.from(dataPool?.tokenAId), TokenId.from(dataPool?.tokenBId)),
+            TokenPair.from(
+              TokenId.from(dataPool?.tokenAId),
+              TokenId.from(dataPool?.tokenBId),
+            ),
           ).toBase58();
-          console.log('poolKey', poolKey)
           router.push(`/info/pools/${poolKey}`);
         }}
         loading={loading}
       />
     </>
   );
-}
+};
+
+export const PoolPanel = React.memo(PoolPanelComponent);

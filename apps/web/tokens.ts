@@ -17,11 +17,18 @@ export const LIST_TOKENS: Tokens = {
     ticker: "MINA",
     name: "Mina Protocol",
     logo: "/tokens/mina.svg",
+    address: "0xD5745a490f14CdA24bed11156d91Eb7A77c8CB1B",
+    website: "https://minaprotocol.com/",
+    explorer: "https://etherscan.io/token/0xd5745a490f14cda24bed11156d91eb7a77c8cb1b",
   },
   "1": {
     ticker: "DAI",
     name: "DAI Stablecoin",
     logo: "/tokens/dai.svg",
+    address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    website: "https://makerdao.com/",
+    explorer:
+      "https://etherscan.io/token/0x6B175474E89094C44Da98b954EedeAC495271d0F",
   },
   "2": {
     ticker: "BTC",
@@ -32,26 +39,44 @@ export const LIST_TOKENS: Tokens = {
     ticker: "USDC",
     name: "USD Coin",
     logo: "/tokens/usdc.svg",
+    address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+    website: "https://www.circle.com/usdc",
+    explorer:
+      "https://polygonscan.com/token/0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
   },
   "4": {
     ticker: "USDT",
     name: "Tether USD",
     logo: "/tokens/usdt.svg",
+    address: "0x55d398326f99059fF775485246999027B3197955",
+    website:
+      "https://bscscan.com/token/0x55d398326f99059ff775485246999027b3197955",
+    explorer:
+      "https://bscscan.com/token/0x55d398326f99059fF775485246999027B3197955",
   },
   "5": {
     ticker: "ETH",
     name: "Ethereum",
     logo: "/tokens/eth.svg",
+    address: '0x202A57ad5FF7c40aA132377C104E03682436eA9C',
+    website: "https://ethereum.org/en/",
+    explorer: "https://etherscan.io/",
   },
   "6": {
     ticker: "WBTC",
     name: "Wrapped BTC",
     logo: "/tokens/wbtc.svg",
+    address: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
+    website: "https://arbitrum.io/",
+    explorer:
+      "https://arbiscan.io/token/0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
   },
   "7": {
     ticker: "BNB",
     name: "BNB",
     logo: "/tokens/bnb.svg",
+    website: "https://www.binance.com/",
+    explorer: "https://bscscan.com/",
   },
 };
 

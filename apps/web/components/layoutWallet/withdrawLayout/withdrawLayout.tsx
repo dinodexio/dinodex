@@ -15,7 +15,7 @@ import { useWalletStore } from "@/lib/stores/wallet";
 import { useBalance } from "@/lib/stores/balances";
 import { WithdrawConfirm } from "./withdraw-confirm";
 import { TransferWaiting } from "../TransferLayout/transfer-waiting";
-import styles from "../../css/wallet.module.css";
+// import styles from "../../css/wallet.module.css";
 
 export interface withdrawLayoutProps {
   onClose: () => void;

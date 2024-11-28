@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:image" content="assets/images/logo.png" />
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
+    <title>DinoDEX</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="js/chart.js"></script>
+    <script src="js/ChartPool.js"></script>
+    <script src="js/dataDummyToken.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/listRenderModal.js"></script>
+    <script src="js/Modal.js"></script>
+    <script src="js/Pool.js"></script>
+    <script src="js/renderDataToken.js"></script>
+    <script src="js/renderListDataPool.js"></script>
+    <script src="js/renderModalPreviewPool.js"></script>
+    <script src="js/renderTable.js"></script>
+    <script src="js/Swap.js"></script>
+    <script src="js/token.js"></script>
+    <script src="js/tokenLayout.js"></script>
+</head>
+
+<body>
+    <div class="bg-body">
+        <img src='./assets/images/home/bg-web.png' />
+    </div>
+    <div class="header-pool-container">
+        <div class="header-content">
+            <a href="index.html" class="button-header"><span>Home</span></a>
+            <a class="button-header button-header-active"><span>Trade</span></a>
+            <a href="pool.html" class="button-header"><span>Pool</span></a>
+            <a href="token.html" class="button-header"><span>Token</span></a>
+        </div>
+        <div class="header-menu-mobile">
+            <div class="menu button-menu" onclick="togglePopupMenu()"><span></span></div>
+            <img src="assets/images/home/dex.svg" alt="dex" width="30" height="30" style="margin-left: 10px;" />
+
+            <div class="popup-menu-mobile">
+                <a href="index.html" class="menu-item"><span>Home</span></a>
+                <a class="menu-item  menu-item-active"><span>Trade</span></a>
+                <a href="pool.html" class="menu-item"><span>Pool</span></a>
+                <a href="token.html" class="menu-item"><span>Token</span></a>
+                <div class="content-social-menu-mobile">
+                    <a href="https://twitter.com/dinodex" target="_blank"><img src="assets/images/social/git.svg" width="28"
+                            height="28"></a>
+                    <a href="https://t.me/dinodex" target="_blank"><img src="assets/images/social/x.svg" width="28"
+                            height="28"></a>
+                    <a href="https://discord.com/invite/9nXbJX5" target="_blank"><img src="assets/images/social/discord.svg"
+                            width="28" height="28"></a>
+                </div>
+            </div>
+        </div>
+        <div class="button-connect-wallet">
+            <span class="button-connected-wallet-text">Connect Wallet</span>
+        </div>
+    </div>
+    <div class="swap-container">
+        <span class="swap-text">Swap</span>
+        <div class="swap-content">
+            <div class="swap-container-form">
+                <div class="swap-content-item swap-item-first">
+                    <span class="swap-item-header">Sell</span>
+                    <div class="line-swap-item"></div>
+                    <div class="swap-item-content">
+                        <input class="swap-item-input" type="text" placeholder="0" id="input-first"
+                            oninput="handleChangeInput('first', event)">
+                        <div class="swap-item-select"
+                            onclick="Modal.open('modalSelectToken','swap'); saveTypeSelectToken('sell')"
+                            data-select="sell">
+                            <span>Select</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="20" viewBox="0 0 19 20"
+                                fill="none">
+                                <path d="M5.70703 8.28906L9.61635 12.1984L13.5257 8.28906" stroke="black"
+                                    stroke-width="1.29412" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <span class="value-price">$933.45</span>
+                    </div>
+                    <div class="swap-item-footer">
+                        <span class="swap-item-footer-text">Balance: 1 ETH</span>
+                    </div>
+                </div>
+                <div class="swap-button" onclick="changeSwap()">
+                    <img src="assets/images/swap/swap-button-icon.svg" alt="swap-button">
+                </div>
+                <div class="swap-content-item swap-item-second">
+                    <span class="swap-item-header">Buy</span>
+                    <div class="line-swap-item"></div>
+                    <div class="swap-item-content">
+                        <input class="swap-item-input" type="text" placeholder="0" id="input-second"
+                            oninput="handleChangeInput('second', event)">
+                        <div class="swap-item-select" data-select="buy"
+                            onclick="Modal.open('modalSelectToken','swap'); saveTypeSelectToken('buy')">
+                            <span>Select</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="20" viewBox="0 0 19 20"
+                                fill="none">
+                                <path d="M5.70703 8.28906L9.61635 12.1984L13.5257 8.28906" stroke="black"
+                                    stroke-width="1.29412" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <span class="value-price">$933.45</span>
+                    </div>
+                    <div class="swap-item-footer">
+                        <span class="swap-item-footer-text">Balance: 1 ETH</span>
+                    </div>
+                </div>
+            </div>
+            <div class="button-swap button-swap-disabled" style="margin-top: -12px;">
+                <span>Select a token</span>
+            </div>
+        </div>
+        <div class="slippage-container">
+            <div class="slippage-head">Slippage</div>
+            <div class="slippage-item" data-slippage="0.1">0.1%</div>
+            <div class="slippage-item" data-slippage="0.2">0.2%</div>
+            <div class="slippage-item slippage-item-active" data-slippage="0.5">0.5%</div>
+            <div class="slippage-item" data-slippage="1">1%</div>
+        </div>
+    </div>
+    <div class="footer-container">
+        <img src="assets/images/home/dex.svg" alt="dex" width="84" height="84">
+    </div>
+    <script>
+        const element = document.querySelector('body');
+        const svgPath = 'assets/images/home/logo_icon_28x28.svg';
+        const cursorUrl = `url(${svgPath}), auto`;
+        element.style.cursor = cursorUrl;
+    </script>
+</body>
+
+</html>

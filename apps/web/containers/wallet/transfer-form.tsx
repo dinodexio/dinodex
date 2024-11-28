@@ -83,6 +83,7 @@ export function TransferForm() {
         values.amount_token,
         values.to,
         addPrecision(values.amount_amount),
+        {}
       );
     } catch (e) {
     } finally {

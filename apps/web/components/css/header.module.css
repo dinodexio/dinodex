@@ -96,7 +96,7 @@
 .popup-menu-mobile-show {
     opacity: 1;
     visibility: visible;
-    z-index: 100;
+    z-index: 1000;
 }
 
 .header-menu-mobile {

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
@@ -16,12 +17,12 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
 				<p className="mt-6 max-w-2xl text-base leading-7 text-neutral-600">
 					<code>{error.message}</code>
 				</p>
-				<button
+				<Button
 					className="mt-8 h-10 rounded-md bg-red-500 px-6 font-semibold text-white"
 					onClick={() => reset()}
 				>
 					Try again
-				</button>
+				</Button>
 			</div>
 		</div>
 	);
