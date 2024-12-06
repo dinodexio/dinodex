@@ -1,6 +1,6 @@
-# Protokit starter-kit
+# DinoDex
 
-This repository is a monorepo aimed at kickstarting application chain development using the Protokit framework.
+This repository is a single repository intended to host the source code of Dinodex using the Protokit framework.
 You can learn more about the Protokit framework at the [official documentation](protokit.dev), or at the official [Mina discord](https://discord.gg/minaprotocol).
 
 ## Quick start
@@ -17,7 +17,7 @@ You can learn more about the Protokit framework at the [official documentation](
 **Run the following commands to get started:**
 ```zsh
 # clone the repository
-git clone https://github.com/proto-kit/starter-kit my-chain
+git clone https://github.com/dinodexio/dinodex dinodex
 cd my-chain
 
 # ensures you have the right node.js version
