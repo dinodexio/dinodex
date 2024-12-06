@@ -5,11 +5,11 @@
 1. Download Auro wallet [https://www.aurowallet.com/](https://www.aurowallet.com/)
 2. Create your Wallet address on ‘Mina Mainnet’ following the prompts in Auro
 3. Faucet your accounts   
-    a. Visit [https://alpha.dinodex.io/](https://alpha.dinodex.io/)  
-    b. Select ‘Launch App’
-    c. Connect your Auro wallet and click the "get test tokens" button
+    a. Visit [https://alpha.dinodex.io/](https://alpha.dinodex.io/).
+    b. Select ‘Launch App’.
+    c. Connect your Auro wallet and click the "get test tokens" button.
 
-## Test Lumina; Faucet, Swap, and Pool
+## Test DinoDex; Faucet, Swap, and Pool
 Mina Devnet Testing
 
 ### Swap

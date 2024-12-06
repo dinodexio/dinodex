@@ -76,7 +76,8 @@ export class SwapEvent extends Struct({
   tokenAId: TokenId,
   tokenBId: TokenId,
   tokenAAmount: Balance,
-  tokenBAmount: Balance
+  tokenBAmount: Balance,
+  poolFee: Balance,
 }) {}
 /**
  * Runtime module responsible for providing trading/management functionalities for XYK pools.
@@ -208,6 +209,73 @@ export class XYK extends RuntimeModule<XYKConfig> {
 
   }
 
+  /**
+   * Provides liquidity to an existing pool, if the pool exists and the
+   * provider has sufficient balance. Additionally mints LP tokens for the provider.
+   *
+   * @param provider
+   * @param tokenAId
+   * @param tokenBId
+   * @param amountA
+   * @param amountBLimit
+   */
+  public async addLiquidity2(
+    provider: PublicKey,
+    tokenAId: TokenId,
+    tokenBId: TokenId,
+    tokenAAmount: Balance,
+    tokenBAmountLimit: Balance
+  ) {
+    const tokenPair = TokenPair.from(tokenAId, tokenBId);
+    // tokenAId = tokenPair.tokenAId;
+    // tokenBId = tokenPair.tokenBId;
+    const poolKey = PoolKey.fromTokenPair(tokenPair);
+    const poolDoesExists = await this.poolExists(poolKey);
+    const amountANotZero = tokenAAmount.greaterThan(Balance.from(0));
+
+    const reserveA = await this.balances.getBalance(tokenAId, poolKey);
+    const reserveB = await this.balances.getBalance(tokenBId, poolKey);
+    const reserveANotZero =  reserveA.greaterThan(Balance.from(0));
+    const adjustedReserveA = Balance.from(
+      Provable.if<Balance>(reserveANotZero, Balance, reserveA, Balance.from(1))
+    );
+
+    const reserveBNotZero =  reserveB.greaterThan(Balance.from(0));
+    const adjustedReserveB = Balance.from(
+      Provable.if<Balance>(reserveANotZero, Balance, reserveB, Balance.from(1))
+    );
+
+    // TODO: why do i need Balance.from on the `amountA` argument???
+    // const amountB = mulDiv(tokenAAmount, adjustedReserveB, adjustedReserveA);
+
+    const amountB = Balance.from(
+      Provable.if<Balance>(reserveBNotZero && reserveANotZero, Balance, mulDiv(tokenAAmount, adjustedReserveB, adjustedReserveA), tokenBAmountLimit)
+    )
+
+    const isAmountBLimitSufficient =
+      tokenBAmountLimit.greaterThanOrEqual(amountB);
+
+    const lpTokenId = LPTokenId.fromTokenPair(tokenPair);
+    const lpTokenTotalSupply = await this.balances.getCirculatingSupply(lpTokenId);
+
+    // TODO: ensure tokens are provided in the right order, not just ordered by the TokenPair
+    // otherwise the inputs for the following math will be in the wrong order
+    const lpTokensToMint = Balance.from(
+      Provable.if<Balance>(reserveANotZero && reserveBNotZero, Balance, mulDiv(lpTokenTotalSupply, tokenAAmount, adjustedReserveA), Provable.if<Balance>( tokenAId.greaterThan(tokenBId), Balance, tokenAAmount, tokenBAmountLimit))
+    );
+
+    assert(poolDoesExists, errors.poolDoesNotExist());
+    assert(amountANotZero, errors.amountAIsZero());
+    // assert(reserveANotZero, errors.reserveAIsZero());
+    assert(isAmountBLimitSufficient, errors.amountBLimitInsufficient());
+
+    await this.balances.transfer(tokenAId, provider, poolKey, tokenAAmount);
+    await this.balances.transfer(tokenBId, provider, poolKey, amountB);
+    await this.balances.mintAndIncrementSupply(lpTokenId, provider, lpTokensToMint);
+    this.events.emit( "addLiquidity", new AddLiquidityEvent({ provider, tokenAId, tokenBId, tokenAAmount, tokenBAmount: amountB, tokenLPAmount: lpTokensToMint}));
+
+  }
+
   public async removeLiquidity(
     provider: PublicKey,
     tokenAId: TokenId,
@@ -235,9 +303,9 @@ export class XYK extends RuntimeModule<XYKConfig> {
     const tokenBAmount = mulDiv(Balance.from(lpTokenAmount), reserveB, adjustedLpTokenTotalSupply);
 
     const isTokenAAmountLimitSufficient =
-      tokenAAmountLimit.greaterThanOrEqual(tokenAAmount);
+      tokenAAmount.greaterThanOrEqual(tokenAAmountLimit);
     const isTokenBAmountLimitSufficient =
-      tokenBLAmountLimit.greaterThanOrEqual(tokenBAmount);
+      tokenBAmount.greaterThanOrEqual(tokenBLAmountLimit);
 
     Provable.log("limits", {
       tokenAAmount,
@@ -357,10 +425,10 @@ export class XYK extends RuntimeModule<XYKConfig> {
         tokenOut,
         Balance.from(amountIn)
       );
-
+      const poolFee = mulDiv(calculatedAmountOut, UInt64.from(this.config.fee), UInt64.from(this.config.feeDivider));
       const amoutOutWithoutFee = calculatedAmountOut.sub(
         // calculatedAmountOut.mul(this.config.fee).div(this.config.feeDivider)
-        mulDiv(calculatedAmountOut, UInt64.from(this.config.fee), UInt64.from(this.config.feeDivider))
+        poolFee
       );
 
       lastTokenOut = Provable.if(poolExists, TokenId, tokenOut, lastTokenOut);
@@ -372,7 +440,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
       amountIn = Balance.from(Provable.if<Balance>(poolExists, Balance, amountIn, Balance.zero));
       
       // if(amountIn.greaterThan(UInt64.from(0))){
-      this.events.emit("swap", new SwapEvent({creator: seller, tokenAId: tokenIn, tokenBId: tokenOut, tokenAAmount: amountIn, tokenBAmount: Balance.from(Provable.if<Balance>(poolExists, Balance, amountOut, Balance.zero))}));
+      this.events.emit("swap", new SwapEvent({creator: seller, tokenAId: tokenIn, tokenBId: tokenOut, tokenAAmount: amountIn, tokenBAmount: Balance.from(Provable.if<Balance>(poolExists, Balance, amountOut, Balance.zero)), poolFee }));
       await this.balances.transfer(tokenIn, sender, lastPoolKey, amountIn); 
       // }
       sender = lastPoolKey;
@@ -406,7 +474,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
     tokenBAmountLimit: Balance
   ) {
     const provider = this.transaction.sender.value;
-    await this.addLiquidity(
+    await this.addLiquidity2(
       provider,
       tokenAId,
       tokenBId,
