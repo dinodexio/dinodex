@@ -22,4 +22,4 @@ const resolversEnchanceMap: ResolversEnhanceMap = {
 applyResolversEnhanceMap(resolversEnchanceMap);
 
 // remove non read only generated resolvers and their methods
-export const resolvers = cleanResolvers(generatedResolvers);
+export const resolvers : any = cleanResolvers(generatedResolvers);

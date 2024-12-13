@@ -7,6 +7,7 @@ import { XYK } from "./modules/dex/xyk";
 import { TokenRegistry } from "./modules/dex/token-registry";
 import { Withdrawals } from "./modules/Withdrawals";
 import { Locks } from "./modules/locks";
+import { PublicKey } from "o1js";
 export const modules = VanillaRuntimeModules.with({
   Balances,
   Locks,
@@ -22,7 +23,9 @@ export const config: ModulesConfig<typeof modules> = {
   },
   Locks: {},
   Withdrawals: {},
-  Faucet: {},
+  Faucet: {
+    factory: PublicKey.fromBase58(process.env.PROTOKIT_FACTORY_KEY!)
+  },
   TokenRegistry: {},
   XYK: {
     feeDivider: 1000n,

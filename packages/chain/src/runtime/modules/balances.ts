@@ -31,20 +31,20 @@ export class Balances extends BaseBalances<BalancesConfig> {
       to: PublicKey,
       amount: Balance
     ) {
-      const fromBalance = await this.getBalance(tokenId, from);
+      // const fromBalance = await this.getBalance(tokenId, from);
   
-      const fromBalanceIsSufficient = fromBalance.greaterThanOrEqual(amount);
+      // const fromBalanceIsSufficient = fromBalance.greaterThanOrEqual(amount);
   
-      assert(fromBalanceIsSufficient, errors.fromBalanceInsufficient());
+      // assert(fromBalanceIsSufficient, errors.fromBalanceInsufficient());
   
-      const newFromBalance = fromBalance.sub(amount);
-      await this.setBalance(tokenId, from, newFromBalance);
+      // const newFromBalance = fromBalance.sub(amount);
+      // await this.setBalance(tokenId, from, newFromBalance);
   
-      const toBalance = await this.getBalance(tokenId, to);
-      const newToBalance = toBalance.add(amount);
+      // const toBalance = await this.getBalance(tokenId, to);
+      // const newToBalance = toBalance.add(amount);
   
-      await this.setBalance(tokenId, to, newToBalance);
-      this.events.emit('transfer', new TransferEvent({tokenId, from, to, amount}));
+      // await this.setBalance(tokenId, to, newToBalance);
+      // this.events.emit('transfer', new TransferEvent({tokenId, from, to, amount}));
     }
   
     public async mint(tokenId: TokenId, address: PublicKey, amount: Balance) {

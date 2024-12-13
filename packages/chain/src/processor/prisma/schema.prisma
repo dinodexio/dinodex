@@ -30,3 +30,58 @@ model Balance {
 
   @@id([height, address])
 }
+
+model Pool {
+  poolKey           String  @id
+  tokenAId          String
+  tokenBId          String
+  tokenAAmount      String
+  tokenBAmount      String
+  path              Json
+  blockHeight       Int
+  updateBlockHeight Int
+  createAt          DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model PoolAction {
+  hash          String
+  blockHeight   Int
+  creator       String
+  status        Boolean
+  eventIndex    Int
+  poolKey       String
+  directionAB   Boolean
+  tokenAId      String
+  tokenBId      String
+  tokenAAmount  String
+  tokenBAmount  String
+  tokenAPrice   Float
+  tokenBPrice   Float
+  type          String
+  createAt      DateTime @default(now())
+
+  @@id([hash, eventIndex])
+}
+
+model RouteStable {
+  tokenId       String
+  tokenStableId String
+  vector        Json
+
+  @@id([tokenId, tokenStableId])
+}
+
+model Token {
+  tokenId  String @id
+  price    Float
+}
+
+model HistoryToken {
+  id              Int @id @default(autoincrement())
+  blockHeight     Int
+  tokenId         String
+  tokenStableId   String
+  price           Float
+  createAt        DateTime @default(now())
+}
