@@ -2,7 +2,7 @@ import pg from 'pg'
 import cors from 'cors'
 import express from 'express'
 // import { Pools } from "./tokens"
-import { client as clientAppchain, PoolKey, TokenPair } from "chain";
+import { client as clientAppchain, PoolKey, TokenPair, clientBot as clientBotAppChain } from "chain";
 import { TokenId } from "@proto-kit/library";
 import BigNumber from 'bignumber.js';
 
@@ -12,14 +12,16 @@ import { memoPools } from './components/MemoPools';
 import { decodeDinodexTxEvent, revertPrecision, sleep } from './components/utils';
 import { MemoChain } from './components/MemoChain';
 import { dinodex_pool_action_collection, dinodex_pool_list_collection } from './db';
+import { Field, PrivateKey, PublicKey, Scalar, Signature } from 'o1js';
 
 const { Client } = pg
 const app = express();
 
-await clientAppchain.start();
+await clientAppchain.start()
+await clientBotAppChain.start()
 
 app.use(cors())
-
+app.use(express.urlencoded({ extended: false }));
 
 const PORT = process.env.NEXT_PUBLIC_SERVER_APP_PORT || 3333
 const HOST = process.env.SERVER_APP_HOST || "http://localhost"
@@ -485,6 +487,30 @@ app.get('/routers', (req, res) => {
     } catch (error) {
         res.json({ error: true, message: "No Router" })
     }
+})
+
+app.post('/dripBundle', async (req, res) => {
+    const { address = '' } = req.body
+    try {
+        if (!address) {
+            throw Error("Address invalid!")
+        }
+
+        const faucetModule = clientBotAppChain.runtime.resolve("Faucet");
+        const addressPublicKey = PublicKey.fromBase58(address)
+        const publicKey = faucetModule.config.factory
+        const tx = await clientBotAppChain.transaction(publicKey, async () => {
+            await faucetModule.dripBundleTo(addressPublicKey)
+        })
+
+        await tx.sign()
+        await tx.send();
+        
+        res.json({ error: false, message: "drip done!" })
+    } catch (error) {
+        res.json({ error: true, message: "Error!" })
+    }
+
 })
 
 app.listen(PORT, () => {
