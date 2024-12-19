@@ -1,7 +1,7 @@
-
-
 :root {
   --white-color-bg: #fff;
+  --white-color-bg-page-portal: #f7f4f2;
+  --white-color-text: #fafafa;
   --white-color-bg-opacity: rgba(255, 255, 255, 0.8);
   --black-color-text: #000;
   --black-color-shadow: rgba(0, 0, 0, 0.25);
@@ -69,6 +69,7 @@
   --black-text-color: #000;
   --white-text-color: #fff;
   --red-text-color: #f83b28;
+  --red2-text-color: #ff5656;
   --green-text-color: #45b272;
   --green2-text-color: #0a6;
   --bg-button-active-color: #ff603b;
@@ -92,6 +93,34 @@
   --bg-fixed-color: #fccdc2;
   --bg-body-color: #fffbf7;
   --bg-chart-color: #6a16ff;
+  --black-shadow-navbar: rgba(0, 0, 0, 0.08);
+  --black-shadow-text: rgba(0, 0, 0, 0.12);
+  --black-text-navbar: #1a1a1a;
+  --white-color-bg-navbar: #ffe6e0;
+  --orange-color-text-navbar: #f55631;
+  --white-color-bg-footer: #fff9f2;
+  --purple-color-text: #634d8a;
+  --bg-brown-op-color: rgba(255, 0, 0, 0.3);
+  --or-2-color: #f5a997;
+  --green3-color: #6bdf61;
+}
+
+@font-face {
+  font-family: "Unbounded";
+  src: url("assets/fonts/Unbounded-Medium.ttf") format("opentype");
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "PPMondwest";
+  src: url("assets/fonts/PPMondwest-Regular.otf") format("opentype");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Poppins";
+  src: url("assets/fonts/Poppins-Regular.ttf") format("opentype");
+  font-weight: 400;
 }
 
 @font-face {
@@ -141,5 +170,50 @@
   font-weight: 300;
   letter-spacing: 1px;
   font-style: regular;
->>>>>>> apps/web/UI/v2/global.css
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter/Inter_24pt-Thin.ttf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter/Inter_24pt-Regular.ttf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter/Inter_24pt-Medium.ttf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter/Inter_24pt-SemiBold.ttf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter/Inter_24pt-Bold.ttf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter/Inter_24pt-ExtraBold.ttf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+main {
+  flex: 1 0 auto;
 }

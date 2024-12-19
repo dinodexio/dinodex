@@ -1,7 +1,7 @@
 import { useToast } from "@/components/ui/use-toast";
 import { PendingTransaction, UnsignedTransaction } from "@proto-kit/sequencer";
 import { MethodIdResolver } from "@proto-kit/module";
-import { useCallback, useEffect, useMemo } from "react";
+import { use, useCallback, useEffect, useMemo } from "react";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 // @ts-ignore
@@ -11,7 +11,6 @@ import { useClientStore } from "./client";
 import { useChainStore } from "./chain";
 import { Field, PublicKey, Signature, UInt64 } from "o1js";
 import Image from "next/image";
-import { useBalancesStore } from "./balances";
 import { TRANSACTION_TYPES } from "@/constants";
 import { dataSubmitProps } from "@/types";
 import stylesWallet from "../../components/css/wallet.module.css";
@@ -130,7 +129,7 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
     },
 
     pendingTransactions: [] as PendingTransaction[],
-    addPendingTransaction(pendingTransaction, type = "Transaction", data) {
+    addPendingTransaction(pendingTransaction, type = "Transaction", data = {}) {
       set((state) => {
         // @ts-expect-error
         state.pendingTransactions.push(pendingTransaction);
@@ -151,14 +150,13 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
 function removeEventListeners() {
   if (typeof mina !== "undefined") {
     // Xóa các trình nghe sự kiện như accountsChanged
-    mina.on("accountsChanged", () => {}); // Hàm không có tác dụng để xóa trình nghe
+    mina.on("accountsChanged", () => { }); // Hàm không có tác dụng để xóa trình nghe
   }
 }
 
 export const useNotifyTransactions = () => {
   const wallet = useWalletStore();
   const chain = useChainStore();
-  const { setLoadBalances } = useBalancesStore();
   const { toast } = useToast();
   const client = useClientStore();
   const previousPendingTransactions = usePrevious(wallet.pendingTransactions);
@@ -312,7 +310,7 @@ export const useNotifyTransactions = () => {
             height={height ? height : 18}
             alt={alt}
             className={className}
-            // style={{ marginLeft: "-36px" }}
+          // style={{ marginLeft: "-36px" }}
           />
         );
 
@@ -335,18 +333,17 @@ export const useNotifyTransactions = () => {
                 message: `${type} sent`,
               };
             case "SUCCESS":
-              setLoadBalances(true);
               return {
                 iconSrc:
                   type === TRANSACTION_TYPES.ADD ||
-                  type === TRANSACTION_TYPES.REMOVE ||
-                  type === TRANSACTION_TYPES.CREATE
+                    type === TRANSACTION_TYPES.REMOVE ||
+                    type === TRANSACTION_TYPES.CREATE
                     ? [dataTransaction?.logoA, dataTransaction?.logoB]
                     : "/icon/success-icon.svg",
                 message:
                   type !== TRANSACTION_TYPES.ADD &&
-                  type !== TRANSACTION_TYPES.REMOVE &&
-                  type !== TRANSACTION_TYPES.CREATE
+                    type !== TRANSACTION_TYPES.REMOVE &&
+                    type !== TRANSACTION_TYPES.CREATE
                     ? `${type} Successful`
                     : type,
               };
@@ -354,8 +351,8 @@ export const useNotifyTransactions = () => {
               return {
                 iconSrc:
                   type === TRANSACTION_TYPES.ADD ||
-                  type === TRANSACTION_TYPES.REMOVE ||
-                  type === TRANSACTION_TYPES.CREATE
+                    type === TRANSACTION_TYPES.REMOVE ||
+                    type === TRANSACTION_TYPES.CREATE
                     ? [dataTransaction?.logoA, dataTransaction?.logoB]
                     : "/icon/failed-ico.svg",
                 message: `${type} Failed`,
@@ -370,8 +367,8 @@ export const useNotifyTransactions = () => {
         return (
           <>
             {type !== TRANSACTION_TYPES.ADD &&
-            type !== TRANSACTION_TYPES.REMOVE &&
-            type !== TRANSACTION_TYPES.CREATE ? (
+              type !== TRANSACTION_TYPES.REMOVE &&
+              type !== TRANSACTION_TYPES.CREATE ? (
               <div
                 className={`flex flex-col items-start ${stylesWallet["content-toast"]}`}
               >
@@ -511,3 +508,48 @@ export const useNotifyTransactions = () => {
     notifyTransaction,
   ]);
 };
+
+export const useNotifications = () => {
+  const { toast } = useToast();
+
+  return useCallback(({ message, type }: { message: string, type: string }) => {
+    function description({ message = '', type = '' }: { message: string, type: string }) {
+      return (
+        <>
+          <div
+            className={`flex flex-col items-start ${stylesWallet["content-toast"]}`}
+          >
+            <span className="flex h-[12px] items-center gap-[4px] text-[20px] font-medium text-textBlack">
+              <div style={{ marginLeft: "-24px" }}>
+                <img
+                  src={"/icon/failed-ico.svg"}
+                  width={18}
+                  height={18}
+                  alt={"dinodex-transaction-fail"}
+                  className={stylesWallet["img-toast"]}
+                // style={{ marginLeft: "-36px" }}
+                />
+              </div>
+              {`${type} Failed`}
+            </span>
+            {message}
+            <Image
+              src="/icon/Close-icon.svg"
+              width={18}
+              height={18}
+              alt=""
+              className="absolute cursor-pointer"
+              style={{ top: 9, right: 13 }}
+            />
+          </div>
+        </>
+      )
+    }
+    toast({
+      title: "",
+      description: description({ message, type }),
+      className: `bg-bgWhiteColor text-textBlack border-none shadow-content rounded-[12px] w-full ${stylesWallet["toast-container"]}`,
+    })
+  }, []
+  );
+}

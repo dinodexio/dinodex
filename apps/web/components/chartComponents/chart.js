@@ -350,7 +350,7 @@ class BarsChart {
       size: this.axis.size,
       labels: columns.map((col) => ({
         position: col.x + col.width / 2,
-        label: col.label,
+        label: d3.timeFormat("%H:%m")(new Date(col.label)),
       })),
     });
     this.axisY = new AxisY(ctx, {
@@ -396,6 +396,7 @@ class BarsChart {
   }
 
   draw() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.column.forEach((col) => col.draw());
     this.axisX.draw();
     this.axisY.draw();
@@ -476,7 +477,7 @@ class DoubleBarChart {
     this.data = config.data;
     this.colors = config.colors || ["#E1D9F0", "#E4F5EE"];
     this.axis = config.axis;
-    this.onHover = config.onHover || function () {};
+    this.onHover = config.onHover || function () { };
     this.hoverColors = config.hoverColors || ["#C0B0E0", "#C0E0D0"];
     this.setupEventListeners();
     this.margin = config.margin || { top: 20, right: 20, bottom: 29, left: 10 };
@@ -674,7 +675,7 @@ class DoubleAreaChart {
       marginRight = 1,
       marginTop = 20,
       marginLeft = 1,
-      onHover = (x, dataHover) => {},
+      onHover = (x, dataHover) => { },
     },
   ) {
     this.ctx = ctx;
@@ -918,12 +919,12 @@ class SingleAreaChart {
       marginRight = 40,
       marginTop = 20,
       marginLeft = 0,
-      onHover = (x, dataHover) => {},
+      onHover = (x, dataHover) => { },
     },
   ) {
     this.ctx = ctx;
     this.canvas = ctx.canvas;
-    this.data = data.map((d) => ({ date: d[0], value: d[1] }));
+    this.data = data.reverse();
     this.hoverLine = null;
     this.setupEventListeners();
     this.colorArea = colorArea;
@@ -948,18 +949,22 @@ class SingleAreaChart {
   }
 
   handleMouseMove(event) {
+    if(!this.data || this.data.length === 0) return;
     const rect = this.canvas.getBoundingClientRect();
     const x = event.clientX - rect.left - this.margin.left;
-    const date = this.xScale.invert(x);
     this.canvas.style.cursor = "pointer";
 
     this.hoverLine = x;
 
+    const date = this.xScale.invert(x);
     const bisect = d3.bisector((d) => d.date).left;
-    const index = bisect(this.data, date, 1);
-    const d0 = this.data[index - 1];
-    const d1 = this.data[index];
+    const numerical = bisect(this.data, date.valueOf());
+
+    const d0 = this.data[numerical - 1];
+    const d1 = this.data[numerical];
+
     if (!d0 || !d1) return;
+
     const d = date - d0.date > d1.date - date ? d1 : d0;
 
     this.hoverData = d;
@@ -1018,7 +1023,6 @@ class SingleAreaChart {
       .scaleTime()
       .domain(d3.extent(this.data, (d) => d.date))
       .range([0, width]);
-
     const yMin = d3.min(this.data, (d) => d.value);
     const yMax = d3.max(this.data, (d) => d.value);
 
@@ -1075,7 +1079,7 @@ class SingleAreaChart {
     yTicks.forEach((tick) => {
       const x = this.canvas.width;
       const y = this.yScale(tick) + this.margin.top;
-      this.ctx.fillText(`$${tick}`, x, y);
+      this.ctx.fillText(`$${tick.toFixed(3)}`, x, y);
     });
 
     // Draw X-axis labels
@@ -1086,7 +1090,7 @@ class SingleAreaChart {
     for (let i = 0; i < 6; i++) {
       const time = new Date(
         startTime.getTime() +
-          (endTime.getTime() - startTime.getTime()) * (i / 6),
+        (endTime.getTime() - startTime.getTime()) * (i / 6),
       );
       xTicks.push(time);
     }
@@ -1099,7 +1103,6 @@ class SingleAreaChart {
     xTicks.forEach((date) => {
       const x = this.xScale(date) + 40;
       const y = height + this.margin.top + 10;
-      // Hiển thị giờ và phút
       this.ctx.fillText(
         date.toLocaleTimeString("us-UA", {
           hour: "2-digit",

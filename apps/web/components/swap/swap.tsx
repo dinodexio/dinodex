@@ -61,7 +61,7 @@ interface ValueInputSwapState {
   tokenOut: string | null;
 }
 
-const INIT_SLIPPAGE = 0.5;
+const INIT_SLIPPAGE = 0.2;
 
 // const pools = generatePools();
 
@@ -302,11 +302,6 @@ export function Swap({ token, type }: SwapProps) {
       const intermediateAmountOut = new BigNumber(addPrecision(amountIn || "0"))
         .multipliedBy(tokenOutReserve)
         .div(new BigNumber(tokenInReserve).plus(addPrecision(amountIn || "0")));
-
-      // console.log(
-      //   "intermediateAmountOut",
-      //   removePrecision(intermediateAmountOut.toFixed(2)),
-      // );
       const amountOutWithoutFee = intermediateAmountOut.minus(
         intermediateAmountOut.multipliedBy(3).dividedBy(100000),
       );

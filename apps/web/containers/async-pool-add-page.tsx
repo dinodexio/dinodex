@@ -10,7 +10,7 @@ import {
 import { useWalletStore } from "@/lib/stores/wallet";
 import { findTokenByParams, tokens } from "@/tokens";
 import BigNumber from "bignumber.js";
-import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {  useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,7 +26,6 @@ import { addPrecision, removePrecision } from "@/lib/utils";
 import { precision, removeTrailingZeroes } from "@/components/ui/balance";
 import { Form } from "@/components/ui/form";
 import { UInt64 } from "o1js";
-import { EMPTY_DATA } from "@/constants";
 import { dataSubmitProps } from "@/types";
 
 export const initCheckForm = {
@@ -37,7 +36,7 @@ export const initCheckForm = {
   message: "",
 };
 
-const INIT_SLIPPAGE = 0.5;
+const INIT_SLIPPAGE = 0.2;
 
 export default function Pool({ params }: { params?: any }) {
   const [loading, setLoading] = useState(false);
@@ -98,6 +97,18 @@ export default function Pool({ params }: { params?: any }) {
       slippage: z.any().optional(),
       slippage_custom: z.any().optional(),
       transactionDeadline: z.any().optional(),
+    })
+    .refine((data) => {
+      if (data.tokenA_token === "1") {
+        return data.tokenB_token !== "2";
+      }
+      if (data.tokenA_token === "2") {
+        return data.tokenB_token !== "1";
+      }
+      return true;
+    }, {
+      message: "Invalid token pair",
+      path: ["tokenA_token"],
     })
     .refine((data) => data.tokenA_token !== data.tokenB_token, {
       message: "Tokens must be different",

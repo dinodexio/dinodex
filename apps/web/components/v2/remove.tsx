@@ -36,7 +36,7 @@ import { formatBigNumber } from "@/lib/utils";
 import { dataSubmitProps } from "@/types";
 import { Input } from "../ui/input";
 import useClickOutside from "@/hook/useClickOutside";
-const Header = dynamic(() => import("@/components/header"), {
+const Header = dynamic(() => import("@/components/headerv2"), {
   ssr: false,
 });
 
@@ -62,6 +62,11 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
 
   const [openSetting, setOpenSetting] = useState(false);
 
+  const [settingSlippage, setSettingSlippage] = useState({
+    default: 0.5,
+    value: "",
+    transactionDeadline: "",
+  });
   const settingRef = useClickOutside<HTMLDivElement>(() => {
     setOpenSetting(false);
   });
@@ -163,21 +168,36 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
           : 0;
         const tokenA_amount = Number(valueTokenPool?.tokenA_amount);
         const tokenB_amount = Number(valueTokenPool?.tokenB_amount);
+
+        const tokenPair = TokenPair.from(
+          TokenId.from(firstTokenValue),
+          TokenId.from(secondTokenValue),
+        );
+
+        const isVectorAB = tokenPair.tokenAId.toString() === firstTokenValue;
+
+        const calculateMinAmount = (amount: number) =>
+          Math.floor(
+            amount *
+              (1 -
+                (Number(settingSlippage?.value) || settingSlippage.default) /
+                  100),
+          ).toString();
+
+        const minAmountA = calculateMinAmount(tokenA_amount);
+        const minAmountB = calculateMinAmount(tokenB_amount);
+
+        const tokenAmounts = isVectorAB
+          ? { minAmountA, minAmountB }
+          : { minAmountA: minAmountB, minAmountB: minAmountA };
+
         await removeLiquidity(
-          tokenParams?.tokenA?.value,
-          tokenParams?.tokenB?.value,
+          firstTokenValue,
+          secondTokenValue,
           Math.floor(Number(tokenLP_amount.toString())).toString(),
           // TODO: actually add a limit here based on allowed slippage
-          new BigNumber(tokenParams?.tokenA?.value).lt(
-            tokenParams?.tokenB?.value,
-          )
-            ? Math.floor(Number(tokenB_amount.toString())).toString()
-            : Math.floor(Number(tokenA_amount.toString())).toString(),
-          new BigNumber(tokenParams?.tokenA?.value).lt(
-            tokenParams?.tokenB?.value,
-          )
-            ? Math.floor(Number(tokenA_amount.toString())).toString()
-            : Math.floor(Number(tokenB_amount.toString())).toString(),
+          tokenAmounts.minAmountA,
+          tokenAmounts.minAmountB,
           data,
         );
         return true;
@@ -198,13 +218,13 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
   return (
     <>
       <Dialog>
-        <div className="flex w-full flex-col px-[16px] pb-[8px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px]">
+        <div className="flex w-full flex-col ">
           <Toaster />
-          <div className="flex basis-11/12 flex-col 2xl:basis-10/12">
-            <Header />
+          <Header />
+          <div className="flex basis-11/12 flex-col px-[16px] pb-[8px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px] 2xl:basis-10/12">
             <div className="mx-auto mt-[40px] flex w-full max-w-[1065px] flex-col items-center justify-center gap-[25px] sm:mt-[40px] lg:mt-[100px] xl:mt-[113.74px]">
               <Card
-                className={`mx-auto flex w-full max-w-[605px] flex-col gap-[15px] rounded-[24px] border-none bg-bgWhiteColor px-[8px] py-[8px] shadow-popup sm:px-[8px] sm:py-[8px] lg:px-[15px] lg:pt-[25px] lg:pb-[20px] xl:px-[15px] xl:pt-[25px] xl:pb-[20px]`}
+                className={`mx-auto flex w-full max-w-[605px] flex-col gap-[15px] rounded-[24px] border-none bg-bgWhiteColor px-[8px] py-[8px] shadow-popup sm:px-[8px] sm:py-[8px] lg:px-[15px] lg:pb-[20px] lg:pt-[25px] xl:px-[15px] xl:pb-[20px] xl:pt-[25px]`}
               >
                 <CardHeader className="flex-row items-center justify-between p-0 px-[10px]">
                   <Link href="/pool">
@@ -223,10 +243,8 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                     className="relative flex h-[42px] items-center gap-1 p-[6px]"
                     ref={settingRef}
                   >
-                    <span className="text-[20px] font-[400] text-textBlack opacity-60">
-                      {/* {fields.slippage_custom
-                        ? `${truncateString(fields.slippage_custom, precision)}%`
-                        : null} */}
+                    <span className="text-[20px] font-[400] text-textBlack opacity-60 absolute right-[40px]">
+                      {settingSlippage.value ? `${settingSlippage.value}%` : ''}
                     </span>
                     <Image
                       src="/images/swap/setting-icon.svg"
@@ -251,18 +269,79 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                         <div className="flex items-center gap-[12px] rounded-[12px] bg-[#EBEBEB] pr-[12px] shadow-content">
                           <div
                             className={`flex cursor-pointer items-center justify-center rounded-[12px] bg-bgWhiteColor px-3 py-[6px] text-[16px] font-[400]
-                       shadow-content transition duration-300 ease-in-out hover:bg-[#EBEBEB] sm:text-[16px] lg:text-[18px] xl:text-[18px] text-borderOrColor
+                       ${settingSlippage.value ? "text-textBlack" : "text-borderOrColor"} shadow-content transition duration-300 ease-in-out hover:bg-[#EBEBEB] sm:text-[16px] lg:text-[18px] xl:text-[18px]
                       `}
-                            onClick={() => {}}
+                            onClick={() => {
+                              if (settingSlippage.value) {
+                                setSettingSlippage((prev) => ({
+                                  ...prev,
+                                  value: "",
+                                }));
+                              }
+                              setSettingSlippage((prev) => ({
+                                ...prev,
+                                default: 0.5,
+                              }));
+                            }}
                           >
                             Auto
                           </div>
                           <div className="flex items-center gap-[2px]">
                             <Input
+                              onChange={(e) => {
+                                let input = e.target.value;
+
+                                // Step 1: Remove invalid characters (e/E)
+                                input = input.replace(/[eE]/g, "");
+
+                                // Step 2: Replace ',' with '.' for decimal formatting
+                                input = input.replace(/,/g, ".");
+
+                                // Step 3: Remove all invalid characters except digits and '.'
+                                input = input.replace(/[^0-9.]/g, "");
+
+                                // Step 4: Allow only one '.' in the input
+                                const parts = input.split(".");
+                                if (parts.length > 2) {
+                                  return setSettingSlippage((prev) => ({
+                                    ...prev,
+                                    value: "",
+                                  }));
+                                }
+
+                                // Step 5: Add '0' before '.' if the input starts with '.'
+                                if (input.startsWith(".")) {
+                                  input = `0${input}`;
+                                }
+
+                                // Step 6: Limit to 2 decimal places if a '.' is present
+                                if (parts.length === 2) {
+                                  const integerPart = parts[0];
+                                  const decimalPart = parts[1].slice(0, 2); // Keep only up to 2 digits after '.'
+                                  input = `${integerPart}.${decimalPart}`;
+                                }
+
+                                // Step 7: Parse input and validate against range [0.1, 20]
+                                const value = parseFloat(input);
+                                if (value > 50 || value < 0.1) {
+                                  return setSettingSlippage((prev) => ({
+                                    ...prev,
+                                    value: "",
+                                  }));
+                                }
+
+                                // Step 8: Update form value if valid
+                                setSettingSlippage((prev) => ({
+                                  ...prev,
+                                  value: input,
+                                }));
+                              }}
                               className="= mr-[2px] h-full w-[50px] border-0 border-none bg-transparent p-0 text-right text-[18px] font-[400] text-textBlack opacity-50 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-[18px] lg:text-[18px] xl:text-[18px]"
                               placeholder="0.5"
                               type="text"
                               inputMode="decimal"
+                              value={settingSlippage.value || ""}
+                              name="slippage"
                             />
                             <span className="text-[20px] font-[400] text-textBlack opacity-50 ">
                               %
@@ -284,9 +363,23 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                           }}
                         >
                           <Input
+                            onChange={(e) => {
+                              const value = parseFloat(e.target.value) || 0;
+                              if (value > 4320) {
+                                setSettingSlippage((prev) => ({
+                                  ...prev,
+                                  transactionDeadline: "4320",
+                                }));
+                              } else
+                                setSettingSlippage((prev) => ({
+                                  ...prev,
+                                  transactionDeadline: e.target.value,
+                                }));
+                            }}
+                            value={settingSlippage.transactionDeadline || ""}
+                            name="transactionDeadline"
                             type="number"
                             min={0}
-                            max={4320}
                             className="padding-0 h-full w-[70px] border-0 border-none bg-transparent text-[18px] font-[500] text-textBlack outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-[18px] lg:text-[18px] xl:text-[18px]"
                           />
                           <span className="text-[18px] font-[400] text-textBlack opacity-50 sm:text-[18px] lg:text-[18px] xl:text-[18px]">
@@ -332,7 +425,7 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                       Detailed
                     </span> */}
                   </div>
-                  <span className="text-[50px] font-[400] text-textBlack sm:text-[50px] lg:text-[64px] xl:text-[64px] h-[74px] flex items-center">
+                  <span className="flex h-[74px] items-center text-[50px] font-[400] text-textBlack sm:text-[50px] lg:text-[64px] xl:text-[64px]">
                     {valueRange}%
                   </span>
                   <div className="h-[31px] w-full">
@@ -349,7 +442,7 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                     {valueDeposit?.map((item: any) => {
                       return (
                         <div
-                          className={styles['button-withdraw']}
+                          className={styles["button-withdraw"]}
                           onClick={() => setValueRange(item?.value)}
                           key={item.value}
                         >
@@ -489,7 +582,7 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                       }
                       className={`${stylesButton["button-swap"]} ${stylesButton["btn-supply-remove"]} w-full`}
                       style={{ fontSize: 22, height: 56 }}
-                    // onClick={handleRemoveLiquidity}
+                      // onClick={handleRemoveLiquidity}
                     >
                       <span>Remove</span>
                     </Button>

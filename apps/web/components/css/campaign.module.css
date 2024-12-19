@@ -1,0 +1,108 @@
+.container-campaign {
+    max-width: min(100%, 1440px);
+    padding: 40px 20px 62px 20px;
+    margin: 0 auto;
+}
+
+.first-container-campaign {
+    position: relative;
+    height: 640px;
+    margin: 40px auto 0 auto;
+    background-image: url('/images/campaign/banner-campaign.webp');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 30px;
+}
+
+.bg-campaign {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.first-content-campaign {
+    z-index: 10;
+    position: relative;
+    padding-top: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.title-campaign {
+    text-align: center;
+    font-family: 'Inter';
+    font-size: 110px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    background: linear-gradient(165deg, #E79B83 24.58%, #F08090 42.62%, var(--white-text-color) 69.99%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    padding-bottom: 20px;
+}
+
+.second-container-campaign {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding-top: 40px;
+}
+
+@media (max-width: 1200px) {
+    .first-container-campaign {
+        height: 500px;
+    }
+
+    .first-content-campaign>img {
+        width: 300px;
+    }
+
+    .title-campaign {
+        font-size: 72px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .second-container-campaign {
+        padding: 40px 60px 62px 60px;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 850px) {
+    .container-campaign {
+        padding: 20px 8px 40px 8px;
+    }
+
+    .title-campaign {
+        font-size: calc(100vw / 10);
+    }
+
+    .first-container-campaign {
+        width: 96%;
+        margin: 40px auto 0 auto;
+    }
+
+    .second-container-campaign {
+        width: 96%;
+        padding: 40px 0 62px 0;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 550px) {
+    .first-container-campaign {
+        height: 100vw;
+    }
+
+    .first-content-campaign>img {
+        width: calc(100vw - 100px);
+    }
+}

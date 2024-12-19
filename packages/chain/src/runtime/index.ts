@@ -24,7 +24,7 @@ export const config: ModulesConfig<typeof modules> = {
   Locks: {},
   Withdrawals: {},
   Faucet: {
-    factory: PublicKey.fromBase58(process.env.PROTOKIT_FACTORY_KEY!)
+    factory: PublicKey.fromBase58(process.env.NEXT_PUBLIC_PROTOKIT_FACTORY_ADDRESS!)
   },
   TokenRegistry: {},
   XYK: {

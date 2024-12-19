@@ -1,0 +1,9 @@
+<svg width="32" height="26" viewBox="0 0 32 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 212">
+<path id="Subtract" opacity="0.3" fill-rule="evenodd" clip-rule="evenodd" d="M28.5 26C30.1569 26 31.5 24.6569 31.5 23V15C31.5 13.3431 30.1569 12 28.5 12H22.6151L16.5 21.4362V23C16.5 24.6569 17.8431 26 19.5 26H28.5Z" fill="#909D45"/>
+<path id="Subtract_2" fill-rule="evenodd" clip-rule="evenodd" d="M3.5 0C1.84315 0 0.5 1.34315 0.5 3V15C0.5 16.6569 1.84315 18 3.5 18H12.9505L18.5 9.6757V3C18.5 1.34315 17.1569 0 15.5 0H3.5Z" fill="#909D45"/>
+<path id="Union" fill-rule="evenodd" clip-rule="evenodd" d="M10.6562 3.78125H8.15625V7.53125L4.40625 7.53125V10.0312H8.15625V13.7812H10.6562V10.0312H14.4062V7.53125L10.6562 7.53125V3.78125Z" fill="#E4F293"/>
+<rect id="Rectangle 2" x="28.3125" y="18.5625" width="2" height="8" transform="rotate(90 28.3125 18.5625)" fill="#909D45"/>
+<path id="Vector 15" d="M22.3125 7.5625L12.3125 22.5625" stroke="#909D45" stroke-width="2"/>
+</g>
+</svg>

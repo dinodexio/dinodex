@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { PublicKey } from 'o1js';
-import { BalancesKey, TokenId } from "@proto-kit/library";
+import { Balance, BalancesKey, TokenId } from "@proto-kit/library";
 
 export const MemoLeaderboard = {
   clientBotAppChain: undefined,
@@ -16,6 +16,7 @@ export const MemoLeaderboard = {
   },
   historical: {},
   space_time: 30 * 1000,
+  minaInitPerAddress: 1000,
   init: function (client) {
     this.clientBotAppChain = client
   },
@@ -99,16 +100,16 @@ export const MemoLeaderboard = {
   getBalance: async function (tokenId, address) {
     const balanceKey = new BalancesKey({ tokenId: TokenId.from(tokenId), address: PublicKey.fromBase58(address) })
     const balance = await this.clientBotAppChain.query.runtime.Balances.balances.get(balanceKey)
-    return balance
+    return balance || Balance.from(0)
   },
   getHistory: function (address, key = 'totalVolume') {
-    const historicalData = this.historical[address] ? this.historical[address][key] : []
-    let indexHistory = this.maxLengthHistory - 1
-    if (historicalData.length == 0) return 0
-    if (indexHistory > historicalData.length) {
-      indexHistory = historicalData.length - 1
-    }
-    return historicalData[indexHistory]
+    const historicalDataBase = this.historical[address] ? this.historical[address][key] : []
+    let indexHistory = historicalDataBase.findIndex(data => data != null)
+    // if (historicalData.length == 0) return 0
+    // if (indexHistory > historicalData.length) {
+    //   indexHistory = historicalData.length - 1
+    // }
+    return historicalDataBase[indexHistory]
   },
   updateInfoWallet: function (currentDataBlock = {}) {
     const {
@@ -121,7 +122,7 @@ export const MemoLeaderboard = {
 
     const volume = BigNumber(tokenAAmount).times(tokenAPrice).plus(
       BigNumber(tokenBAmount).times(tokenBPrice)
-    ).dividedBy(10e9)
+    ).dividedBy(1e9)
 
     const newTotalVolume = BigNumber(this.processData[creator]?.totalVolume || 0).plus(volume)
     const totalVolumeHistory = this.getHistory(creator, "totalVolume") || 0
@@ -129,7 +130,9 @@ export const MemoLeaderboard = {
     this.processData[creator] = {
       ...this.processData[creator],
       totalVolume: newTotalVolume.toString(),
-      totalVolumeChange: totalVolumeHistory == 0 ? 100 : BigNumber(newTotalVolume).minus(totalVolumeHistory).dividedBy(totalVolumeHistory).times(100).toNumber()
+      totalVolumeChange: totalVolumeHistory == 0 
+      ? 0
+      : BigNumber(newTotalVolume).minus(totalVolumeHistory).dividedBy(this.minaInitPerAddress).times(100).toNumber()
     }
   },
   updateRank: async function () {
@@ -156,23 +159,27 @@ export const MemoLeaderboard = {
       const balancesMina = await this.getBalance("0", addressWallet)
       const balancesTrex = await this.getBalance("1", addressWallet)
       const balancesRaptor = await this.getBalance("2", addressWallet)
+      
       const pnl = BigNumber(balancesMina.toString())
         .plus(BigNumber(balancesTrex.toString()).times(this.prices["1"] || 0))
         .plus(BigNumber(balancesRaptor.toString()).times(this.prices["2"] || 0))
-        .minus(1000 * 10e9)
-        .dividedBy(10e9)
+        .minus(BigNumber(this.minaInitPerAddress).times(1e9))
+        .dividedBy(1e9)
       const pnlHistory = this.getHistory(addressWallet, "pnl") || 0
       this.processData[addressWallet] = {
         ...this.processData[addressWallet],
         pnl: pnl.toString(),
-        pnlChange: pnlHistory == 0 ? 100 : BigNumber(pnl).minus(pnlHistory).dividedBy(pnlHistory).times(100).toNumber()
+        pnlChange: pnlHistory == 0 
+        ? 0
+        : BigNumber(pnl).minus(pnlHistory).dividedBy(this.minaInitPerAddress).times(100).toNumber()
       }
     }
     this.sortTotalVolume = this.convertAndSort()
 
   },
-  convertAndSort: function (key = "rank", type = 'asc') {
-    const array = Object.entries(this.processData).map(([walletAddress, info = {}]) => ({
+  convertAndSort: function (key = "rank", type = 'asc', data = null) {
+    if (data == null) data = this.processData
+    const array = Object.entries(data).map(([walletAddress, info = {}]) => ({
       walletAddress,
       ...info
     }));

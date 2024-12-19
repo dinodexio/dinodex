@@ -2,42 +2,10 @@ import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { Token, tokens } from "@/tokens";
-import { generatePriceData } from "../utils";
-
-export interface ComputedTransactionJSON {
-  argsFields: string[];
-  auxiliaryData?: any[];
-  hash?: string;
-  isMessage?: boolean;
-  argsJSON: string[];
-  methodId: string;
-  moduleName?: string;
-  methodName?: string;
-  type?: string;
-  token?: {
-    first: {
-      logo: string;
-      name: string;
-      symbol: string;
-      amount: string;
-    };
-    second: {
-      logo: string;
-      name: string;
-      symbol: string;
-      amount: string;
-    };
-  };
-  address?: string;
-  price?: number | string;
-  nonce: string;
-  sender: string;
-  timeStamp?: string;
-  signature: {
-    r: string;
-    s: string;
-  };
-}
+import { generatePriceData, removePrecision } from "../utils";
+import { ComputedTransactionJSON, LeaderboardData } from "@/types";
+import BigNumber from "bignumber.js";
+import { precision } from "@/components/ui/balance";
 
 export interface ComputedPoolTransactionJSON {
   hash?: string | number;
@@ -46,7 +14,9 @@ export interface ComputedPoolTransactionJSON {
   tokenAId: string;
   tokenBId: string;
   tokenAAmount?: string | number;
+  tokenAPrice?: string | number;
   tokenBAmount?: string | number;
+  tokenBPrice?: string | number;
   directionAB?: boolean;
   type?: string;
   blockHeight?: string | number;
@@ -54,10 +24,18 @@ export interface ComputedPoolTransactionJSON {
   price?: {
     usd?: string | number;
   };
+  createAt?: string;
 }
 
 export interface PoolTransactionQueryResponse {
   data: Array<ComputedPoolTransactionJSON>;
+  error: boolean;
+}
+
+export interface PoolTransactionInfoQueryResponse {
+  data: {
+    poolActions?: Array<PoolsInfoJSON>;
+  };
   error: boolean;
 }
 
@@ -74,7 +52,6 @@ export interface ChainState {
   block?: {
     height: string;
   } & ComputedBlockJSON;
-  // transactions?: ComputedTransactionJSON[];
   data: any;
   transactions: any;
   error: boolean;
@@ -101,7 +78,9 @@ export interface TokensQueryResponse {
 }
 
 export interface TransactionQueryResponse {
-  data: ComputedTransactionJSON;
+  data?: {
+    poolActions?: ComputedTransactionJSON;
+  };
   error: boolean;
 }
 
@@ -112,9 +91,6 @@ export interface TokenDataJSON {
   logo?: string;
   name?: string;
   price?: string | number;
-  volume?: string | number;
-  tvl?: string | number;
-  fdv?: string | number;
   prices?: any[];
 }
 
@@ -126,6 +102,11 @@ export interface ComputedTokenJSON {
   volume?: { usd?: string };
   tvl?: { usd?: string };
   fdv?: { usd?: string };
+}
+
+export interface ComputedTokenInfoJSON {
+  tokenId?: string | number;
+  price?: string | number;
 }
 
 export interface PoolsDataJSON extends ComputedPoolsJSON {
@@ -142,6 +123,13 @@ export interface PoolsDataJSON extends ComputedPoolsJSON {
   volume7d?: any;
 }
 
+export interface BalanceDataJSON {
+  address?: string;
+  amount?: string | number;
+  tokenId?: string | number;
+  waitForUpdate?: boolean;
+}
+
 export interface ComputedPoolsJSON {
   tokenAId: string;
   tokenBId: string;
@@ -151,6 +139,38 @@ export interface ComputedPoolsJSON {
   apr?: string | number;
   volume_1d?: string | number;
   volume_7d?: string | number;
+  blockHeight?: number;
+  createAt?: string;
+  path?: string[];
+  poolKey?: string;
+  tokenAAmount?: string;
+  tokenBAmount?: string;
+  updateBlockHeight?: number;
+  updatedAt?: string;
+}
+
+export interface PoolsInfoJSON {
+  blockHeight: number;
+  createAt: string;
+  creator: string;
+  directionAB: boolean;
+  eventIndex: number;
+  hash: string;
+  poolKey: string;
+  tokenAAmount: string;
+  tokenAId: string;
+  tokenBAmount: string;
+  tokenBId: string;
+  type: string;
+
+  //before update
+  tokenAPrice?: string | number
+  tokenBPrice?: string | number
+  tvl?: string | number;
+  apr?: string | number;
+  volume_1d?: string | number;
+  volume_7d?: string | number;
+  price?: string | number;
 }
 
 export interface PoolsQueryResponse {
@@ -158,17 +178,54 @@ export interface PoolsQueryResponse {
   error: boolean;
 }
 
+export interface PoolsInfoQueryResponse {
+  data: {
+    pools: Array<PoolsInfoJSON>;
+  };
+  error: boolean;
+}
+
+export interface tokensQueryResponse {
+  data: {
+    tokens: Array<ComputedTokenInfoJSON>;
+  };
+  error: boolean;
+}
+
+export interface PoolsInfoDetailQueryResponse {
+  data: {
+    pool: Array<PoolsInfoJSON>;
+  };
+  error: boolean;
+}
+
+export interface GetTvlResponse {
+  data: {
+    tokens?: Array<ComputedTokenInfoJSON>;
+    pools?: Array<{
+      tokenAAmount: number | string;
+      tokenAId: number | string;
+      tokenBAmount: number | string;
+      tokenBId: number | string;
+    }>;
+  };
+  error?: string;
+}
+
 export interface AggregatorState {
   loading: boolean;
   transactions: any;
+  balances: Array<BalanceDataJSON>;
   pools: Array<PoolsDataJSON>;
   tokens: Array<TokenDataJSON>;
   totalTVL: number | string;
   totalVOL: number | string;
   error: boolean;
+  loadBalances: (address: string) => Promise<void>;
   loadTokens: () => Promise<void>;
   loadPools: () => Promise<void>;
   loadTransactions: () => Promise<void>;
+  getTVL: () => Promise<void>;
 }
 
 export const useAggregatorStore = create<
@@ -177,63 +234,90 @@ export const useAggregatorStore = create<
 >(
   immer((set) => ({
     loading: Boolean(false),
+    balances: [],
     pools: [],
     transactions: [],
     tokens: [],
     totalTVL: 0,
     totalVOL: 0,
     error: false,
+    async loadBalances(address: string) {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
+        {
+          method: "Post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: `
+           query loadBalances {
+             balances(
+                  where: {address: {equals: "${address}"}},
+                  take: 50
+                ) {
+                  address
+                  amount
+                  tokenId
+                  waitForUpdate
+                }
+           }
+            `,
+          }),
+        },
+      );
+      const data: { data: { balances: BalanceDataJSON[] } } = await response.json();
+      set((state) => {
+        state.balances = data.data.balances;
+      });
+    },
     async loadTokens() {
       set((state) => {
         state.loading = true;
       });
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/tokens`,
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
         {
-          method: "GET",
+          method: "Post",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            query: `
+              query loadTokensInfo {
+                tokens(skip: 0, take: 50) {
+                  price
+                  tokenId
+                }
+              }
+            `,
+          }),
         },
       );
 
-      const data = (await response.json()) as TokensQueryResponse;
-      const newData: any = data.data.map(
-        (token: ComputedTokenJSON, index): TokenDataJSON => {
-          const basePrice = Number(token.price?.usd) || 100;
+      const data = (await response.json()) as tokensQueryResponse;
+
+      const newData: any = data.data.tokens.map(
+        (token: ComputedTokenInfoJSON, index): TokenDataJSON => {
+          const basePrice = Number(token.price) || 100;
 
           const priceData = generatePriceData(basePrice);
           return {
             index: index + 1,
-            id: token.id,
-            ticker: token.ticker,
-            name: token.name,
-            price: token.price?.usd,
-            volume: token.volume?.usd,
-            fdv: token.fdv?.usd,
-            tvl: token.tvl?.usd,
-            logo: token.id ? tokens[token.id]?.logo : "",
+            id: token.tokenId,
+            ticker: tokens[token.tokenId || 0]?.ticker,
+            name: tokens[token.tokenId || 0]?.name,
+            price: token.price,
+            logo: token.tokenId ? tokens[token.tokenId]?.logo : "",
             prices: priceData,
           };
         },
       );
-      const result = newData.reduce(
-        (
-          acc: { totalTVL: any; totalVOL: any },
-          item: { tvl: any; volume: any },
-        ) => {
-          acc.totalTVL += item.tvl || 0;
-          acc.totalVOL += item.volume || 0;
-          return acc;
-        },
-        { totalTVL: 0, totalVOL: 0 },
-      );
+
       set((state) => {
         state.loading = false;
         state.tokens = newData;
-        state.totalTVL = result.totalTVL;
-        state.totalVOL = result.totalVOL;
         state.error = data?.error;
       });
     },
@@ -243,17 +327,35 @@ export const useAggregatorStore = create<
       });
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/pools`,
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
         {
-          method: "GET",
+          method: "Post",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            query: `
+              query loadPools {
+                pools(skip: 0, take: 50, orderBy: {blockHeight: desc}) {
+                  blockHeight
+                  createAt
+                  path
+                  poolKey
+                  tokenAAmount
+                  tokenAId
+                  tokenBAmount
+                  tokenBId
+                  updateBlockHeight
+                  updatedAt
+                }
+              }
+            `,
+          }),
         },
       );
 
-      const data = (await response.json()) as PoolsQueryResponse;
-      const newData: any = data.data.map((pool: any, index) => {
+      const data = (await response.json()) as PoolsInfoQueryResponse;
+      const newData: any = data?.data?.pools?.map?.((pool: any, index) => {
         const firstToken = tokens[pool.tokenAId];
         const secondToken = tokens[pool.tokenBId];
         return {
@@ -263,10 +365,10 @@ export const useAggregatorStore = create<
             first: firstToken,
             second: secondToken,
           },
-          feeTier: pool?.feeTier || null,
-          tvl: pool?.tvl?.usd || null,
-          volume1d: pool?.volume_1d?.usd || null,
-          volume7d: pool?.volume_7d?.usd || null,
+          feeTier: null,
+          tvl: null,
+          volume1d: null,
+          volume7d: null,
         };
       });
       set((state) => {
@@ -281,12 +383,34 @@ export const useAggregatorStore = create<
       });
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/txs`,
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
         {
-          method: "GET",
+          method: "Post",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            query: `
+              query loadTransactions {
+                poolActions(orderBy: {blockHeight: desc}, skip: 0, take: 50) {
+                  blockHeight
+                  createAt
+                  creator
+                  directionAB
+                  eventIndex
+                  hash
+                  poolKey
+                  tokenAAmount
+                  tokenAId
+                  tokenBAmount
+                  tokenBId
+                  tokenAPrice
+                  tokenBPrice
+                  type
+                }
+              }
+            `,
+          }),
         },
       );
 
@@ -294,8 +418,66 @@ export const useAggregatorStore = create<
 
       set((state) => {
         state.loading = false;
-        state.transactions = data?.data;
+        state.transactions = data?.data?.poolActions;
         state.error = data?.error;
+      });
+    },
+
+    async getTVL() {
+      set((state) => {
+        state.loading = true;
+      });
+      const responseTokens = await fetch(
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
+        {
+          method: "Post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: `
+              query loadTokensInfo {
+                tokens {
+                  price
+                  tokenId
+                }
+                pools(orderBy: {blockHeight: desc}) {
+                  tokenAAmount
+                  tokenAId
+                  tokenBAmount
+                  tokenBId
+                }
+              }
+            `,
+          }),
+        },
+      );
+      const dataResponse = (await responseTokens.json()) as GetTvlResponse;
+
+      let dataTokens = dataResponse.data?.tokens || [];
+      let dataPools = dataResponse.data?.pools || [];
+
+      const result = dataPools.reduce((acc, pool) => {
+        let priceTokenA =
+          dataTokens.find((token) => token.tokenId === pool?.tokenAId)?.price ||
+          0;
+        let priceTokenB =
+          dataTokens.find((token) => token.tokenId === pool?.tokenBId)?.price ||
+          0;
+        let TvlTokenA = BigNumber(pool?.tokenAAmount || 0)
+          .times(priceTokenA)
+          .div(10 ** precision)
+          .toNumber();
+        let TvlTokenB = BigNumber(pool?.tokenBAmount || 0)
+          .times(priceTokenB)
+          .div(10 ** precision)
+          .toNumber();
+        return acc + (TvlTokenA + TvlTokenB);
+      }, 0);
+
+      set((state) => {
+        state.loading = false;
+        state.totalTVL = result;
       });
     },
   })),
@@ -356,18 +538,36 @@ export const usePoolInfo = (poolKey: string) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/pool/info/${poolKey}`,
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
         {
-          method: "GET",
+          method: "Post",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            query: `
+              query loadPoolInfo {
+                pool(where: {poolKey: "${poolKey}"}) {
+                  blockHeight
+                  createAt
+                  path
+                  poolKey
+                  tokenAId
+                  tokenBId
+                  tokenAAmount
+                  tokenBAmount
+                  updateBlockHeight
+                  updatedAt
+                }
+              }
+            `,
+          }),
         },
       );
 
-      const data = await response.json();
+      const data = (await response.json()) as PoolsInfoDetailQueryResponse;
       setLoading(false);
-      setData(data?.data || {});
+      setData(data?.data?.pool || {});
       setError(data?.error);
     } catch {
       setData({});
@@ -377,25 +577,53 @@ export const usePoolInfo = (poolKey: string) => {
 };
 
 export const usePoolTxs = (poolKey: string) => {
-  const [data, setData] = useState<Array<ComputedPoolTransactionJSON>>([]);
+  const [data, setData] = useState<Array<PoolsInfoJSON>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const getPoolTxs = async () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/pool/txs/${poolKey}`,
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
         {
-          method: "GET",
+          method: "Post",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            query: `
+              query loadPoolInfo {
+                poolActions(
+                  where: {poolKey: {contains: "${poolKey}"}}
+                  orderBy: {blockHeight: desc}
+                  skip: 0
+                  take: 50
+                ) {
+                  blockHeight
+                  createAt
+                  creator
+                  directionAB
+                  eventIndex
+                  hash
+                  poolKey
+                  tokenAAmount
+                  tokenAId
+                  tokenBAmount
+                  tokenBId
+                  tokenAPrice
+                  tokenBPrice
+                  type
+                }
+              }
+            `,
+          }),
         },
       );
 
-      const dataRes = (await response.json()) as PoolTransactionQueryResponse;
+      const dataRes =
+        (await response.json()) as PoolTransactionInfoQueryResponse;
       setLoading(false);
-      setData(dataRes?.data || []);
+      setData(dataRes?.data?.poolActions || []);
       setError(dataRes?.error);
     } catch {
       setData([]);
@@ -406,52 +634,117 @@ export const usePoolTxs = (poolKey: string) => {
 
 export const useTokenInfo = (tokenId: string) => {
   const [data, setData] = useState<any>({});
+  const [dataHistoryToken, setDataHistoryToken] = useState<Array<{
+    createAt: string,
+    price: string | number,
+    id: string | number
+  }>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const getTokenInfo = async () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/token/info/${tokenId}`,
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
         {
-          method: "GET",
+          method: "Post",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            query: `
+              query loadTokenInfo {
+                token(where: {tokenId: "${tokenId}"}) {
+                  price
+                  tokenId
+                }
+              }
+
+            `
+          }),
         },
       );
 
       const data = await response.json();
+      let dataRes = data.data.token;
+      const basePrice = Number(dataRes.price) || 100;
+      const priceData = generatePriceData(basePrice);
+      const newData: any = {
+        id: dataRes.tokenId,
+        ticker: tokens[dataRes.tokenId || 0]?.ticker,
+        name: tokens[dataRes.tokenId || 0]?.name,
+        price: dataRes.price,
+        volume: dataRes.volume || 0,
+        fdv: dataRes.fdv || 0,
+        tvl: dataRes.tvl || 0,
+        logo: dataRes.tokenId ? tokens[dataRes.tokenId]?.logo : "",
+        prices: priceData,
+      };
       setLoading(false);
-      setData(data?.data || {});
+      setData(newData || {});
+      setDataHistoryToken(data?.data?.historyTokens || [])
       setError(data?.error);
     } catch {
       setData({});
     }
   };
-  return { data, loading, error, getTokenInfo };
+  return { data, dataHistoryToken, loading, error, getTokenInfo };
 };
 
 export const useTokenTxs = (tokenId: string) => {
-  const [data, setData] = useState<Array<ComputedPoolTransactionJSON>>([]);
+  const [data, setData] = useState<Array<PoolsInfoJSON>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const getTokenTxs = async () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/token/txs/${tokenId}`,
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
         {
-          method: "GET",
+          method: "Post",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            query: `
+              query loadTokenTxs {
+                poolActions(where: 
+                  {OR: 
+                    [
+                      {tokenBId: {contains: "${tokenId}"}}, 
+                      {tokenAId: {contains: "${tokenId}"}}
+                    ]
+                  }
+                  orderBy: {blockHeight: desc}
+                  skip: 0
+                  take: 50
+                  )
+                {
+                  blockHeight
+                  createAt
+                  creator
+                  directionAB
+                  eventIndex
+                  hash
+                  poolKey
+                  tokenAAmount
+                  tokenAId
+                  tokenBAmount
+                  tokenBId
+                  tokenAPrice
+                  tokenBPrice
+                  type
+                }
+              }
+            `,
+          }),
         },
       );
 
-      const dataRes = (await response.json()) as PoolTransactionQueryResponse;
+      const dataRes =
+        (await response.json()) as PoolTransactionInfoQueryResponse;
       setLoading(false);
-      setData(dataRes?.data || []);
+      setData(dataRes?.data?.poolActions || []);
       setError(dataRes?.error);
     } catch {
       setData([]);
@@ -459,3 +752,209 @@ export const useTokenTxs = (tokenId: string) => {
   };
   return { data, loading, error, getTokenTxs };
 };
+
+export const useTokenPools = (tokenId: string) => {
+  const [data, setData] = useState<Array<PoolsInfoJSON>>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  const getTokenPools = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
+        {
+          method: "Post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: `
+              query loadTokenPools {
+                pools(
+                  where: {
+                    OR: [
+                      {tokenAId: {contains: "${tokenId}"}}, 
+                      {tokenBId: {contains: "${tokenId}"}}
+                    ]
+                  }
+                  orderBy: {blockHeight: desc}
+                  skip: 0
+                  take: 50
+                ) {
+                  blockHeight
+                  createAt
+                  path
+                  poolKey
+                  tokenAAmount
+                  tokenAId
+                  tokenBAmount
+                  tokenBId
+                  updateBlockHeight
+                  updatedAt
+                }
+              }
+            `,
+          }),
+        },
+      );
+
+      const dataRes = (await response.json()) as PoolsInfoQueryResponse;
+      const newData: any = dataRes.data.pools.map((pool: any, index) => {
+        const firstToken = tokens[pool.tokenAId];
+        const secondToken = tokens[pool.tokenBId];
+        return {
+          ...pool,
+          id: index + 1, // TODO update id token
+          tokenselected: {
+            first: firstToken,
+            second: secondToken,
+          },
+          feeTier: pool?.feeTier || null,
+          tvl: pool?.tvl?.usd || null,
+          apr: pool?.apr || null,
+          volume1d: pool?.volume_1d?.usd || null,
+          volume7d: pool?.volume_7d?.usd || null,
+        };
+      });
+      setLoading(false);
+      setData(newData || []);
+      setError(dataRes?.error);
+    } catch {
+      setData([]);
+    }
+  };
+  return { data, loading, error, getTokenPools };
+}
+
+export const useHistoryToken = (tokenId: string, filterTime: string | null, skip?: number, take?: number) => {
+  const [data, setData] = useState<Array<{
+    createAt: string,
+    price: string | number,
+    id: string | number
+  }>>([]);
+  const [loading, setLoading] = useState<Boolean>(false)
+  const [error, setError] = useState(false);
+
+  const getHistoryToken = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
+        {
+          method: "Post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: `
+              query loadHistoryToken {
+                historyTokens(where: {
+                tokenId: {contains: "${tokenId}"}, 
+                createAt: ${filterTime ? `{gt: "${filterTime}"}` : `{}`}},
+                orderBy: {createAt: desc}
+                ${skip ? `skip: ${skip}` : ``}
+                take: ${take || 1}
+                ) {
+                  createAt
+                  price
+                  id
+                }
+              }
+            `
+          }),
+        },
+      );
+      const data = await response.json();
+
+      setLoading(false);
+      setData(data?.data?.historyTokens || []);
+      setError(data?.error);
+
+    } catch {
+      setData([]);
+    }
+  };
+  return { data, loading, error, getHistoryToken };
+}
+
+export const useLeaderBoard = () => {
+  const [data, setData] = useState<Array<LeaderboardData>>([]);
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState(false);
+
+  const asyncLeaderBoard = async (sortType: "total_vol" | 'pnl') => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/leaderboard/?${new URLSearchParams({ sortType })}`
+    );
+    const dataRes = await response.json()
+    return dataRes
+  }
+  const getLeaderBoard = async (sortType: "total_vol" | 'pnl' = 'total_vol') => {
+    try {
+      setLoading(true);
+      const data = await asyncLeaderBoard(sortType);
+      setLoading(false);
+      setData(data);
+
+    } catch {
+      setData([]);
+    }
+  };
+  return { data, loading, error, getLeaderBoard };
+}
+
+export const useHistoryPools = (poolKey: string, filterTime?:string) => {
+  const [data, setData] = useState<Array<{
+    createAt: string,
+    tokenAPrice: string | number,
+    tokenBPrice: string | number,
+    tokenAAmount: string | number,
+    tokenBAmount: string | number,
+  }>>([]);
+  const [loading, setLoading] = useState<Boolean>(false)
+  const [error, setError] = useState(false);
+
+  const getHistoryPools = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
+        {
+          method: "Post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: `
+              query loadHistoryPools {
+                historyPools(
+                  orderBy: {createAt: desc}
+                  where: {
+                    poolKey: {contains: "${poolKey}"},
+                    createAt: ${filterTime ? `{gt: "${filterTime}"}` : `{gt: "${'2024-12-18T09:09:09.884Z'}"}`}
+                  }
+                ) {
+                  createAt
+                  tokenAPrice
+                  tokenBAmount
+                  tokenBPrice
+                  tokenAAmount
+                }
+              }
+            `
+          }),
+        },
+      );
+      const data = await response.json();
+
+      setLoading(false);
+      setData(data?.data?.historyPools || []);
+      setError(data?.error);
+
+    } catch {
+      setData([]);
+    }
+  };
+  return { data, loading, error, getHistoryPools };
+}

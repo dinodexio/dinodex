@@ -9,12 +9,10 @@ export function USDBalance({
   className,
   type = "default",
 }: USDBalanceProps) {
-  if (!balance || balance === "~") return <span className={className}>
-    ~$
-  </span>;
+  if (!balance || balance === "~") return <span className={className}>~$</span>;
   return (
     <span className={className}>
-      {"$" + balance}
+      {type === "default" ? `$${balance}` : `${balance}$`}
     </span>
   );
 }

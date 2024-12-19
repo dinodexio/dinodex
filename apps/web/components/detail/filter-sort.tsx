@@ -3,7 +3,10 @@ import { useState } from "react";
 import Image from "next/image";
 import useClickOutside from "@/hook/useClickOutside";
 import styles from "../css/tokens.module.css";
-export interface FilterSortProps {}
+export interface FilterSortProps {
+  onChangeTime?: (value: string) => void;
+
+}
 let dataFilterTime = [
   {
     value: "1h",
@@ -41,32 +44,23 @@ let FilterChart = [
     label: "TVL",
   },
 ];
-export function FilterSort({}: FilterSortProps) {
-  const [openNetWork, setOpenNetWork] = useState<boolean>(false);
-  const [dataNetWork, setDataNetWork] = useState<any>(null);
+export function FilterSort({onChangeTime}: FilterSortProps) {
   const [openFiltersChart, setOpenFiltersChart] = useState<boolean>(false);
   const [dataFiltersChart, setDataFiltersChart] = useState<string>("price");
-  const [dataTime, setDataTime] = useState<any>("1d");
-
-  const refNetWork = useClickOutside<HTMLDivElement>(() => {
-    setOpenNetWork(false);
-  });
-
+  const [dataTime, setDataTime] = useState<any>("1h");
   const refFiltersChart = useClickOutside<HTMLDivElement>(() => {
     setOpenFiltersChart(false);
   });
-
-  const handleClickNetwork = (item: any) => {
-    setDataNetWork(item);
-    setOpenNetWork(false);
-  };
 
   return (
     <div className={styles["filter-container"]}>
       <div className={styles["filter-time-container"]}>
         {dataFilterTime.map((item, index) => (
           <div
-            onClick={() => setDataTime(item.value)}
+            onClick={() => {
+              setDataTime(item.value)
+              onChangeTime && onChangeTime(item.value)
+            }}
             className={`${styles["filter-time-item"]} ${item.value === dataTime ? styles["filter-time-item-active"] : ""}`}
             key={index}
           >
@@ -97,7 +91,6 @@ export function FilterSort({}: FilterSortProps) {
         <div
           className={styles["network-content"]}
           onClick={() => {
-            setOpenNetWork(false);
             setOpenFiltersChart(!openFiltersChart);
           }}
           ref={refFiltersChart}

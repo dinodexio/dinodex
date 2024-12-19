@@ -30,7 +30,7 @@
   font-weight: 400;
   font-style: italic;
 }
- 
+
 @font-face {
   font-family: "SF Pro Display";
   src: url("/fonts/SFProDisplay/SF-Pro-Display-Medium.otf") format("opentype");
@@ -50,6 +50,18 @@
 @font-face {
   font-family: 'PPMondwest';
   src: url('/fonts/PPMondwest/PPMondwest-Regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter/static/Inter_28pt-Regular.ttf') format('opentype');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'Kode Mono';
+  src: url('/fonts/KodeMono/KodeMono-VariableFont_wght.ttf') format('opentype');
+  font-weight: 600;
 }
 
 @layer base {
@@ -103,28 +115,57 @@
     --header-background-color: #f8f9fa;
     --footer-background-color: #343a40;
     --hero-background-color: #e9ecef;
-    --header-button-color: radial-gradient(1465.72% 50% at 60.91% 50%, #FF603B 0%, #F83B28 100%);
+    --header-button-color: radial-gradient(1465.72% 50% at 60.91% 50%,
+        #ff603b 0%,
+        #f83b28 100%);
     --black-text-color: #000;
-    --white-text-color: #FFF;
-    --red-text-color: #F83B28;
-    --green-text-color: #45B272;
-    --green2-text-color: #0A6;
-    --bg-button-active-color: #FF603B;
-    --bg-button-color: #FFCABD;
-    --button-connect-wallet-color: #C5B4E3;
-    --button-connect-wallet-hover-color: linear-gradient(180deg, #9FE4C9 0%, #C5B4E3 100%);
-    --button-header-hover-color: linear-gradient(90deg, #FF603B 0%, #6A16FF 100%);
-    --button-connected-wallet-color: #FFD4C8;
+    --white-text-color: #fff;
+    --red-text-color: #f83b28;
+    --red2-text-color: #FF5656;
+    --green-text-color: #45b272;
+    --green2-text-color: #0a6;
+    --bg-button-active-color: #ff603b;
+    --bg-button-active-color-25: #ff603b40;
+    --bg-button-color: #ffcabd;
+    --button-connect-wallet-color: #c5b4e3;
+    --button-connect-wallet-hover-color: linear-gradient(180deg,
+        #9fe4c9 0%,
+        #c5b4e3 100%);
+    --button-header-hover-color: linear-gradient(90deg, #ff603b 0%, #6a16ff 100%);
+    --button-connected-wallet-color: #ffd4c8;
     --bg-overlay-color: rgba(217, 217, 217, 0.48);
     --bg-overlay-black-color: rgba(0, 0, 0, 0.5);
     --overlay-black-color: rgba(0, 0, 0, 0.4);
     --border-black-color: rgba(0, 0, 0, 0.3);
     --shadow-popup-color: rgba(0, 0, 0, 0.25);
-    --bg-pool-color: rgba(255, 255, 255, 0.50);
-    --bg-switch-range-color: #EBEBEB;
-    --bg-fixed-color: #FCCDC2;
-    --bg-body-color: #FFFBF7;
-    --bg-chart-color: #6A16FF
+    --bg-pool-color: rgba(255, 255, 255, 0.5);
+    --bg-switch-range-color: #ebebeb;
+    --bg-fixed-color: #fccdc2;
+    --bg-body-color: #fffbf7;
+    --bg-chart-color: #6a16ff;
+    --black-shadow-navbar: rgba(0, 0, 0, 0.08);
+    --black-shadow-text: rgba(0, 0, 0, 0.12);
+    --black-text-navbar: #1a1a1a;
+    --white-color-bg-navbar: #ffe6e0;
+    --orange-color-text-navbar: #f55631;
+    --white-color-bg-footer: #fff9f2;
+    --purple-color-text: #634d8a;
+    --bg-brown-op-color: rgba(255, 0, 0, 0.30);
+    --or-2-color: #F5A997;
+    --green3-color: #6BDF61;
+    --white-color-bg: #fff;
+    --white-color-bg-page-portal: #f7f4f2;
+    --white-color-text: #fafafa;
+    --white-color-bg-opacity: rgba(255, 255, 255, 0.8);
+    --black-color-text: #000;
+    --black-color-shadow: rgba(0, 0, 0, 0.25);
+    --orange-color-bg: #ff603b;
+    --purple-color-bg: #c5b4e3;
+    --green-color-bg: #9fe4c9;
+    --black-shadow-item-token: rgba(255, 255, 255, 0.25);
+    --black-overlay: rgba(0, 0, 0, 0.5);
+    --brown-color-bg: rgba(255, 96, 59, 0.25);
+    --gray-color-shadow: rgba(26, 26, 26, 0.3);
   }
 }
 

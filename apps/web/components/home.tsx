@@ -1,5 +1,5 @@
 "use client";
-import Header from "./header";
+import Header from "./headerv2";
 import { Toaster } from "@/components/ui/toaster";
 
 export interface HomeProps {

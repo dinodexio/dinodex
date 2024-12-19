@@ -1,6 +1,8 @@
 import {
   capitalizeFirstLetter,
+  formatNumber,
   formatNumberWithPrice,
+  formatterInteger,
   formatTimeAgo,
   truncateString,
 } from "@/lib/utils";
@@ -9,6 +11,23 @@ import styles from "../css/table.module.css";
 import { precision } from "../ui/balance";
 import { DataTransactionPanel, TransactionPanelProps } from "@/types";
 import { SkeletonLoading } from "./SkeletonLoading";
+import { EMPTY_DATA } from "@/constants";
+import BigNumber from "bignumber.js";
+
+function formatNumberPrecisionVol(value: string | number, isPrice: boolean = false) {
+  if (!value) return EMPTY_DATA;
+
+  const priceResult = formatNumber(BigNumber(value).toNumber());
+  return `${
+    priceResult == "<0.01"
+      ? isPrice
+        ? "< $0.01"
+        : priceResult
+      : isPrice
+        ? `$${priceResult}`
+        : priceResult
+  }`;
+}
 
 export function PoolTransactionPanel({
   data = [],
@@ -38,10 +57,9 @@ export function PoolTransactionPanel({
       render: (data: DataTransactionPanel) => {
         return (
           <span
-            className={`${data?.action === "sell" ? styles["text-red"] : styles["text-green"]} ${styles["text-action"]} text-[18px]`}
+            className={`${data?.action === "sell" || data?.action === "remove" ? styles["text-red"] : styles["text-green"]} ${styles["text-action"]} text-[18px]`}
           >
-            {capitalizeFirstLetter(data?.action || "")}{" "}
-            {truncateString(titleA, 5)}
+            {capitalizeFirstLetter(data?.typeText || "")}
           </span>
         );
       },
@@ -54,10 +72,10 @@ export function PoolTransactionPanel({
       render: (data: DataTransactionPanel) => {
         return (
           <span>
-            {truncateString(
-              formatNumberWithPrice(data?.price || 0)?.toString(),
-              6,
-            )}
+            $
+            {Number(data?.priceusd) > 1000000
+              ? formatNumberPrecisionVol(Number(Number(data?.priceusd).toFixed(4)), true)
+              : formatterInteger(Number(Number(data?.priceusd).toFixed(4)))}
           </span>
         );
       },
@@ -130,7 +148,7 @@ export function PoolTransactionPanel({
       <Table
         data={data}
         column={columnTableTransactionTokenInfo}
-        onClickTr={() => {}}
+        onClickTr={() => { }}
         classTable="table-layout"
         loading={loading}
       />

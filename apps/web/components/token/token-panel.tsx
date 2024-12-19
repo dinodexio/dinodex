@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Table } from "../table/table";
 import Image from "next/image";
 import { formatNumber, formatterInteger } from "@/lib/utils";
@@ -13,7 +13,7 @@ export interface TokenPanelProps {
   valueSearch?: string;
 }
 
-function formatNumberPrecisionVol(value: string, isPrice: boolean = false) {
+function formatNumberPrecisionVol(value: string | number, isPrice: boolean = false) {
   if (!value) return EMPTY_DATA;
 
   const priceResult = formatNumber(BigNumber(value).toNumber());
@@ -74,8 +74,8 @@ let columTableToken = [
         <span className={styles["price-text"]}>
           $
           {Number(data?.price) > 1000000
-            ? formatNumberPrecisionVol(data?.price, true)
-            : formatterInteger(data?.price)}
+            ? formatNumberPrecisionVol(Number(Number(data?.price).toFixed(4)), true)
+            : formatterInteger(Number(Number(data?.price).toFixed(4)))}
         </span>
       );
     },
@@ -189,7 +189,9 @@ let columTableToken = [
 
 const TokenPanelComponent = ({ valueSearch }: TokenPanelProps) => {
   const router = useRouter();
-  const { tokens } = useAggregatorStore();
+  const { tokens,loading,loadTokens } = useAggregatorStore();
+
+
   const filterDataToken = useMemo(() => {
     let tokensFilter = tokens;
     if (valueSearch) {
@@ -203,6 +205,10 @@ const TokenPanelComponent = ({ valueSearch }: TokenPanelProps) => {
     return tokensFilter;
   }, [tokens, valueSearch]);
 
+  useEffect(() => {
+    loadTokens();
+  }, []);
+
   return (
     <>
       <Table
@@ -211,6 +217,7 @@ const TokenPanelComponent = ({ valueSearch }: TokenPanelProps) => {
         onClickTr={(dataToken) => {
           router.push(`/info/tokens/${dataToken?.ticker}`);
         }}
+        loading={loading}
       />
     </>
   );

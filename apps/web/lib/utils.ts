@@ -188,6 +188,7 @@ export const dataTokenDefault = {
 export function formatPriceUSD(
   amount: number | string,
   ticker: string,
+  tokenPrice?: number | string
 ): string {
   // Convert the amount to a number
   const parsedAmount = typeof amount === "number" ? amount : Number(amount);
@@ -197,11 +198,8 @@ export function formatPriceUSD(
     return "~";
   }
 
-  // Fetch the token price; default to 1 if the ticker is unknown
-  const tokenPrice = TOKEN_PRICES[ticker] ?? 1;
-
   // Calculate the price in USD
-  const priceInUSD = parsedAmount * tokenPrice;
+  const priceInUSD = parsedAmount * Number(tokenPrice || 0);
 
   // Format the price for large numbers
   return formatNumber(priceInUSD);
@@ -320,13 +318,17 @@ export const formatTimeAgo = (
   const timeAgo = moment(timestamp)
     .startOf("minute")
     .fromNow(true)
-    .replace(/\sminutes?/, "m")
-    .replace(/\shours?/, "h")
-    .replace(/\sdays?/, "d")
-    .replace(/\smonths?/, "mo")
-    .replace(/\syears?/, "y");
-
-  return /\d/.test(timeAgo) ? `${timeAgo} ago` : "24h ago";
+    .replace(" minutes", "m")
+    .replace(" hours", "h")
+    .replace(" days", "d")
+    .replace(" months", "mo")
+    .replace(" years", "y")
+    .replace("a minute", "1m")
+    .replace("an hour", "1h")
+    .replace("a day", "1d")
+    .replace("a month", "1mo")
+    .replace("a year", "1y")
+  return /\d/.test(timeAgo) ? `${timeAgo} ago` : "a few sec";
 };
 
 export const generatePriceData = (basePrice: number) => {
@@ -344,3 +346,12 @@ export const generatePriceData = (basePrice: number) => {
 
   return priceData;
 };
+
+export function formatNumberWithCommas(number: string | number, decimals = 2) {
+  let formattedNumber = Number(number).toLocaleString('en-US',{
+    minimumFractionDigits: 0, 
+    maximumFractionDigits: decimals, 
+  });
+
+  return formattedNumber;
+}

@@ -11,3 +11,21 @@ export interface dataSubmitProps {
   amountValue?: string;
   ticker?: string;
 }
+
+export interface ComputedTransactionJSON {
+  blockHeight: number;
+  createAt: string;
+  creator: string;
+  directionAB: boolean;
+  poolKey: string;
+  tokenAId: string;
+  tokenBId: string;
+  tokenAAmount: string;
+  tokenBAmount: string;
+  type: string;
+  hash: string;
+
+  //before update
+  tokenBPrice?: string | number;
+  tokenAPrice?: string | number;
+}

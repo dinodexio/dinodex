@@ -1,12 +1,12 @@
 import {
   convertMethodname,
   formatNumber,
+  removePrecision,
   truncateAddress,
   truncateString,
 } from "@/lib/utils";
 import styles from "../css/table.module.css";
 import { Table } from "../table/table";
-import { ComputedTransactionJSON, useChainStore } from "@/lib/stores/chain";
 import React, { useMemo } from "react";
 import {
   ADDLIQUIDITY,
@@ -25,6 +25,7 @@ import {
 import Image from "next/image";
 import BigNumber from "bignumber.js";
 import { formatBigNumber, precision } from "../ui/balance";
+import { TransactionPanelProcessed } from "@/types";
 
 export interface TransactionPanelProps {
   valueSearch: string;
@@ -74,8 +75,8 @@ let columTableTransaction = [
     title: "Time",
     key: "time",
     width: 118,
-    render: (data: any) => {
-      const time = new Date(data?.timeStamp).getTime();
+    render: (data: TransactionPanelProcessed) => {
+      const time = new Date(data?.createAt).getTime();
       const now = new Date().getTime();
       const diff = now - time; // difference in milliseconds
 
@@ -126,7 +127,7 @@ let columTableTransaction = [
     title: <span>Type</span>,
     key: "type",
     width: 273,
-    render: (data: any) => (
+    render: (data: TransactionPanelProcessed) => (
       <div className={styles["type-transaction"]}>
         <span className={styles["type-text"]}>
           {convertMethodname(data?.type)}
@@ -160,7 +161,7 @@ let columTableTransaction = [
     title: <span>USD</span>,
     key: "usd",
     width: 143,
-    render: (data: any) => {
+    render: (data: TransactionPanelProcessed) => {
       return <span>${data?.priceusd}</span>;
     },
   },
@@ -169,10 +170,10 @@ let columTableTransaction = [
     title: <span>Token amount</span>,
     key: "token-amount",
     width: 218,
-    render: (data: any) => {
+    render: (data: TransactionPanelProcessed) => {
       return (
         <div className={styles["token-item"]}>
-          <span>{formatNumber(data?.token?.first?.amount)}</span>
+          <span>{formatNumber(data?.token?.first?.amount || "")}</span>
           <Image
             src={data?.token?.first?.logo || "/icon/empty-token.svg"}
             alt="token"
@@ -189,10 +190,10 @@ let columTableTransaction = [
     title: <span>Token amount</span>,
     key: "token-amount",
     width: 218,
-    render: (data: any) => {
+    render: (data: TransactionPanelProcessed) => {
       return (
         <div className={styles["token-item"]}>
-          <span>{formatNumber(data?.token?.second?.amount)}</span>
+          <span>{formatNumber(data.token.second.amount || 0)}</span>
           <Image
             src={data?.token?.second?.logo || "/icon/empty-token.svg"}
             alt="token"
@@ -209,8 +210,8 @@ let columTableTransaction = [
     title: <span>Wallet</span>,
     key: "wallet",
     width: 168,
-    render: (data: any) => {
-      return <span>{data?.address}</span>;
+    render: (data: TransactionPanelProcessed) => {
+      return <span>{data?.creator?.slice(0, 6)}...{data?.creator?.slice(-4)}</span>;
     },
   },
 ];
@@ -218,8 +219,7 @@ let columTableTransaction = [
 const TransactionPanelComponent = ({ valueSearch }: TransactionPanelProps) => {
   const { transactions, loading } = useAggregatorStore();
   usePollTransactions();
-  // Memoize the transaction processing to avoid re-computation on every render
-  const processedTransactions = useMemo(() => {
+  const processedTransactions = useMemo<TransactionPanelProcessed[]>(() => {
     if (!transactions) return [];
 
     return transactions?.filter?.((el: any) => el?.data !== null)?.map((item: any) => {
@@ -231,35 +231,40 @@ const TransactionPanelComponent = ({ valueSearch }: TransactionPanelProps) => {
       ) {
         tokenData = {
           first: {
-            ...tokens[item.data.tokenA.id],
-            amount: formatBigNumber(item?.data?.tokenA?.amount),
+            ...tokens[item.tokenAId],
+            amount: formatBigNumber(item.tokenAAmount),
           },
           second: {
-            ...tokens[item.data.tokenB.id],
-            amount: formatBigNumber(item?.data?.tokenB?.amount),
+            ...tokens[item.tokenBId],
+            amount: formatBigNumber(item?.tokenBAmount),
           },
         };
       } else if (item.type === SELLPATH) {
         tokenData = {
           first: {
-            ...tokens[item.data.from.tokenId],
-            amount: formatBigNumber(item?.data?.from?.amount),
+            ...tokens[item.directionAB ? item.tokenAId : item.tokenBId],
+            amount: formatBigNumber(item.directionAB ? item.tokenAAmount : item.tokenBAmount),
           },
           second: {
-            ...tokens[item.data.to.tokenId],
-            amount: formatBigNumber(item?.data?.to?.amount),
+            ...tokens[item.directionAB ? item.tokenBId : item.tokenAId],
+            amount: formatBigNumber(item.directionAB ? item.tokenBAmount : item.tokenAAmount),
           },
         };
       }
+
+      let priceTransaction = item.directionAB 
+      ? removePrecision(BigNumber(item?.tokenAAmount || 0).times(item?.tokenAPrice).toString(), precision)
+      : removePrecision(BigNumber(item?.tokenBAmount || 0).times(item?.tokenBPrice).toString(), precision)
+      
       return {
         ...item,
         token: tokenData,
         address: truncateAddress(item?.sender),
-        priceusd: formatNumber(tokenData?.second?.amount?.toString()),
+        priceusd: formatNumber(priceTransaction.toString()),
       };
     });
   }, [transactions]);
-  // Filter the transactions based on search value
+  // // Filter the transactions based on search value
   const filteredTransactions = useMemo(() => {
     if (!valueSearch) return processedTransactions;
 
@@ -273,6 +278,7 @@ const TransactionPanelComponent = ({ valueSearch }: TransactionPanelProps) => {
       );
     });
   }, [processedTransactions, valueSearch]);
+  
   return (
     <>
       <Table

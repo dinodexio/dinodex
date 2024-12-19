@@ -1,0 +1,480 @@
+.containerPagePortaL {
+  display: flex;
+  width: 1440px;
+  flex-direction: column;
+  align-items: center;
+  background: var(--white-color-bg-page-portal);
+}
+
+.containerBodyPortal {
+  display: flex;
+  padding: 24px 0px;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  align-self: stretch;
+}
+
+.containerContentTop {
+  display: flex;
+  padding: 80px 41px 48px 41px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  align-self: stretch;
+}
+
+.boxTitlePage {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  align-self: stretch;
+}
+
+.textBoxTitle {
+  color: var(--purple-color-text);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  align-self: stretch;
+  cursor: default;
+}
+
+.titlePage {
+  color: var(--black-color-text);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 64px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  align-self: stretch;
+  cursor: default;
+}
+
+.decriptionPortal {
+  width: min(100%, 840px);
+  color: var(--black-color-text);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 28px;
+  opacity: 0.6;
+  cursor: default;
+}
+
+.containerContentBot {
+  display: flex;
+  max-width: 1280px;
+  padding: 24px 41px 72px 41px;
+  align-items: flex-start;
+  gap: 24px;
+  align-self: stretch;
+  margin: 0 auto;
+}
+
+.boxContentBot {
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 24px;
+  flex: 1 0 0;
+  flex-wrap: wrap;
+}
+
+.boxTotalAPI {
+  display: flex;
+  width: min(100%, 471px);
+  height: 228px;
+  padding: 24px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 4px 32px 0px var(--black-shadow-navbar);
+}
+
+.boxSport {
+  display: flex;
+  width: min(100%, 348px);
+  height: 228px;
+  padding: 24px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 4px 32px 0px var(--black-shadow-navbar);
+}
+
+.boxSwap {
+  display: flex;
+  width: min(100%, 331px);
+  height: 228px;
+  padding: 24px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 4px 32px 0px var(--black-shadow-navbar);
+}
+
+.boxHistory {
+  display: flex;
+  width: min(100%, 348px);
+  height: 228px;
+  padding: 24px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 4px 32px 0px var(--black-shadow-navbar);
+}
+
+.boxTransaction {
+  display: flex;
+  width: min(100%, 445px);
+  height: 228px;
+  padding: 24px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 4px 32px 0px var(--black-shadow-navbar);
+}
+
+.boxBalance {
+  display: flex;
+  width: min(100%, 357px);
+  height: 228px;
+  padding: 24px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-radius: 12px;
+  background: var(--white-color-bg);
+  box-shadow: 0px 4px 32px 0px var(--black-shadow-navbar);
+}
+
+.boxTitleItemInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  align-self: stretch;
+}
+
+.titleItemInfo {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  align-self: stretch;
+  cursor: default;
+}
+
+.decriptionItemInfo {
+  color: var(--black-color-text);
+  font-family: "SF Pro Display";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 22px;
+  align-self: stretch;
+  cursor: default;
+}
+
+.boxBtnBoxInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btnGet {
+  display: flex;
+  height: 44px;
+  padding: 0px 16px 0px 24px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 12px;
+  background: var(--orange-color-bg);
+  cursor: pointer;
+}
+
+.textBtnGet {
+  color: var(--white-color-text);
+  text-align: center;
+  text-shadow: 0px 2px 3px var(--black-shadow-text);
+  font-family: "SF Pro Display";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.btnLearn {
+  display: flex;
+  height: 44px;
+  padding: 0px 16px 0px 24px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--orange-color-text-navbar);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.textBtnLearn {
+  color: var(--orange-color-text-navbar);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.iconArrowHover {
+  display: none;
+}
+
+.btnLearn:hover {
+  background: var(--orange-color-text-navbar);
+}
+
+.btnLearn:hover .textBtnLearn {
+  color: var(--white-color-bg);
+}
+
+.btnLearn:hover .iconArrowHover {
+  display: block;
+}
+
+.btnLearn:hover .iconArrowDefault {
+  display: none;
+}
+
+.containerMenuNav_mobile {
+  display: none;
+}
+
+.iconDropDownHeader {
+  display: none;
+  position: relative;
+}
+
+.boxMenuNav_mobile {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: var(--white-color-bg);
+  box-shadow: 0px 4px 32px 0px var(--black-shadow-navbar);
+  border-radius: 12px;
+  left: 40px;
+  top: 55px;
+  padding: 10px 20px;
+}
+
+@media screen and (max-width: 1280px) {
+  .boxSwap,
+  .boxHistory {
+    width: 360px;
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .containerFooter {
+    padding: 35px 30px 20px 30px;
+    gap: 40px;
+  }
+
+  .containerTagFooter {
+    gap: 30px;
+  }
+
+  .titleBoxTag {
+    font-size: 16px;
+  }
+
+  .tag {
+    font-size: 14px;
+  }
+
+  .textBoxContact {
+    font-size: 13px;
+  }
+
+  .containerNavbar {
+    padding: 20px 30px;
+    gap: 40px;
+  }
+
+  .titleNavbar {
+    font-size: 24px;
+  }
+
+  .tabNavbar {
+    font-size: 16px;
+  }
+
+  .tabNavbar:hover {
+    font-size: 16px;
+  }
+
+  .containerTitleNavbar {
+    gap: 6px;
+  }
+
+  .contentLeftNavbar {
+    gap: 15px;
+  }
+
+  .boxMenuNav {
+    gap: 4px;
+  }
+
+  .tabNavbar {
+    padding: 0px 10px;
+  }
+
+  .tabNavbar:hover {
+    padding: 0px 10px;
+  }
+
+  .btnConnect {
+    width: 140px;
+    padding: 0px 12px;
+  }
+
+  .boxTotalAPI,
+  .boxSport,
+  .boxSwap,
+  .boxHistory,
+  .boxTransaction,
+  .boxBalance {
+    width: 48%;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .titleItemInfo {
+    font-size: 20px;
+  }
+
+  .decriptionItemInfo {
+    font-size: 14px;
+  }
+
+  .btnGet,
+  .btnLearn {
+    padding: 0px 8px 0px 12px;
+  }
+
+  .textBtnGet,
+  .textBtnLearn {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 730px) {
+  .contentFooterTop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .boxTitleFooter {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .containerNavbar {
+    padding: 20px 10px;
+  }
+
+  .titleNavbar {
+    display: none;
+  }
+
+  .iconDropDownNavbar {
+    display: none;
+  }
+
+  .textBoxTitle {
+    font-size: 18px;
+  }
+
+  .titlePage {
+    font-size: 48px;
+  }
+}
+
+@media screen and (max-width: 685px) {
+  .boxContentBot {
+    display: flex;
+    justify-content: center;
+  }
+
+  .boxTotalAPI,
+  .boxSport,
+  .boxSwap,
+  .boxHistory,
+  .boxTransaction,
+  .boxBalance {
+    width: 70%;
+  }
+}
+
+@media screen and (max-width: 580px) {
+  .containerTitleNavbar {
+    gap: 12px;
+  }
+
+  .boxMenuNav {
+    display: none;
+  }
+
+  .titleNavbar {
+    display: none;
+  }
+
+  .iconDropDownHeader {
+    display: block;
+  }
+
+  .boxTotalAPI,
+  .boxSport,
+  .boxSwap,
+  .boxHistory,
+  .boxTransaction,
+  .boxBalance {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .containerFooter {
+    padding: 35px 10px 20px;
+  }
+
+  .boxInfoContact {
+    gap: 15px;
+  }
+}

@@ -1,0 +1,128 @@
+body {
+  background-image: url("../assets/images/navbar_footer/image_bg_table.svg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.image_dino {
+  position: fixed;
+  top: 69px;
+  left: 100px;
+}
+
+.tableWrapper {
+  max-width: 1400px;
+  width: 100%;
+  overflow: hidden;
+  margin: 150px auto 0px;
+}
+
+table {
+  width: 1400px;
+  align-items: flex-start;
+  border-radius: 12px;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 8, 8, 0.4) 0%,
+    rgba(8, 8, 8, 0.4) 100%
+  );
+  backdrop-filter: blur(16px);
+  border: none;
+}
+th,
+td {
+  border: 1px solid rgba(255, 209, 166, 0.24);
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 15px;
+  text-align: center;
+}
+
+th:first-child,
+td:first-child {
+  border-left: none;
+}
+
+th:last-child,
+td:last-child {
+  border-right: none;
+}
+
+tr:first-child,
+th {
+  border-top: none;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr {
+  height: 72px;
+}
+
+tr:first-child {
+  height: 88px;
+}
+
+td {
+  color: #ededed;
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  flex: 1 0 0;
+  text-align: left;
+}
+
+th {
+  font-family: Unbounded;
+  font-size: 17px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  background: linear-gradient(270deg, #94db52 50.1%, #d3e48f 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: left;
+  vertical-align: bottom;
+}
+
+th:first-child {
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  color: #ffb587;
+  -webkit-text-fill-color: initial;
+  background: transparent;
+  text-align: left;
+  vertical-align: bottom;
+  opacity: 0.6;
+}
+
+td:first-child {
+  width: 208px;
+  padding: 16px;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+  background: rgba(0, 0, 0, 0.5);
+  color: #ffab7a;
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  text-align: left;
+}
+
+tr:first-child th {
+  border: none;
+}

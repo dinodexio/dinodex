@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "../css/swap.module.css";
 import stylesModal from "../css/modal.module.css";
 import stylesButton from "../css/button.module.css";
@@ -47,7 +47,6 @@ export function Swap({
   balances,
   isDetail,
 }: SwapProps) {
-  const { setLoadBalances } = useBalancesStore();
   const form = useFormContext();
   const error = Object.values(form.formState.errors)[0]?.message?.toString();
   const [openSetting, setOpenSetting] = useState(false);
@@ -73,12 +72,13 @@ export function Swap({
   const typeSelectToken = `${typeOpenModal}_token`;
 
   const handleSelectedPool = (token: any) => {
-    setLoadBalances(true);
     form.setValue(typeSelectToken, token?.value, {
       shouldValidate: true,
       shouldDirty: true,
       shouldTouch: true,
     });
+
+    form.setValue(`${typeOpenModal}_price`, token?.price);
 
     // TODO after api pools then remove code
     if (fields.tokenIn_token && fields.tokenOut_token) {
@@ -115,10 +115,12 @@ export function Swap({
       tokenIn: formatPriceUSD(
         fields.tokenIn_amount,
         tokens[fields.tokenIn_token]?.ticker ?? "",
+        fields.tokenIn_price,
       ),
       tokenOut: formatPriceUSD(
         fields.tokenOut_amount,
         tokens[fields.tokenOut_token]?.ticker ?? "",
+        fields.tokenOut_price,
       ),
     };
   }, [
@@ -127,14 +129,14 @@ export function Swap({
     fields.tokenIn_token,
     fields.tokenOut_token,
   ]);
+
   return (
     <Dialog>
       <div
-        className={`${styles["swap-container"]} ${
-          isDetail
+        className={`${styles["swap-container"]} ${isDetail
             ? `${styles["token-swap-container"]} ${styles["pc-swap-token"]}`
             : ""
-        }`}
+          }`}
       >
         <div
           className={`flex w-full items-center justify-between ${styles["swap-header"]}`}
@@ -179,7 +181,7 @@ export function Swap({
                       if (form.getValues("slippage_custom")) {
                         form.setValue("slippage_custom", "");
                       }
-                      form.setValue("slippage", "1");
+                      form.setValue("slippage", "0.2");
                     }}
                   >
                     Auto
@@ -230,7 +232,7 @@ export function Swap({
                         },
                       })}
                       className="mr-[2px] h-full w-[50px] border-0 border-none bg-transparent p-0 text-right text-[18px] font-[400] text-textBlack opacity-50 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 sm:text-[18px] lg:text-[20px] xl:text-[20px]"
-                      placeholder="1.00"
+                      placeholder="0.2"
                       type="text"
                       inputMode="decimal"
                     />
@@ -283,14 +285,12 @@ export function Swap({
           </div>
         </div>
         <div
-          className={`${styles["swap-content"]} ${
-            isDetail ? styles["token-swap-content"] : ""
-          }`}
+          className={`${styles["swap-content"]} ${isDetail ? styles["token-swap-content"] : ""
+            }`}
         >
           <div
-            className={`${styles["swap-container-form"]} ${
-              isDetail ? styles["token-swap-form"] : ""
-            }`}
+            className={`${styles["swap-container-form"]} ${isDetail ? styles["token-swap-form"] : ""
+              }`}
           >
             <div
               className={`${styles["swap-content-item"]} ${styles["swap-item-first"]}`}
@@ -342,11 +342,12 @@ export function Swap({
 
                 <DialogTrigger>
                   <div
-                    className={`${styles["swap-item-select"]} ${
-                      fields.tokenIn_token &&
+                    className={`${styles["swap-item-select"]} ${fields.tokenIn_token &&
                       styles["swap-item-select-have-token"]
-                    }`}
-                    onClick={() => setTypeOpenModal("tokenIn")}
+                      }`}
+                    onClick={() => {
+                      setTypeOpenModal("tokenIn");
+                    }}
                   >
                     {fields?.tokenIn_token ? (
                       <>
@@ -409,11 +410,12 @@ export function Swap({
                 />
                 <DialogTrigger>
                   <div
-                    className={`${styles["swap-item-select"]} ${
-                      fields.tokenOut_token &&
+                    className={`${styles["swap-item-select"]} ${fields.tokenOut_token &&
                       styles["swap-item-select-have-token"]
-                    }`}
-                    onClick={() => setTypeOpenModal("tokenOut")}
+                      }`}
+                    onClick={() => {
+                      setTypeOpenModal("tokenOut");
+                    }}
                   >
                     {fields.tokenOut_token ? (
                       <>
@@ -458,6 +460,22 @@ export function Swap({
           >
             <span>{error ?? "Swap"}</span>
           </Button>
+
+          {!isDetail && (
+            <div className={styles["wrapper-warning-swap"] + " flex flex-row items-center gap-5 mb-[20px]"}>
+              <Image
+                src="/images/swap/warning.svg"
+                alt="swap-icon"
+                width={24}
+                height={24}
+              />
+              <span className="text-[14px] xl:text-[18px] lg:text-[16px] sm:text-[12px] text-textBlack weight-[400] font-sans">
+                Note: All transactions in the Trading Competition take place on
+                DinoDex's Local net, using test tokens that cannot be converted to
+                Mainnet or Devnet
+              </span>
+            </div>
+          )}
         </div>
 
         {/* <div className={styles["slippage-container"]}>

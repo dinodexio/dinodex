@@ -313,7 +313,6 @@ const hideListDataPool = () => {
             activePoolInfo.style.height = 'max-content'
             activePoolInfo.style.justifyContent = 'start'
             dataPool?.slice(0,1).forEach(function (item) {
-                console.log('item',item)
                 let tokenSelectedPool = item?.tokenSelectedPool
                 activePoolInfo.innerHTML += `
                     <div class="item-active-pool">
@@ -342,7 +341,6 @@ const hideListDataPool = () => {
             activePoolInfo.style.maxHeight = '266px'
             activePoolInfo.style.justifyContent = 'start'
             dataPool.forEach(function (item) {
-                console.log('item',item)
                 let tokenSelectedPool = item?.tokenSelectedPool
                 activePoolInfo.innerHTML += `
                     <div class="item-active-pool">

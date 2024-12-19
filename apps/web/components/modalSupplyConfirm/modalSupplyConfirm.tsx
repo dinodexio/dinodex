@@ -1,14 +1,12 @@
 import Image from "next/image";
 import React, { useEffect } from "react";
 import "../style.css";
-import { DialogClose } from "../ui/dialog";
+import { Dialog, DialogClose } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { tokens } from "@/tokens";
-import { Balance } from "../ui/balance";
 import styles from "../css/modalPreviewPool.module.css";
 import stylesButton from "../css/button.module.css";
 import { LayoutWaitingAndSuccess } from "../modalRemovePool/layoutModal/layoutWaitingAndSuccess";
-import { formatPercentage } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
 
 export interface modalSupplyComfirmProps {

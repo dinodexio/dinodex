@@ -4,14 +4,13 @@ import Image from "next/image";
 import styles from "../css/table.module.css";
 import { Balances } from "../pool/v2/list-pool";
 import { EMPTY_DATA } from "@/constants";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useAggregatorStore, usePollPools } from "@/lib/stores/aggregator";
 import BigNumber from "bignumber.js";
 // import { removePrecision } from "@/lib/utils";
 // import { precision } from "../ui/balance";
 import { useRouter } from "next/navigation";
-import { PoolKey, TokenPair } from "chain";
-import { TokenId } from "@proto-kit/library";
+import { DataPoolsPanel } from "@/types";
 
 export interface PoolPanelProps {
   balances?: Balances;
@@ -56,7 +55,7 @@ let columTablePool = [
     title: "#",
     key: "numberic-pool",
     width: 67,
-    render: (data: any) => {
+    render: (data: DataPoolsPanel) => {
       return <span>{data?.id}</span>;
     },
   },
@@ -65,7 +64,7 @@ let columTablePool = [
     title: "Pool",
     key: "token-name",
     width: 230,
-    render: (data: any) => {
+    render: (data: DataPoolsPanel) => {
       return (
         <div className={styles["token-info"]}>
           <div className={styles["token-info-logo"]}>
@@ -103,7 +102,7 @@ let columTablePool = [
     title: "TVL",
     key: "tvl",
     width: 163,
-    render: (data: any) => {
+    render: (data: DataPoolsPanel) => {
       return (
         <span className={styles["price-text"]}>
           {formatNumberPrecisionVol(data?.tvl, true)}
@@ -116,7 +115,7 @@ let columTablePool = [
     title: "APR",
     key: "apr",
     width: 163,
-    render: (data: any) => {
+    render: (data: DataPoolsPanel) => {
       return <span>{convertSmallNumberToPercent(data?.apr)}</span>;
     },
   },
@@ -125,7 +124,7 @@ let columTablePool = [
     title: "1D vol",
     key: "volume1d",
     width: 163,
-    render: (data: any) => {
+    render: (data: DataPoolsPanel) => {
       return (
         <span className={styles["price-text"]}>
           {formatNumberPrecisionVol(data?.volume1d, true)}
@@ -138,7 +137,7 @@ let columTablePool = [
     title: "7D vol",
     key: "volume7d",
     width: 163,
-    render: (data: any) => {
+    render: (data: DataPoolsPanel) => {
       return (
         <span className={styles["price-text"]}>
           {formatNumberPrecisionVol(data?.volume7d, true)}
@@ -151,7 +150,7 @@ let columTablePool = [
     title: "1D vol/TVL",
     key: "volume1d-tvl",
     width: 163,
-    render: (data: any) => {
+    render: (data: DataPoolsPanel) => {
       return (
         <span className={styles["price-text"]}>
           {formatNumberPrecisionVol(
@@ -167,9 +166,9 @@ let columTablePool = [
 
 const PoolPanelComponent = ({ balances, valueSearch }: PoolPanelProps) => {
   const router = useRouter();
-  const { pools: poolBalances = [], loading } = useAggregatorStore();
+  const { pools: poolBalances = [], loading, loadPools } = useAggregatorStore();
 
-  usePollPools();
+  // usePollPools();
 
   const filterDataPool = useMemo(() => {
     if (!valueSearch) return poolBalances;
@@ -186,19 +185,17 @@ const PoolPanelComponent = ({ balances, valueSearch }: PoolPanelProps) => {
       );
     });
   }, [poolBalances, valueSearch]);
+
+  useEffect(() => {
+    loadPools()
+  },[])
   return (
     <>
       <Table
         data={filterDataPool || []}
         column={columTablePool}
         onClickTr={(dataPool) => {
-          const poolKey = PoolKey.fromTokenPair(
-            TokenPair.from(
-              TokenId.from(dataPool?.tokenAId),
-              TokenId.from(dataPool?.tokenBId),
-            ),
-          ).toBase58();
-          router.push(`/info/pools/${poolKey}`);
+          router.push(`/info/pools/${dataPool.poolKey}`);
         }}
         loading={loading}
       />

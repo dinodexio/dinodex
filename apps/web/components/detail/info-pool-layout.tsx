@@ -7,7 +7,7 @@ import { PoolTransactionPanel } from "./pool-transaction-panel";
 import stylesTokens from "../css/tokens.module.css";
 import stylesDetails from "../css/detailToken.module.css";
 import Link from "next/link";
-import { usePoolInfo, usePoolTxs } from "@/lib/stores/aggregator";
+import { useAggregatorStore, useHistoryPools, usePoolInfo, usePoolTxs } from "@/lib/stores/aggregator";
 // import { Loader } from "../ui/Loader";
 import {
   ADDLIQUIDITY,
@@ -17,19 +17,24 @@ import {
   SELLPATH,
 } from "@/constants";
 import { tokens } from "@/tokens";
-import { formatNumberWithPrice } from "@/lib/utils";
+import {
+  formatNumber,
+  formatNumberWithPrice,
+  removePrecision,
+} from "@/lib/utils";
 import { precision } from "../ui/balance";
 import { InfoPoolLayoutProps, DataTransactionPanel } from "@/types";
 import { CopyContainer } from "./copy-container";
 import { Toaster } from "../ui/toaster";
-const Header = dynamic(() => import("@/components/header"), {
+const Header = dynamic(() => import("@/components/headerv2"), {
   ssr: false,
 });
 import { Footer } from "../footer";
 import { ScrollToTopButton } from "../scrollToTopButton/scrollToTopButton";
 import dynamic from "next/dynamic";
-import { Skeleton } from "../ui/skeleton";
 import { SkeletonLoading } from "./SkeletonLoading";
+import BigNumber from "bignumber.js";
+import ChartPoolBar from "../chartComponents/ChartPoolBar";
 
 const displaySortAddress = (address = "") => {
   return `${address.substring(0, 5)}...${address.substring(address.length - 5)}`;
@@ -41,26 +46,21 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
   const {
     data: poolTxs,
     loading: loadingTxs,
-    error: erroTxs,
     getPoolTxs,
   } = usePoolTxs(poolKey);
+
+  const { tokens: listTokens, loadTokens } = useAggregatorStore();
+
+  const { data: dataHistoryPool, loading: loadingHistoryPool, getHistoryPools } = useHistoryPools(poolKey)
 
   const [changePool, setChangePool] = useState<Boolean>(false);
 
   const dataInfoDisplay = useMemo(() => {
-    const {
-      tokenAId,
-      tokenBId,
-      tokenAAmount,
-      tokenBAmount,
-      tvl,
-      volume_1d,
-      poolKey,
-    } = poolInfo;
+    const { tokenAId, tokenBId, tokenAAmount, tokenBAmount } = poolInfo;
     return {
       poolKey: poolKey,
-      tvl: tvl?.usd,
-      volume_1d: volume_1d?.usd,
+      tvl: null,
+      volume_1d: null,
       tokenselected: {
         first: changePool
           ? {
@@ -84,73 +84,93 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
     };
   }, [JSON.stringify(poolInfo), changePool]);
 
+  const TvlPool = useMemo(() => {
+    if (!listTokens || listTokens.length === 0) return 0;
+    const { tokenAId, tokenBId, tokenAAmount, tokenBAmount } = poolInfo;
+    let priceTokenA = listTokens[tokenAId]?.price || 0;
+    let priceTokenB = listTokens[tokenBId]?.price || 0;
+    return BigNumber(tokenAAmount || 0)
+      .times(priceTokenA)
+      .plus(BigNumber(tokenBAmount || 0).times(priceTokenB)).div(10 ** precision).toNumber();
+  }, [JSON.stringify(listTokens)]);
+
   const dataTxsDisplay: DataTransactionPanel[] = useMemo(() => {
     return poolTxs.map((tx) => {
       //TODO constains text buy sell
       let type = [REMOVELIQUIDITY].includes(tx.type || "")
-        ? "sell"
+        ? "remove"
         : [CREATEPOOL, ADDLIQUIDITY].includes(tx.type || "")
-          ? "buy"
+          ? "add"
           : "";
 
-      if (type === SELLPATH) {
+      let typeText = type;
+      let priceTransaction = removePrecision(
+        BigNumber(tx?.tokenAAmount || 0)
+          .times(tx?.tokenAPrice || 0)
+          .toString(),
+        precision,
+      );
+
+      if (tx.type === SELLPATH) {
         type = tx.directionAB ? "sell" : "buy";
+        typeText = type + " " + dataInfoDisplay?.tokenselected?.first?.ticker;
       }
       return {
         action: type,
-        timestamp: tx.timestamp,
-        price: tx?.price?.usd,
+        typeText: typeText,
+        timestamp: tx.createAt,
         tokenAAmount: tx?.tokenAAmount,
         tokenBAmount: tx?.tokenBAmount,
         creator: tx?.creator,
+        priceusd: formatNumber(priceTransaction.toString()),
       };
     });
-  }, [JSON.stringify(poolTxs)]);
+  }, [JSON.stringify(poolTxs), JSON.stringify(dataInfoDisplay)]);
 
   const widthPoolBalances = useMemo(() => {
-    let amountA = Number(
-      formatNumberWithPrice(
-        dataInfoDisplay?.tokenselected?.first?.amount,
-        false,
-        precision,
-      ),
-    );
-    let amountB = Number(
-      formatNumberWithPrice(
-        dataInfoDisplay?.tokenselected?.second?.amount,
-        false,
-        precision,
-      ),
-    );
+    let amountA = BigNumber(dataInfoDisplay?.tokenselected?.first?.amount).div(10 ** precision).toNumber();
+    let amountB = BigNumber(dataInfoDisplay?.tokenselected?.second?.amount).div(10 ** precision).toNumber();
     let widthA = (amountA / (amountA + amountB)) * 100;
     let widthB = (amountB / (amountA + amountB)) * 100;
     return {
       widthA: widthA > widthB ? widthA - 1 : widthA,
       widthB: widthB > widthA ? widthB - 1 : widthB,
     };
-  }, [dataInfoDisplay]);
+  }, [JSON.stringify(dataInfoDisplay)]);
+
+  useEffect(() => {
+    console.log('dataHistoryPool::',dataHistoryPool)
+  },[dataHistoryPool])
 
   useEffect(() => {
     getPoolInfo();
     getPoolTxs();
+    loadTokens();
+    getHistoryPools();
   }, []);
 
   return (
     <>
-      <div className="flex w-full flex-col px-[16px] pb-[8px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px]">
+      <div className="flex w-full flex-col ">
         <Toaster />
-        <div className="flex basis-11/12 flex-col 2xl:basis-10/12">
-          <Header />
+        <Header />
+        <div className="flex basis-11/12 flex-col px-[16px] pb-[8px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px] 2xl:basis-10/12">
           <div
             className="mx-auto mt-[40px] flex w-full flex-col items-center gap-[20px] lg:items-center lg:gap-[32px] xl:mt-[63px] xl:flex-row xl:items-start xl:justify-center xl:gap-[46px]"
             style={{ zIndex: 50 }}
           >
-            <div className="w-full max-w-[734px]">
+            <div className="w-full max-w-[734px]" style={{ zIndex: 102 }}>
               <div className={stylesDetails["token-info-container"]}>
                 {loading ? (
                   <>
-                    <SkeletonLoading loading={loading} className="h-[30px] w-[30px] rounded-full" />
-                    <SkeletonLoading loading={loading} className="h-[30px] w-full max-w-[300px]" />
+                    <SkeletonLoading
+                      loading={loading}
+                      className="h-[30px] w-[30px] rounded-full"
+                    />
+                    <SkeletonLoading
+                      loading={loading}
+                      className="h-[30px] w-full max-w-[300px]"
+                    />
                   </>
                 ) : (
                   <>
@@ -163,7 +183,9 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                               dataInfoDisplay?.tokenselected?.first?.logo ||
                               "/images/swap/logo-token-default.svg"
                             }
-                            alt={dataInfoDisplay?.tokenselected?.first?.name || ""}
+                            alt={
+                              dataInfoDisplay?.tokenselected?.first?.name || ""
+                            }
                             width={30}
                             height={30}
                           />
@@ -175,7 +197,9 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                               dataInfoDisplay?.tokenselected?.second?.logo ||
                               "/images/swap/logo-token-default.svg"
                             }
-                            alt={dataInfoDisplay?.tokenselected?.second?.name || ""}
+                            alt={
+                              dataInfoDisplay?.tokenselected?.second?.name || ""
+                            }
                             width={30}
                             height={30}
                           />
@@ -209,8 +233,14 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                 <div className={stylesDetails["token-chart-price"]}>
                   {loading ? (
                     <>
-                      <SkeletonLoading loading={loading} className="h-[40px] w-[300px] mb-[4px]" />
-                      <SkeletonLoading loading={loading} className="h-[20px] w-[300px]" />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="mb-[4px] h-[40px] w-[300px]"
+                      />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="h-[20px] w-[300px]"
+                      />
                     </>
                   ) : (
                     <>
@@ -232,6 +262,7 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                   {/* <ChartToken type="priceToken" onHover={(dataHover) => {
                 setDataHover(dataHover)
               }} /> */}
+                  <ChartPoolBar data={dataHistoryPool.reverse()}/>
                 </div>
               </div>
               <FilterSort />
@@ -240,21 +271,45 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                   <span className="text-[20px] font-[400] text-textBlack sm:text-[20px] lg:text-[24px] xl:text-[24px]">
                     Stats
                   </span>
-                  <SkeletonLoading loading={loading} className="h-[21px] w-[100px] mb-[12px]" />
-                  <SkeletonLoading loading={loading} className="h-[40px] w-full" />
+                  <SkeletonLoading
+                    loading={loading}
+                    className="mb-[12px] h-[21px] w-[100px]"
+                  />
+                  <SkeletonLoading
+                    loading={loading}
+                    className="h-[40px] w-full"
+                  />
                   <div className="flex w-full items-center justify-between">
                     <div className="flex w-[50%] flex-col items-start">
-                      <SkeletonLoading loading={loading} className="h-[21px] w-[100px] mb-[12px]" />
-                      <SkeletonLoading loading={loading} className="h-[40px] w-full" />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="mb-[12px] h-[21px] w-[100px]"
+                      />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="h-[40px] w-full"
+                      />
                     </div>
                     <div className="flex w-[45%] flex-col items-start">
-                      <SkeletonLoading loading={loading} className="h-[21px] w-[100px] mb-[12px]" />
-                      <SkeletonLoading loading={loading} className="h-[40px] w-full" />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="mb-[12px] h-[21px] w-[100px]"
+                      />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="h-[40px] w-full"
+                      />
                     </div>
                   </div>
                   <div className="flex flex-col items-start">
-                    <SkeletonLoading loading={loading} className="h-[21px] w-[100px] mb-[12px]" />
-                    <SkeletonLoading loading={loading} className="h-[40px] w-[200px]" />
+                    <SkeletonLoading
+                      loading={loading}
+                      className="mb-[12px] h-[21px] w-[100px]"
+                    />
+                    <SkeletonLoading
+                      loading={loading}
+                      className="h-[40px] w-[200px]"
+                    />
                   </div>
                 </div>
               ) : (
@@ -281,7 +336,9 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                         }
                         width={15}
                         height={15}
-                        alt={dataInfoDisplay?.tokenselected?.first?.ticker || ""}
+                        alt={
+                          dataInfoDisplay?.tokenselected?.first?.ticker || ""
+                        }
                       />
                       <span className="text-[14px] font-[400] text-textBlack sm:text-[14px] lg:text-[18.813px] xl:text-[18.813px]">
                         {dataInfoDisplay?.tokenselected?.first?.ticker}
@@ -302,7 +359,9 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                         }
                         width={15}
                         height={15}
-                        alt={dataInfoDisplay?.tokenselected?.second?.ticker || ""}
+                        alt={
+                          dataInfoDisplay?.tokenselected?.second?.ticker || ""
+                        }
                       />
                       <span className="text-[14px] font-[400] text-textBlack sm:text-[14px] lg:text-[18.813px] xl:text-[18.813px]">
                         {dataInfoDisplay?.tokenselected?.second?.ticker}
@@ -326,7 +385,10 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                       </span>
                       <div className="flex items-center gap-[10px]">
                         <span className="text-[24px] font-[400] text-textBlack sm:text-[24px] lg:text-[45px] xl:text-[54px]">
-                          {formatNumberWithPrice(dataInfoDisplay?.tvl, true)}
+                          {formatNumberWithPrice(
+                            TvlPool || "",
+                            true,
+                          )}
                         </span>
                         <div className="flex items-center gap-[4px]">
                           <Image
@@ -385,25 +447,19 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                   Transactions
                 </span>
               </div>
-              {/* {loading || loadingTxs ? <SkeletonLoading loading={loading && loadingTxs} className="h-[200px] w-full" /> : (
-                <PoolTransactionPanel
-                  data={dataTxsDisplay}
-                  titleA={dataInfoDisplay.tokenselected.first.ticker || ""}
-                  titleB={dataInfoDisplay.tokenselected.second.ticker || ""}
-                  logoA={dataInfoDisplay.tokenselected.first.logo || ""}
-                  logoB={dataInfoDisplay.tokenselected.second.logo || ""}
-                />
-              )} */}
               <PoolTransactionPanel
                 data={dataTxsDisplay}
                 titleA={dataInfoDisplay.tokenselected.first.ticker || ""}
                 titleB={dataInfoDisplay.tokenselected.second.ticker || ""}
                 logoA={dataInfoDisplay.tokenselected.first.logo || ""}
                 logoB={dataInfoDisplay.tokenselected.second.logo || ""}
-                loading={loading}
+                loading={loadingTxs || loading}
               />
             </div>
-            <div className="mt-[-7px] w-full max-w-[734px] sm:max-w-[734px] lg:max-w-[426px] xl:max-w-[426px]">
+            <div
+              className="mt-[-7px] w-full max-w-[734px] sm:max-w-[734px] lg:max-w-[426px] xl:max-w-[426px]"
+              style={{ zIndex: 102 }}
+            >
               <div className="hidden items-center justify-between sm:hidden lg:flex xl:flex">
                 <Link
                   href="/swap"
@@ -447,19 +503,43 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                   <span className="text-[20px] font-[400] text-textBlack sm:text-[20px] lg:text-[24px] xl:text-[24px]">
                     Stats
                   </span>
-                  <SkeletonLoading loading={loading} className="h-[21px] w-[100px]" />
-                  <SkeletonLoading loading={loading} className="h-[64px] w-full" />
+                  <SkeletonLoading
+                    loading={loading}
+                    className="h-[21px] w-[100px]"
+                  />
+                  <SkeletonLoading
+                    loading={loading}
+                    className="h-[64px] w-full"
+                  />
                   <div className="flex flex-col items-start">
-                    <SkeletonLoading loading={loading} className="h-[21px] w-[100px] mb-[12px]" />
-                    <SkeletonLoading loading={loading} className="h-[70px] w-full" />
+                    <SkeletonLoading
+                      loading={loading}
+                      className="mb-[12px] h-[21px] w-[100px]"
+                    />
+                    <SkeletonLoading
+                      loading={loading}
+                      className="h-[70px] w-full"
+                    />
                   </div>
                   <div className="flex flex-col items-start">
-                    <SkeletonLoading loading={loading} className="h-[21px] w-[100px] mb-[12px]" />
-                    <SkeletonLoading loading={loading} className="h-[70px] w-full" />
+                    <SkeletonLoading
+                      loading={loading}
+                      className="mb-[12px] h-[21px] w-[100px]"
+                    />
+                    <SkeletonLoading
+                      loading={loading}
+                      className="h-[70px] w-full"
+                    />
                   </div>
                   <div className="flex flex-col items-start">
-                    <SkeletonLoading loading={loading} className="h-[21px] w-[100px] mb-[12px]" />
-                    <SkeletonLoading loading={loading} className="h-[70px] w-full" />
+                    <SkeletonLoading
+                      loading={loading}
+                      className="mb-[12px] h-[21px] w-[100px]"
+                    />
+                    <SkeletonLoading
+                      loading={loading}
+                      className="h-[70px] w-full"
+                    />
                   </div>
                 </div>
               ) : (
@@ -537,7 +617,10 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                     </span>
                     <div className="flex items-center gap-[10px]">
                       <span className="text-[24px] font-[400] text-textBlack sm:text-[24px] lg:text-[45px] xl:text-[54px]">
-                        {formatNumberWithPrice(dataInfoDisplay?.tvl, true)}
+                        {formatNumberWithPrice(
+                          TvlPool || "",
+                          true,
+                        )}
                       </span>
                       <div className="flex items-center gap-[4px]">
                         <Image
@@ -558,7 +641,10 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                     </span>
                     <div className="flex items-center gap-[10px]">
                       <span className="text-[24px] font-[400] text-textBlack sm:text-[24px] lg:text-[45px] xl:text-[54px]">
-                        {formatNumberWithPrice(dataInfoDisplay.volume_1d, true)}
+                        {formatNumberWithPrice(
+                          dataInfoDisplay.volume_1d || "",
+                          true,
+                        )}
                       </span>
                       <div className="flex items-center gap-[4px]">
                         <Image
@@ -592,16 +678,34 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                 {loading ? (
                   <div className="flex flex-col gap-[20px]">
                     <div className="flex items-center gap-[8px]">
-                      <SkeletonLoading loading={loading} className="h-[30px] w-[30px] rounded-full" />
-                      <SkeletonLoading loading={loading} className="h-[30px] w-full max-w-[300px]" />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="h-[30px] w-[30px] rounded-full"
+                      />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="h-[30px] w-full max-w-[300px]"
+                      />
                     </div>
                     <div className="flex items-center gap-[8px]">
-                      <SkeletonLoading loading={loading} className="h-[30px] w-[30px] rounded-full" />
-                      <SkeletonLoading loading={loading} className="h-[30px] w-full max-w-[300px]" />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="h-[30px] w-[30px] rounded-full"
+                      />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="h-[30px] w-full max-w-[300px]"
+                      />
                     </div>
                     <div className="flex items-center gap-[8px]">
-                      <SkeletonLoading loading={loading} className="h-[30px] w-[30px] rounded-full" />
-                      <SkeletonLoading loading={loading} className="h-[30px] w-full max-w-[300px]" />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="h-[30px] w-[30px] rounded-full"
+                      />
+                      <SkeletonLoading
+                        loading={loading}
+                        className="h-[30px] w-full max-w-[300px]"
+                      />
                     </div>
                   </div>
                 ) : (
@@ -617,7 +721,8 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                                 "/images/swap/logo-token-default.svg"
                               }
                               alt={
-                                dataInfoDisplay?.tokenselected?.first?.name || ""
+                                dataInfoDisplay?.tokenselected?.first?.name ||
+                                ""
                               }
                               width={30}
                               height={30}
@@ -631,7 +736,8 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                                 "/images/swap/logo-token-default.svg"
                               }
                               alt={
-                                dataInfoDisplay?.tokenselected?.second?.name || ""
+                                dataInfoDisplay?.tokenselected?.second?.name ||
+                                ""
                               }
                               width={30}
                               height={30}
@@ -662,7 +768,9 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                             dataInfoDisplay?.tokenselected?.first?.logo ||
                             "/images/swap/logo-token-default.svg"
                           }
-                          alt={dataInfoDisplay?.tokenselected?.first?.name || ""}
+                          alt={
+                            dataInfoDisplay?.tokenselected?.first?.name || ""
+                          }
                           width={30}
                           height={30}
                         />
@@ -686,10 +794,10 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                           </svg>
                         </div>
                       </Link>
-                      <CopyContainer
+                      {/* <CopyContainer
                         value="0xFd08as123u8asy348123FCbb9"
                         content={<>0xFd08...FCbb9b</>}
-                      />
+                      /> */}
                     </div>
                     <div className="flex w-full items-center justify-between">
                       <Link
@@ -702,7 +810,9 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                             dataInfoDisplay?.tokenselected?.second?.logo ||
                             "/images/swap/logo-token-default.svg"
                           }
-                          alt={dataInfoDisplay?.tokenselected?.second?.name || ""}
+                          alt={
+                            dataInfoDisplay?.tokenselected?.second?.name || ""
+                          }
                           width={30}
                           height={30}
                         />
@@ -726,10 +836,10 @@ export function InfoPoolLayout({ params }: InfoPoolLayoutProps) {
                           </svg>
                         </div>
                       </Link>
-                      <CopyContainer
+                      {/* <CopyContainer
                         value="0xFd08as123u8asy348123FCbb9"
                         content={<>0xFd08...FCbb9b</>}
-                      />
+                      /> */}
                     </div>
                   </div>
                 )}

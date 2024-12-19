@@ -1,0 +1,39 @@
+{
+  "name": "bot",
+  "version": "1.0.0",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "history:start": "node --experimental-specifier-resolution=node bot.js",
+    "dev": "nodemon --experimental-specifier-resolution=node --inspect bot.js",
+    "start": "node --experimental-specifier-resolution=node bot.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "async-mutex": "^0.5.0",
+    "bignumber.js": "^9.1.2",
+    "bip32": "5.0.0-rc.0",
+    "bip39": "^3.1.0",
+    "chain": "workspace:*",
+    "graphql": "^16.9.0",
+    "graphql-request": "^7.1.0",
+    "mina-signer": "^3.0.7",
+    "o1js": "1.6.0",
+    "tiny-secp256k1": "^2.2.3"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/pg": "^8.11.10",
+    "nodemon": "^3.1.4"
+  },
+  "peerDependencies": {
+    "@proto-kit/common": "*",
+    "@proto-kit/library": "*",
+    "@proto-kit/module": "*",
+    "@proto-kit/protocol": "*",
+    "@proto-kit/sdk": "*",
+    "@proto-kit/sequencer": "*"
+  }
+}

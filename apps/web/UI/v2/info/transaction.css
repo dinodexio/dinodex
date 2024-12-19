@@ -1,0 +1,824 @@
+.containerFluid {
+  height: auto;
+  min-height: 100dvh;
+  background: var(--bg-transaction);
+  font-family: "SF Pro Display";
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.transactionBody {
+  display: flex;
+  padding: 88px 0px;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  align-self: stretch;
+}
+
+.transactionOverview {
+  display: flex;
+  padding: 24px 60px;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  /* align-self: stretch; */
+}
+
+.transactionOverviewHeader {
+  display: flex;
+  max-width: 1352px;
+  align-items: center;
+  align-content: center;
+  gap: 16px;
+  align-self: stretch;
+  flex-wrap: wrap;
+}
+
+.transactionOverviewHeaderTag {
+  display: flex;
+  flex-direction: column;
+  height: 88px;
+  min-width: 176px;
+  padding: 8px 16px;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.overviewHeaderText {
+  color: var(--s-text);
+  font-size: 14px;
+  font-style: normal;
+}
+
+.transactionOverviewHeaderTag > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.overviewHeaderTextTitle {
+  font-weight: 500;
+  line-height: 22px;
+}
+
+.iconInfo {
+  display: flex;
+  width: 16px;
+  height: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: var(--bg-gray-a);
+  background-clip: content-box;
+  padding: 2px;
+  transition: all 0.3s ease-in-out;
+}
+
+.iconInfo:hover {
+  background-color: var(--h-text);
+  color: var(--text-primary);
+}
+
+.overviewHeaderTextValue {
+  font-weight: 700;
+  line-height: normal;
+}
+
+.red-text {
+  color: var(--primary-red-b);
+}
+
+.plusText {
+  color: #59c259;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.overviewDivider {
+  width: 1px;
+  align-self: stretch;
+  background-color: var(--devider-a);
+  height: auto;
+  margin: 8px 0px;
+}
+
+.overviewHeaderGrayText {
+  font-weight: 500;
+  line-height: 22px;
+}
+
+.minaPriceHeaderTagWrapper {
+  display: flex;
+  padding-right: 16px;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.minaPriceHeaderTag {
+  min-width: auto;
+}
+
+.chartWrapper {
+  display: flex;
+  width: 108px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  align-self: stretch;
+}
+
+.overviewTag {
+  display: flex;
+  height: 24px;
+  padding: 0px 4px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 6px;
+  background: var(--bg-gray-b);
+
+  color: var(--s-text);
+  text-align: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+.transactionCardsList {
+  display: flex;
+  max-width: 1352px;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 16px;
+  align-self: stretch;
+  flex-wrap: wrap;
+}
+
+.cardsListText {
+  color: var(--s-text);
+
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+.transactionCard {
+  display: flex;
+  min-width: 318px;
+  padding: 16px;
+  align-items: center;
+  gap: 12px;
+  flex: 1 0 0;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: var(--box-shadow-a);
+}
+
+.transactionCardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1 0 0;
+}
+
+.cardValue,
+.epochValue {
+  display: flex;
+  color: var(--p-text);
+  /* flex-direction: column;
+  justify-content: center; */
+  align-self: stretch;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.epochValue {
+  width: 150px;
+}
+
+.epochPercentageWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.epochGreenPercentage {
+  font-weight: 700;
+  line-height: 22px;
+  font-size: 13px;
+  color: var(--text-green-c);
+}
+
+.epochPercentageBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 6px;
+  align-self: stretch;
+}
+
+.percentageBar {
+  width: 124px;
+  height: 3px;
+  border-radius: 12px;
+  background-color: var(--bg-gray-c);
+}
+
+.percentageBarRedFill,
+.percentageBarGreenFill {
+  height: 3px;
+  border-radius: 12px;
+  background-color: var(--text-green-c);
+}
+
+.percentageBarRedFill {
+  background-color: var(--primary-red-c);
+}
+
+.epochSlots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+.echoRedSlots {
+  font-weight: 700;
+  color: var(--primary-red-c);
+}
+
+.transactionCardRedValue {
+  color: var(--primary-red-b);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  display: flex;
+  width: 183px;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.transactionCardIcon {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+}
+
+.decimalText {
+  color: var(--s-text);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.tickerTag {
+  color: var(--s-Text, #575c66);
+  font-family: "SF Pro Display";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.feeOverview {
+  display: flex;
+  max-width: 1352px;
+  align-items: center;
+  align-content: center;
+  gap: 16px;
+  align-self: stretch;
+  flex-wrap: wrap;
+}
+
+.feeInfoWrapper {
+  display: flex;
+  height: 88px;
+  min-width: 176px;
+  padding: 8px 16px;
+  align-items: center;
+  gap: 12px;
+  flex: 1 0 0;
+}
+
+.feeInfoText {
+  color: var(--s-text);
+  text-align: right;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.grayFeeValue,
+.feeValue {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  align-self: stretch;
+  text-align: right;
+}
+
+.feeValue {
+  font-weight: 600;
+  color: var(--p-text);
+}
+
+.grayFeeValue {
+  color: var(--t-text);
+  flex-wrap: wrap;
+}
+
+.feeValueWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex: 1 0 0;
+  max-width: 191px;
+}
+
+.transactionTableContainer {
+  display: flex;
+  padding: 24px 41px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.transactionTableWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  max-width: 1358px;
+}
+
+.transactionTableTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+
+  color: var(--p-text);
+  text-align: center;
+  height: 32px;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.apiBtn {
+  display: flex;
+  height: 32px;
+  padding: 0px 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  color: var(--t-text);
+  text-align: center;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  cursor: pointer;
+}
+
+.transactionTableTabContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.transactionTableTabWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transactionTableTab {
+  display: flex;
+  min-height: 40px;
+  padding: 0px 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+
+  color: var(--s-text);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.transactionTableTab:hover {
+  background-color: var(--bg-red-a);
+}
+
+.activeTab {
+  color: var(--primary-red-b);
+  background-color: var(--bg-red-a);
+}
+
+.headerCell {
+  display: flex;
+  height: 44px;
+  padding: 0px 16px;
+  align-items: center;
+  gap: 10px;
+  flex: 1 0 0;
+}
+
+.containerTable {
+  color: var(--p-text);
+  font-family: "SF Pro Display";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+th,
+td {
+  font-weight: inherit;
+}
+
+.tableRow {
+  height: 72px;
+}
+
+.tableHeadRow {
+  height: 44px;
+}
+
+.tableHeadRow,
+.tableRow {
+  border-bottom: 1px solid var(--devider-b);
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.typeValue {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.detailsBtn {
+  display: flex;
+  height: 40px;
+  padding: 0px 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  background: #ebebeb;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+
+  color: var(--s-text);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.detailsBtn:hover {
+  background-color: var(--text-primary);
+}
+
+.transferInfo {
+  display: flex;
+  min-width: 124px;
+  padding: 0px 32px 0px 16px;
+  align-items: center;
+  gap: 20px;
+}
+
+.tranferSender {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.sender {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.senderName {
+  font-size: 14px;
+  line-height: normal;
+}
+
+.transactionAddress {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  align-items: center;
+}
+
+.transactionValue {
+  color: var(--primary-red-c);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pendingCell {
+  display: flex;
+  padding: 0px 16px;
+  align-items: center;
+}
+
+.pendingTag {
+  display: flex;
+  height: 20px;
+  padding: 0px 6px;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  border-radius: 12px;
+  background: var(--bg-yellow-a);
+
+  color: var(--text-yellow-a);
+}
+
+.pendingIcon {
+  width: 10px;
+  height: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.bodyCell {
+  display: flex;
+  padding: 0px 16px;
+  align-items: center;
+  gap: 10px;
+  flex: 1 0 0;
+}
+
+.ageCell {
+  color: var(--s-text);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.amountCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+}
+
+.amountValue {
+  display: flex;
+  align-items: center;
+  line-height: normal;
+}
+
+.tableDecimalText {
+  color: var(--s-text);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.currencyName {
+  color: var(--t-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.memoText {
+  color: var(--s-text);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
+.memoName {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  flex: 1 0 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.blockCell {
+  gap: 4px;
+  font-size: 10px;
+  line-height: 18px;
+  color: var(--s-text);
+}
+
+.acountAvt {
+  width: 18px;
+  height: 18px;
+  border-radius: 18px;
+}
+
+.tableWrapper {
+  width: 1358px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.viewAllText {
+  color: var(--primary-red-b);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 28px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.viewAllText:hover {
+  color: var(--primary-red-c);
+}
+
+.minMaxFeeValue {
+  color: var(--p-text);
+  font-family: "SF Pro Display";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.showLessBtn {
+  display: none;
+  height: 42px;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+}
+
+.showLessText {
+  color: var(--primary-red-b);
+  text-align: center;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 28px; /* 200% */
+}
+
+.minusText {
+  color: var(--primary-red-d);
+  font-family: "SF Pro Display";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 22px; 
+}
+
+@media screen and (max-width: 992px) {
+  .transactionOverview {
+    padding: 24px 32px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .transactionOverview {
+    padding: 24px 0px;
+    width: 100%;
+  }
+
+  .transactionOverviewHeader {
+    order: 2;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 8px 16px;
+    background: #fff5f0;
+    align-items: flex-start;
+    gap: 0px;
+  }
+
+  .transactionOverviewHeaderTag {
+    width: 100%;
+    border-bottom: 1px solid var(--devider-b);
+    padding: 16px 0px;
+    height: auto;
+  }
+
+  .minaPriceHeaderTagWrapper {
+    width: 100%;
+    border-bottom: 1px solid var(--devider-b);
+    padding: 16px 0px;
+  }
+
+  .minaPriceHeaderTag {
+    padding: 8px 0px;
+    border: none;
+  }
+
+  .overviewDivider {
+    display: none;
+  }
+
+  .transactionCardsList {
+    order: 1;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .transactionCard {
+    width: 100%;
+    border-radius: 0;
+    border-bottom: 1px solid var(--devider-b);
+    box-shadow: none;
+  }
+
+  .transactionCard:last-child {
+    border-bottom: none;
+  }
+
+  .feeOverview {
+    order: 3;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 0px 16px;
+  }
+
+  .feeInfoWrapper {
+    width: 100%;
+    border-bottom: 1px solid var(--devider-b);
+  }
+
+  .feeInfoWrapper:last-child {
+    border-bottom: none;
+  }
+
+  .feeValueWrapper {
+    max-width: none;
+  }
+
+  .transactionTableTabContainer {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .viewAllText {
+    padding: 0px 16px;
+  }
+
+  .transactionTableContainer {
+    padding: 24px 16px;
+  }
+
+  .showLessBtn {
+    display: flex;
+    cursor: pointer;
+  }
+}

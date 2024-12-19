@@ -1,15 +1,16 @@
 import Image from "next/image";
-import React, { forwardRef, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import "../style.css";
-import { DialogClose } from "../ui/dialog";
+import { Dialog, DialogClose } from "../ui/dialog";
 import { LIST_TOKENS } from "@/tokens";
 import styles from "../css/modalListToken.module.css";
-import { formatNumber, formatterInteger } from "@/lib/utils";
-import { EMPTY_DATA } from "@/constants";
-import BigNumber from "bignumber.js";
+import { formatPriceUSD } from "@/lib/utils";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { useBalancesStore } from "@/lib/stores/balances";
-import { Balance } from "../ui/balance";
+import { Balance, precision } from "../ui/balance";
+import { USDBalance } from "../ui/usd-balance";
+import { useAggregatorStore } from "@/lib/stores/aggregator";
+import BigNumber from "bignumber.js";
 // import { cn } from "@/lib/utils";
 // import { Input } from "../ui/input";
 
@@ -19,28 +20,14 @@ export interface modalListTokenProps {
   dialogClose: boolean;
 }
 
-function formatNumberPrecisionVol(value: any, isPrice: boolean = false) {
-  if (!value) return EMPTY_DATA;
-
-  const priceResult = formatNumber(BigNumber(value).toNumber());
-  return `${
-    priceResult == "<0.01"
-      ? isPrice
-        ? "< $0.01"
-        : priceResult
-      : isPrice
-        ? `$${priceResult}`
-        : priceResult
-  }`;
-}
-
-export const ModalListToken = ({ tokenSelected, onClickToken, dialogClose }: modalListTokenProps) => {
-  const {
-    wallet,
-  } = useWalletStore();
-  const {
-    balances
-  } = useBalancesStore();
+export const ModalListToken = ({
+  tokenSelected,
+  onClickToken,
+  dialogClose,
+}: modalListTokenProps) => {
+  const { wallet } = useWalletStore();
+  const { balances } = useBalancesStore();
+  const { tokens, loadTokens } = useAggregatorStore();
   const ownBalances = wallet ? balances[wallet] : {};
 
   const tokenOptions = useMemo(() => {
@@ -48,13 +35,18 @@ export const ModalListToken = ({ tokenSelected, onClickToken, dialogClose }: mod
       label: token?.name,
       ticker: token?.ticker,
       value: tokenId,
-      price:1000000,
-      balance: ownBalances[tokenId] || 0,
-    })) 
-    console.log('list_token',list_token)
-    return list_token
-  },[LIST_TOKENS,ownBalances])
+      price: tokens ? tokens.find((t) => t.id === tokenId)?.price : '--',
+      balance: ownBalances ? ownBalances[tokenId] : 0,
+    }));
+    return list_token;
+  }, [LIST_TOKENS, ownBalances, tokens]);
   const [valueSearch, setValueSearch] = React.useState<string>("");
+
+  useEffect(() => {
+    if (!tokens || tokens.length === 0) {
+      loadTokens();
+    }
+  }, [JSON.stringify(tokens)])
   return (
     <div className="h-max">
       <div className={styles["header-content-modal"]}>
@@ -81,7 +73,7 @@ export const ModalListToken = ({ tokenSelected, onClickToken, dialogClose }: mod
       </div>
       <div>
         <input
-          className={`${styles["search-input"]} text-textBlack border-none outline-none`}
+          className={`${styles["search-input"]} border-none text-textBlack outline-none`}
           value={valueSearch}
           type="text"
           placeholder="Search tokens"
@@ -118,22 +110,41 @@ export const ModalListToken = ({ tokenSelected, onClickToken, dialogClose }: mod
                             width={50}
                             height={50}
                           />
-                          <Image src="/icon/logo-dino.svg" alt="check" width={18} height={18} className="absolute bottom-0 right-0"/>
+                          <Image
+                            src="/icon/logo-dino.svg"
+                            alt="check"
+                            width={18}
+                            height={18}
+                            className="absolute bottom-0 right-0"
+                          />
                         </div>
                         <div className={styles["list-token-item-text"]}>
                           <span className={styles["list-token-item-name"]}>
                             {token.label}
                           </span>
-                          <span className={styles["list-token-item-symbol"]}>{token.ticker}</span>
+                          <span className={styles["list-token-item-symbol"]}>
+                            {token.ticker}
+                          </span>
                         </div>
                       </div>
-                      <div className={styles["list-token-item-text"]} style={{ alignItems: "end" }}>
-                        <span className={styles["list-token-item-name"]}>
-                          {Number(token.price) > 9999999
-                            ? formatNumberPrecisionVol(token.price, false)
-                            : formatterInteger(token.price)}$
+                      <div
+                        className={styles["list-token-item-text"]}
+                        style={{ alignItems: "end" }}
+                      >
+                        <USDBalance
+                          className={styles["list-token-item-name"]}
+                          balance={formatPriceUSD(
+                            BigNumber(token?.balance || "~")
+                              .div(10 ** precision)
+                              .toFixed(2).toString(),
+                            token?.ticker || "",
+                            token?.price || "~"
+                          )}
+                          type="USD"
+                        />
+                        <span className={styles["list-token-item-symbol"]}>
+                          <Balance balance={String(token?.balance)} />
                         </span>
-                        <span className={styles["list-token-item-symbol"]}><Balance balance={String(token?.balance)} /></span>
                       </div>
                     </div>
                   </DialogClose>
@@ -155,7 +166,9 @@ export const ModalListToken = ({ tokenSelected, onClickToken, dialogClose }: mod
                         <span className={styles["list-token-item-name"]}>
                           {token.label}
                         </span>
-                        <span className={styles["list-token-item-symbol"]}>{token.ticker}</span>
+                        <span className={styles["list-token-item-symbol"]}>
+                          {token.ticker}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -166,4 +179,4 @@ export const ModalListToken = ({ tokenSelected, onClickToken, dialogClose }: mod
       </div>
     </div>
   );
-}
+};

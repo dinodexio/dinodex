@@ -87,7 +87,6 @@
   background: var(--white-text-color);
   position: absolute;
   width: max-content;
-  z-index: -1;
   top: 30px;
   right: 0;
   opacity: 0;
@@ -98,7 +97,7 @@
 .network-content-menu-show {
   opacity: 1;
   visibility: visible;
-  z-index: 100;
+  z-index: 110;
 }
 
 .network-content-menu-header,
@@ -225,6 +224,7 @@
   width: 100px;
   margin-left: 10px;
   margin-right: 26px;
+  z-index: 100;
 }
 
 /* filter sort detail*/

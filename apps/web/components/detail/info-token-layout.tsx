@@ -1,10 +1,9 @@
 import Image from "next/image";
 import { FilterSort } from "./filter-sort";
 import "../style.css";
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { TransactionPanel } from "./transaction-panel";
 import { PoolPanel } from "./pool-panel";
-// import { Swap } from "../swap/swap";
 import stylesTokens from "../css/tokens.module.css";
 import stylesDetails from "../css/detailToken.module.css";
 import { CopyContainer } from "./copy-container";
@@ -12,25 +11,28 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  // DrawerDescription,
-  // DrawerFooter,
-  // DrawerHeader,
   DrawerOverlay,
-  // DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-// import useCopy from "@/hook/useCopy";
 import {
-  useAggregatorStore,
+  useHistoryToken,
   useTokenInfo,
+  useTokenPools,
   useTokenTxs,
 } from "@/lib/stores/aggregator";
-// import { Loader } from "../ui/Loader";
 import { Token, tokens } from "@/tokens";
-import { formatNumberWithPrice, truncateAddress } from "@/lib/utils";
-import { InfoTokenLayoutProps, DataTokenTransactionPanel } from "@/types";
+import {
+  formatNumberWithPrice,
+  removePrecision,
+  truncateAddress,
+} from "@/lib/utils";
+import {
+  InfoTokenLayoutProps,
+  DataTokenTransactionPanel,
+  DataTransactionPanel,
+} from "@/types";
 import { Toaster } from "../ui/toaster";
-const Header = dynamic(() => import("@/components/header"), {
+const Header = dynamic(() => import("@/components/headerv2"), {
   ssr: false,
 });
 import { Footer } from "../footer";
@@ -39,6 +41,11 @@ import dynamic from "next/dynamic";
 import Swap from "@/containers/async-swap-page";
 import { SkeletonLoading } from "./SkeletonLoading";
 import Link from "next/link";
+import { ChartToken } from "../token/chart-token";
+import BigNumber from "bignumber.js";
+import { precision } from "../ui/balance";
+import { useObserveTotalSupply } from "@/lib/stores/balances";
+import { EMPTY_DATA } from "@/constants";
 
 interface TokenPage extends Token {
   id: string;
@@ -79,6 +86,9 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
     return result;
   }, [params.key]);
   const [tab, setTab] = useState("transaction");
+  const [filterTime, setFilterTime] = useState<string | null>(
+    new Date(new Date().getTime() - 60 * 60 * 1000).toISOString(),
+  );
   const [dataHover, setDataHover] = useState<any>({});
   const {
     data: tokenInfo,
@@ -86,12 +96,23 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
     error,
     getTokenInfo,
   } = useTokenInfo(token?.id || "");
+  const { data: dataHistoryToken, getHistoryToken } = useHistoryToken(
+    token?.id || "",
+    filterTime,
+    0,
+    100
+  );
   const {
     data: tokenTxs,
     loading: loadingTxs,
-    error: erroTxs,
     getTokenTxs,
   } = useTokenTxs(token?.id || "");
+  const {
+    data: tokenPools,
+    loading: loadingPools,
+    getTokenPools,
+  } = useTokenPools(token?.id || "");
+  const lpTotalSupply = useObserveTotalSupply(token?.id);
 
   const dataInfoDisplay = useMemo(() => {
     const { tvl, price, volume_1d, fdv } = tokenInfo;
@@ -103,7 +124,8 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
       tvl: tvl?.usd,
       volume_1d: volume_1d?.usd,
       fdv: fdv?.usd,
-      price: price?.usd,
+      price: price,
+      prices: tokenInfo.prices,
     };
   }, [JSON.stringify(tokenInfo)]);
 
@@ -127,31 +149,104 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
         action: !xor(isTokenCurrentIsA, Boolean(tx.directionAB))
           ? "sell"
           : "buy", //TODO constains text buy sell
-        timestamp: tx.timestamp,
-        price: tx?.price?.usd,
+        timestamp: tx.createAt,
+        price: removePrecision(
+          BigNumber(tx?.tokenAAmount || 0)
+            .times(tx?.tokenAPrice || 0)
+            .toString(),
+          precision,
+        ).toString(),
         creator: tx?.creator,
         ...tokenTxInfo,
       };
     });
   }, [JSON.stringify(tokenTxs)]);
 
+  const TvlToken = useMemo(() => {
+    const result = tokenPools.reduce((acc, pool) => {
+      let tvlPoolToken =
+        pool?.tokenAId === tokenInfo.id
+          ? BigNumber(pool?.tokenAAmount || 0)
+            .times(tokenInfo.price)
+            .div(10 ** precision)
+            .toNumber()
+          : BigNumber(pool?.tokenBAmount || 0)
+            .times(tokenInfo.price)
+            .div(10 ** precision)
+            .toNumber();
+      return acc + tvlPoolToken;
+    }, 0);
+    return result;
+  }, [JSON.stringify(tokenPools)]);
+
+  const changePrice = useMemo(() => {
+    if (!dataHistoryToken || dataHistoryToken.length === 0) return null;
+    let priceHistory = dataHistoryToken[dataHistoryToken.length - 1]?.price;
+    console.log('priceHistory::;', priceHistory)
+    let differencePrice = BigNumber(
+      BigNumber(dataInfoDisplay.price).minus(BigNumber(priceHistory)),
+    )
+      .div(BigNumber(dataInfoDisplay.price))
+      .toNumber();
+
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3,
+    }).format(differencePrice * 100);
+  }, [JSON.stringify(dataHistoryToken)]);
+
+  const handleFilterTime = (value: string) => {
+    let countTime =
+      value === "1h"
+        ? 60
+        : value === "1d"
+          ? 60 * 24
+          : value === "1w"
+            ? 60 * 24 * 7
+            : value === "1m"
+              ? 60 * 24 * 30
+              : value === "1y"
+                ? 60 * 24 * 365
+                : null;
+
+    const currentTime = new Date(); // Thời gian hiện tại
+
+    const oneHourAgo = countTime
+      ? new Date(currentTime.getTime() - 60 * countTime * 1000).toISOString()
+      : null;
+
+    setFilterTime(oneHourAgo);
+  };
+
   useEffect(() => {
     getTokenInfo();
     getTokenTxs();
+    getTokenPools();
   }, []);
+
+  useEffect(() => {
+    getHistoryToken();
+  }, [filterTime]);
+
   return (
     <>
-      <div className="flex w-full flex-col px-[16px] pb-[8px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px]">
+      <div className="flex w-full flex-col ">
         <Toaster />
-        <div className="flex basis-11/12 flex-col 2xl:basis-10/12">
-          <Header />
+        <Header />
+        <div className="flex basis-11/12 flex-col px-[16px] pb-[8px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px] 2xl:basis-10/12">
           <div className="mx-auto mt-[40px] flex w-full flex-col items-center gap-[20px] lg:items-start lg:gap-[32px] xl:mt-[63px] xl:flex-row xl:items-start xl:justify-center xl:gap-[46px]">
-            <div className="w-full max-w-[734px]">
+            <div className="w-full max-w-[734px]" style={{ zIndex: 102 }}>
               <div className={stylesDetails["token-info-container"]}>
                 {loading ? (
                   <>
-                    <SkeletonLoading loading={true} className="h-[34px] w-[34px] rounded-full" />
-                    <SkeletonLoading loading={true} className="h-[34px] w-full max-w-[300px]" />
+                    <SkeletonLoading
+                      loading={true}
+                      className="h-[34px] w-[34px] rounded-full"
+                    />
+                    <SkeletonLoading
+                      loading={true}
+                      className="h-[34px] w-full max-w-[300px]"
+                    />
                   </>
                 ) : (
                   <>
@@ -176,8 +271,14 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
                 <div className={stylesDetails["token-chart-price"]}>
                   {loading ? (
                     <>
-                      <SkeletonLoading loading={true} className="h-[40px] w-[200px] mb-[8px] z-[1000]" />
-                      <SkeletonLoading loading={true} className="h-[34px] w-[200px] z-[1000]" />
+                      <SkeletonLoading
+                        loading={true}
+                        className="z-[1000] mb-[8px] h-[40px] w-[200px]"
+                      />
+                      <SkeletonLoading
+                        loading={true}
+                        className="z-[1000] h-[34px] w-[200px]"
+                      />
                     </>
                   ) : (
                     <>
@@ -186,27 +287,34 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
                         {dataHover.value
                           ? dataHover.value.toLocaleString("en-US", {
                             minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
+                            maximumFractionDigits: 4,
                           })
                           : formatNumberWithPrice(dataInfoDisplay.price)}
                       </span>
                       <span
                         className={`${stylesDetails["token-chart-change-text"]} ${stylesDetails["text-red"]}`}
                       >
-                        <img src="/images/token/change-down.svg" alt="token-1" />
-                        -0.01%
+                        <img
+                          src="/images/token/change-down.svg"
+                          alt="token-1"
+                        />
+                        {changePrice}%
                       </span>
                     </>
                   )}
                 </div>
                 <div className={stylesDetails["token-chart-img"]} />
                 <div className="relative h-[400px] w-full">
-                  {/* <ChartToken type="priceToken" onHover={(dataHover) => {
-                      setDataHover(dataHover)
-                    }}/> */}
+                  <ChartToken
+                    type="priceToken"
+                    data={dataHistoryToken}
+                    onHover={(dataHover) => {
+                      setDataHover(dataHover);
+                    }}
+                  />
                 </div>
               </div>
-              <FilterSort />
+              <FilterSort onChangeTime={handleFilterTime} />
               {loading ? (
                 <div className={stylesDetails["stats-token-container"]}>
                   <span className={stylesDetails["stats-token-title"]}>
@@ -214,20 +322,44 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
                   </span>
                   <div className={stylesDetails["stats-token-info"]}>
                     <div className={stylesDetails["stats-token-info-item"]}>
-                      <SkeletonLoading loading={true} className="h-[24px] w-[80px] " />
-                      <SkeletonLoading loading={true} className="h-[34px] w-[120px]" />
+                      <SkeletonLoading
+                        loading={true}
+                        className="h-[24px] w-[80px] "
+                      />
+                      <SkeletonLoading
+                        loading={true}
+                        className="h-[34px] w-[120px]"
+                      />
                     </div>
                     <div className={stylesDetails["stats-token-info-item"]}>
-                      <SkeletonLoading loading={true} className="h-[24px] w-[80px] " />
-                      <SkeletonLoading loading={true} className="h-[34px] w-[120px]" />
+                      <SkeletonLoading
+                        loading={true}
+                        className="h-[24px] w-[80px] "
+                      />
+                      <SkeletonLoading
+                        loading={true}
+                        className="h-[34px] w-[120px]"
+                      />
                     </div>
                     <div className={stylesDetails["stats-token-info-item"]}>
-                      <SkeletonLoading loading={true} className="h-[24px] w-[80px] " />
-                      <SkeletonLoading loading={true} className="h-[34px] w-[120px]" />
+                      <SkeletonLoading
+                        loading={true}
+                        className="h-[24px] w-[80px] "
+                      />
+                      <SkeletonLoading
+                        loading={true}
+                        className="h-[34px] w-[120px]"
+                      />
                     </div>
                     <div className={stylesDetails["stats-token-info-item"]}>
-                      <SkeletonLoading loading={true} className="h-[24px] w-[80px] " />
-                      <SkeletonLoading loading={true} className="h-[34px] w-[120px]" />
+                      <SkeletonLoading
+                        loading={true}
+                        className="h-[24px] w-[80px] "
+                      />
+                      <SkeletonLoading
+                        loading={true}
+                        className="h-[34px] w-[120px]"
+                      />
                     </div>
                   </div>
                 </div>
@@ -246,7 +378,7 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
                       <span
                         className={stylesDetails["stats-token-info-item-value"]}
                       >
-                        {formatNumberWithPrice(dataInfoDisplay.tvl, true)}
+                        {formatNumberWithPrice(TvlToken, true)}
                       </span>
                     </div>
                     <div className={stylesDetails["stats-token-info-item"]}>
@@ -258,7 +390,15 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
                       <span
                         className={stylesDetails["stats-token-info-item-value"]}
                       >
-                        --
+                        {lpTotalSupply
+                          ? formatNumberWithPrice(
+                            BigNumber(dataInfoDisplay.price)
+                              .times(BigNumber(lpTotalSupply))
+                              .div(10 ** precision)
+                              .toString(),
+                            true,
+                          )
+                          : `$${EMPTY_DATA}`}
                       </span>
                     </div>
                     <div className={stylesDetails["stats-token-info-item"]}>
@@ -270,7 +410,9 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
                       <span
                         className={stylesDetails["stats-token-info-item-value"]}
                       >
-                        {formatNumberWithPrice(dataInfoDisplay.fdv, true)}
+                        {dataInfoDisplay.fdv
+                          ? formatNumberWithPrice(dataInfoDisplay.fdv, true)
+                          : `$${EMPTY_DATA}`}
                       </span>
                     </div>
                     <div className={stylesDetails["stats-token-info-item"]}>
@@ -282,7 +424,12 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
                       <span
                         className={stylesDetails["stats-token-info-item-value"]}
                       >
-                        {formatNumberWithPrice(dataInfoDisplay.volume_1d, true)}
+                        {dataInfoDisplay.volume_1d
+                          ? formatNumberWithPrice(
+                            dataInfoDisplay.volume_1d,
+                            true,
+                          )
+                          : `$${EMPTY_DATA}`}
                       </span>
                     </div>
                   </div>
@@ -310,32 +457,53 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
                 <TransactionPanel
                   data={dataTxsDisplay}
                   titleToken={dataInfoDisplay.ticker}
-                  loading={loading}
+                  loading={loadingTxs}
                 />
               )}
-              {tab === "pools" && <PoolPanel loading={loading} />}
+              {tab === "pools" && (
+                <PoolPanel data={tokenPools} loading={loadingPools} />
+              )}
             </div>
-            <div className="mt-[-7px] w-full max-w-[734px] sm:max-w-[734px] lg:max-w-[426px] xl:max-w-[426px]">
+            <div
+              className="mt-[-7px] w-full max-w-[734px] sm:max-w-[734px] lg:max-w-[426px] xl:max-w-[426px]"
+              style={{ zIndex: 102 }}
+            >
               <div className="hidden w-full sm:hidden lg:block xl:block">
-                {/* <Swap token={token} type="tokenDetail" /> */}
-                <Swap isDetail />
+                <Swap
+                  isDetail
+                  tokenSelectInfo={{
+                    id: token?.id,
+                    price: Number(dataInfoDisplay.price),
+                  }}
+                />
               </div>
               <div className={stylesDetails["swap-container-info"]}>
                 <span className={stylesDetails["swap-text"]}>Info</span>
                 {loading ? (
                   <div className={stylesDetails["swap-info-content"]}>
-                    <SkeletonLoading loading={true} className="h-[40px] w-[300px]" />
+                    <SkeletonLoading
+                      loading={true}
+                      className="h-[40px] w-[300px]"
+                    />
                     <div className="flex items-center gap-[5px]">
-                      <SkeletonLoading loading={true} className="h-[40px] w-[150px]" />
-                      <SkeletonLoading loading={true} className="h-[40px] w-[150px]" />
+                      <SkeletonLoading
+                        loading={true}
+                        className="h-[40px] w-[150px]"
+                      />
+                      <SkeletonLoading
+                        loading={true}
+                        className="h-[40px] w-[150px]"
+                      />
                     </div>
                   </div>
                 ) : (
                   <div className={stylesDetails["swap-info-content"]}>
-                    {token?.address && <CopyContainer
-                      value={token?.address}
-                      content={truncateAddress(token?.address)}
-                    />}
+                    {token?.address && (
+                      <CopyContainer
+                        value={token?.address}
+                        content={truncateAddress(token?.address)}
+                      />
+                    )}
                     <div className={stylesDetails["swap-info-item"]}>
                       <Image
                         src="/icon/icon-explorer.svg"
@@ -375,7 +543,7 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
                 <DrawerTrigger>
                   <div
                     className="fixed bottom-[60px] left-[50%] flex items-center gap-1 rounded-[12px] border border-borderOrColor bg-bgButtonFixed px-[25px] py-2 text-[20px] text-textBlack"
-                    style={{ transform: "translateX(-50%)" }}
+                    style={{ transform: "translateX(-50%)", zIndex: 102 }}
                   >
                     Swap
                   </div>
@@ -399,14 +567,20 @@ export function InfoTokenLayout({ params }: InfoTokenLayoutProps) {
                     </DrawerClose>
                   </div>
                   {/* <Swap token={token} type="tokenDetail" /> */}
-                  <Swap isDetail />
+                  <Swap
+                    isDetail
+                    tokenSelectInfo={{
+                      id: token?.id,
+                      price: Number(dataInfoDisplay.price),
+                    }}
+                  />
                 </DrawerContent>
               </Drawer>
             </div>
           </div>
           <Footer />
         </div>
-      </div >
+      </div>
       <ScrollToTopButton />
     </>
   );

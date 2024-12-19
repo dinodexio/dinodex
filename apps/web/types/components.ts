@@ -1,5 +1,7 @@
 // src/types/components.ts
 
+import { ComputedTransactionJSON } from "./containers";
+
 export interface HeaderProps {
   title: string;
   subtitle?: string;
@@ -15,11 +17,18 @@ export interface ChartDouAreaProps {
   onHover?: (dataHover: any) => void
 }
 
-export interface ChartDouBarProps {
+export interface ChartPriceTokenProps {
+  data?: any
+  onHover?: (dataHover: any) => void
+}
+
+export interface ChartPoolBarProps {
+  data?: any
   onHover?: (dataHover: any) => void
 }
 
 export interface ChartDouBarProps {
+  data?: any
   onHover?: (dataHover: any) => void
 }
 
@@ -35,11 +44,15 @@ export interface InfoTokenLayoutProps {
 
 export interface DataTransactionPanel {
   action?: string;
+  typeText?: string;
   timestamp?: number | string;
   price?: number | string;
   tokenAAmount?: number | string;
   tokenBAmount?: number | string;
+  tokenAPrice?: number | string;
+  tokenBPrice?: number | string;
   creator?: string;
+  priceusd?: number | string;
 }
 
 export interface TransactionPanelProps {
@@ -69,4 +82,70 @@ export interface TokenTransactionPanelProps {
   data?: Array<DataTokenTransactionPanel>;
   titleToken: string;
   loading?: boolean
+}
+
+export interface DataPoolsPanel {
+  blockHeight: number;
+  createAt: string;
+  path: string[];
+  poolKey: string;
+  tokenAAmount: string;
+  tokenAId: string;
+  tokenBAmount: string;
+  tokenBId: string;
+  updateBlockHeight: number;
+  updatedAt: string;
+  id: number;
+  tokenselected: Tokenselected;
+
+  //before update
+  feeTier?: any;
+  tvl?: any;
+  volume1d?: any;
+  volume7d?: any;
+  apr?: any;
+}
+
+export interface Tokenselected {
+  first: TokenSelectedInfo;
+  second: TokenSelectedInfo;
+}
+
+export interface TokenSelectedInfo {
+  ticker: string;
+  name: string;
+  logo: string;
+  address: string;
+  website: string;
+  explorer: string;
+  amount?: string | number;
+}
+
+export interface TransactionPanelProcessed extends ComputedTransactionJSON {
+  token: {
+    first: TokenSelectedInfo;
+    second: TokenSelectedInfo;
+  },
+  address: string,
+  priceusd: string | number
+}
+
+export interface PoolInfoDetail {
+  poolKey: string;
+  tokenselected: Tokenselected;
+
+  //before update
+  tvl?: any;
+  volume_1d?: any;
+}
+
+export interface LeaderboardData {
+  walletAddress: string;
+  totalVolume: string | number;
+  totalVolumeChange: number;
+  blockHeightRank: number;
+  preRank?: number;
+  rank: number;
+  pnl:number | string;
+  pnlChange: number
 }

@@ -18,7 +18,7 @@ const ToastViewport = React.forwardRef<
       className,
     )}
     {...props}
-    style={{zIndex:110}}
+    style={{zIndex:9999}}
   />
 ));
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;

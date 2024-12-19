@@ -27,7 +27,7 @@ export function ScrollToTopButton() {
       type="button"
       onClick={scrollToTop}
       className="fixed bottom-[60px] left-[50%] hidden items-center gap-1 rounded-[12px] border border-borderOrColor bg-bgButtonFixed px-[25px] py-2 text-[20px] text-textBlack sm:hidden lg:flex xl:flex"
-      style={{ transform: "translateX(-50%)", zIndex: 100 }}
+      style={{ transform: "translateX(-50%)", zIndex: 103 }}
     >
       <Image
         src="/icon/return-to-top-icon.svg"

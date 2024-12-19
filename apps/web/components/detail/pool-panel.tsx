@@ -3,19 +3,23 @@ import { Table } from "../table/table";
 import Image from "next/image";
 import { DATA_POOL, EMPTY_DATA } from "@/constants";
 import styles from "../css/table.module.css";
+import { useRouter } from "next/navigation";
+import { DataPoolsPanel } from "@/types";
 
 export interface PoolPanelProps {
+  data?: any
   loading?: boolean
 }
 
-export function PoolPanel({loading}: PoolPanelProps) {
+export function PoolPanel({data,loading}: PoolPanelProps) {
+  const router = useRouter();
   let columnTablePoolTokenInfo = [
     {
       id: 1,
       title: "#",
       key: "time-transaction",
       width: 45,
-      render: (data: any) => {
+      render: (data: DataPoolsPanel) => {
         return <span>{data?.id}</span>;
       },
     },
@@ -23,14 +27,14 @@ export function PoolPanel({loading}: PoolPanelProps) {
       id: 2,
       title: "Pool",
       key: "pool",
-      render: (data: any) => {
+      render: (data: DataPoolsPanel) => {
         return (
           <div className={styles["token-info"]}>
           <div className={styles["token-info-logo"]}>
             <div className="relative h-6 w-6 overflow-hidden">
               <Image
                 className="absolute left-1/2"
-                src={'/'+data?.tokenselected?.first?.logo}
+                src={data?.tokenselected?.first?.logo}
                 alt={data?.tokenselected?.first?.name}
                 width={24}
                 height={24}
@@ -39,7 +43,7 @@ export function PoolPanel({loading}: PoolPanelProps) {
             <div className="relative h-6 w-6 overflow-hidden">
               <Image
                 className="absolute right-1/2"
-                src={'/'+data?.tokenselected?.second?.logo}
+                src={data?.tokenselected?.second?.logo}
                 alt={data?.tokenselected?.second?.name}
                 width={24}
                 height={24}
@@ -61,7 +65,7 @@ export function PoolPanel({loading}: PoolPanelProps) {
       title: "TVL",
       key: "tvl-pool",
       width: 123,
-      render: (data: any) => {
+      render: (data: DataPoolsPanel) => {
         return (
           <span className={styles["price-text"]}>${formatLargeNumber(data?.tvl)}</span>
         );
@@ -72,7 +76,7 @@ export function PoolPanel({loading}: PoolPanelProps) {
       title: "APR",
       key: "apr-pool",
       width: 123,
-      render: (data: any) => {
+      render: (data: DataPoolsPanel) => {
         return <span>{data?.apr}%</span>;
       },
     },
@@ -81,7 +85,7 @@ export function PoolPanel({loading}: PoolPanelProps) {
       title: "1d vol",
       key: "1d-vol-pool",
       width: 120,
-      render: (data: any) => {
+      render: (data: DataPoolsPanel) => {
         return (
           <span className={styles["price-text"]}>
             ${formatLargeNumber(data?.volume1d)}
@@ -94,7 +98,7 @@ export function PoolPanel({loading}: PoolPanelProps) {
       title: "7d vol",
       key: "wallet-transaction",
       width: 150,
-      render: (data: any) => {
+      render: (data: DataPoolsPanel) => {
         return (
           <span className={styles["price-text"]}>
             ${formatLargeNumber(data?.volume7d)}
@@ -106,9 +110,11 @@ export function PoolPanel({loading}: PoolPanelProps) {
   return (
     <>
       <Table
-        data={DATA_POOL}
+        data={data}
         column={columnTablePoolTokenInfo}
-        onClickTr={() => {}}
+        onClickTr={(dataPool) => {
+          router.push(`/info/pools/${dataPool.poolKey}`);
+        }}
         classTable="table-layout"
         loading={loading}
       />

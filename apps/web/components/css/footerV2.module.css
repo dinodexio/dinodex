@@ -1,0 +1,265 @@
+.containerFooter {
+    display: flex;
+    padding: 70px 60px 40px 60px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 80px;
+    background: var(--white-color-bg-footer);
+  }
+  
+  .contentFooterTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-self: stretch;
+  }
+  
+  .boxTitleFooter {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    /* align-self: stretch; */
+    /* width: fit-content; */
+  }
+  
+  .titleFooter {
+    color: var(--black-color-text);
+    text-align: center;
+    font-family: "PP Mondwest";
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+  
+  .containerTagFooter {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 75px;
+    /* align-self: stretch; */
+  }
+  
+  .boxTag {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .titleBoxTag {
+    color: var(--orange-color-bg);
+    font-family: "SF Pro Display";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 25.362px;
+    cursor: default;
+  }
+  
+  .tag {
+    color: var(--black-color-text);
+    font-family: "SF Pro Display";
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    opacity: 0.7;
+    cursor: pointer;
+    transition: all 0.3s linear;
+  }
+  .tag:hover {
+    color: var(--orange-color-bg);
+  }
+  
+  .contentFooterBot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 35px;
+    align-self: stretch;
+  }
+  
+  .boxContact {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-self: stretch;
+  }
+  
+  .textBoxContact {
+    color: var(--black-color-text);
+    /* text-align: right; */
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+  }
+  
+  .boxInfoContact {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+  }
+  
+  .logoFooter {
+    cursor: pointer;
+  }
+  
+  @media screen and (max-width: 1100px) {
+    .containerFooter {
+      padding: 35px 30px 20px 30px;
+      gap: 40px;
+    }
+  
+    .containerTagFooter {
+      gap: 30px;
+    }
+  
+    .titleBoxTag {
+      font-size: 16px;
+    }
+  
+    .tag {
+      font-size: 14px;
+    }
+  
+    .textBoxContact {
+      font-size: 13px;
+    }
+  }
+  
+  @media screen and (max-width: 730px) {
+    .contentFooterTop {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+  
+    .boxTitleFooter {
+      display: flex;
+      justify-content: center;
+      gap: 2px;
+    }
+  }
+  
+  @media screen and (max-width: 550px) {
+    .containerFooter{
+      padding: 35px 10px 20px;
+    }
+  
+    .boxInfoContact{
+      gap: 15px;
+    }
+  }
+
+
+  .poppins-thin {
+    font-family: "Poppins", sans-serif;
+    font-weight: 100;
+    font-style: normal;
+  }
+  
+  .poppins-extralight {
+    font-family: "Poppins", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+  }
+  
+  .poppins-light {
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+  }
+  
+  .poppins-regular {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .poppins-medium {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+  }
+  
+  .poppins-semibold {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+  }
+  
+  .poppins-bold {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+  
+  .poppins-extrabold {
+    font-family: "Poppins", sans-serif;
+    font-weight: 800;
+    font-style: normal;
+  }
+  
+  .poppins-black {
+    font-family: "Poppins", sans-serif;
+    font-weight: 900;
+    font-style: normal;
+  }
+  
+  .poppins-thin-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 100;
+    font-style: italic;
+  }
+  
+  .poppins-extralight-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 200;
+    font-style: italic;
+  }
+  
+  .poppins-light-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+  }
+  
+  .poppins-regular-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+  }
+  
+  .poppins-medium-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-style: italic;
+  }
+  
+  .poppins-semibold-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: italic;
+  }
+  
+  .poppins-bold-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+  }
+  
+  .poppins-extrabold-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 800;
+    font-style: italic;
+  }
+  
+  .poppins-black-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+  }
+  

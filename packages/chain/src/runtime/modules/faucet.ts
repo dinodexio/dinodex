@@ -21,10 +21,10 @@ export class Faucet extends RuntimeModule<FaucetConfig> {
   }
 
   @runtimeMethod()
-  public async dripSignedTo(tokenId: TokenId, amount: Balance)  {
+  public async dripSignedTo(tokenId: TokenId, address: PublicKey, amount: Balance)  {
     const isFactoryAddress = this.transaction.sender.value.equals(this.config.factory);
     assert(isFactoryAddress, "Sender is not Factory");
-    await this.drip(tokenId, this.transaction.sender.value, amount);
+    await this.drip(tokenId, address, amount);
   }
 
   // testing method for the UI

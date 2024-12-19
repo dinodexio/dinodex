@@ -14,7 +14,7 @@ import { FilterSort } from "./token/filter-sort";
 import { useDebounce } from "@/hook/useDebounce";
 import moment from "moment";
 import dynamic from "next/dynamic";
-const Header = dynamic(() => import("./header"), {
+const Header = dynamic(() => import("./headerv2"), {
   ssr: false,
 });
 
@@ -54,7 +54,8 @@ export function Token({ param }: HomeProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [tab, setTab] = useState("");
-  const { totalTVL, totalVOL, loading, loadTokens } = useAggregatorStore();
+  const { totalTVL, totalVOL, loading, loadTokens, getTVL } =
+    useAggregatorStore();
 
   const [valueSearch, setValueSearch] = useState<string>("");
 
@@ -93,14 +94,14 @@ export function Token({ param }: HomeProps) {
   }, [pathname]);
 
   useEffect(() => {
-    loadTokens();
+    getTVL();
   }, []);
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex flex-col items-center justify-center">
       <Toaster />
+      <Header type="info" />
       <div className="flex w-full flex-col px-[16px] pb-[8px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px]">
-        <Header type="info" />
         <div className="mx-auto mt-[63px] flex w-full max-w-[1146px] flex-col gap-[22px] sm:gap-[22px] lg:gap-[30px] xl:gap-[30px]">
           {/* Conditionally render the chart */}
           <div className="hidden w-full items-center justify-between sm:hidden lg:flex xl:flex">
@@ -111,8 +112,14 @@ export function Token({ param }: HomeProps) {
                 </span>
                 {loading ? (
                   <>
-                    <SkeletonLoading loading={true} className="w-[200px] h-[30px] mb-[4px] mt-[8px]" />
-                    <SkeletonLoading loading={true} className="w-[200px] h-[30px]" />
+                    <SkeletonLoading
+                      loading={true}
+                      className="mb-[4px] mt-[8px] h-[30px] w-[200px]"
+                    />
+                    <SkeletonLoading
+                      loading={true}
+                      className="h-[30px] w-[200px]"
+                    />
                   </>
                 ) : (
                   <>
@@ -148,8 +155,14 @@ export function Token({ param }: HomeProps) {
                 </span>
                 {loading ? (
                   <>
-                    <SkeletonLoading loading={true} className="w-[200px] h-[30px] mb-[4px] mt-[8px]" />
-                    <SkeletonLoading loading={true} className="w-[200px] h-[30px]" />
+                    <SkeletonLoading
+                      loading={true}
+                      className="mb-[4px] mt-[8px] h-[30px] w-[200px]"
+                    />
+                    <SkeletonLoading
+                      loading={true}
+                      className="h-[30px] w-[200px]"
+                    />
                   </>
                 ) : (
                   <>

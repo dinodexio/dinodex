@@ -2,10 +2,10 @@
 import { useRouter, usePathname } from "next/navigation";
 // import { Header } from "./header";
 import { Toaster } from "@/components/ui/toaster";
-import styles from './css/pool.module.css'
+import styles from "./css/pool.module.css";
 import { Footer } from "./footer";
 import dynamic from "next/dynamic";
-const Header = dynamic(() => import('./header'), {
+const Header = dynamic(() => import("./headerv2"), {
   ssr: false,
 });
 
@@ -15,17 +15,15 @@ export interface PoolProps {
   walletElement?: JSX.Element;
 }
 
-export function Pool({
-  listPool,
-  optionPool,
-}: PoolProps) {
+export function Pool({ listPool, optionPool }: PoolProps) {
   return (
-    <div className="flex flex-col w-full px-[16px] pt-8 xl:px-[41px] xl:pt-8 lg:px-[32px] sm:px-[16px]">
+    <div className="flex flex-col items-center justify-center ">
       <Toaster />
-      <div className="flex basis-11/12 flex-col 2xl:basis-10/12">
-        <Header type="pool" />
-
-        <div className={`w-full max-w-[605px] mt-[25px] mx-auto mb-[59px] xl:mt-[90px] lg:mt-[90px] sm:mt-[25px] text-black ${styles['pool-container']}`}>
+      <Header type="pool" />
+      <div className="flex basis-11/12 flex-col px-[16px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px] xl:pt-8 2xl:basis-10/12">
+        <div
+          className={`mx-auto mb-[59px] mt-[25px] w-full max-w-[605px] text-black sm:mt-[25px] lg:mt-[90px] xl:mt-[90px] ${styles["pool-container"]}`}
+        >
           {listPool}
           {/* {optionPool} */}
         </div>

@@ -1,6 +1,8 @@
 import {
   capitalizeFirstLetter,
+  formatNumber,
   formatNumberWithPrice,
+  formatterInteger,
   formatTimeAgo,
   truncateString,
 } from "@/lib/utils";
@@ -10,6 +12,23 @@ import styles from "../css/table.module.css";
 import { precision } from "../ui/balance";
 import { DataTokenTransactionPanel, TokenTransactionPanelProps } from "@/types";
 import { SkeletonLoading } from "./SkeletonLoading";
+import { EMPTY_DATA } from "@/constants";
+import BigNumber from "bignumber.js";
+
+function formatNumberPrecisionVol(value: string | number, isPrice: boolean = false) {
+  if (!value) return EMPTY_DATA;
+
+  const priceResult = formatNumber(BigNumber(value).toNumber());
+  return `${
+    priceResult == "<0.01"
+      ? isPrice
+        ? "< $0.01"
+        : priceResult
+      : isPrice
+        ? `$${priceResult}`
+        : priceResult
+  }`;
+}
 
 
 export function TransactionPanel({
@@ -96,10 +115,10 @@ export function TransactionPanel({
       render: (data: DataTokenTransactionPanel) => {
         return (
           <span>
-            {truncateString(
-              formatNumberWithPrice(data?.price || 0)?.toString(),
-              6,
-            )}
+            $
+            {Number(data?.price) > 1000000
+              ? formatNumberPrecisionVol(Number(Number(data?.price).toFixed(4)), true)
+              : formatterInteger(Number(Number(data?.price).toFixed(4)))}
           </span>
         );
       },

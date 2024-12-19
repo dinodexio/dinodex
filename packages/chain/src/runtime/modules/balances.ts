@@ -25,27 +25,38 @@ export class Balances extends BaseBalances<BalancesConfig> {
     transfer: TransferEvent,
   });
     //overwrite
-    public async transfer(
-      tokenId: TokenId,
-      from: PublicKey,
-      to: PublicKey,
-      amount: Balance
-    ) {
-      // const fromBalance = await this.getBalance(tokenId, from);
-  
-      // const fromBalanceIsSufficient = fromBalance.greaterThanOrEqual(amount);
-  
-      // assert(fromBalanceIsSufficient, errors.fromBalanceInsufficient());
-  
-      // const newFromBalance = fromBalance.sub(amount);
-      // await this.setBalance(tokenId, from, newFromBalance);
-  
-      // const toBalance = await this.getBalance(tokenId, to);
-      // const newToBalance = toBalance.add(amount);
-  
-      // await this.setBalance(tokenId, to, newToBalance);
-      // this.events.emit('transfer', new TransferEvent({tokenId, from, to, amount}));
-    }
+  public async transfer(
+    tokenId: TokenId,
+    from: PublicKey,
+    to: PublicKey,
+    amount: Balance
+  ) {
+    const fromBalance = await this.getBalance(tokenId, from);
+
+    const fromBalanceIsSufficient = fromBalance.greaterThanOrEqual(amount);
+
+    assert(fromBalanceIsSufficient, errors.fromBalanceInsufficient());
+
+    const newFromBalance = fromBalance.sub(amount);
+    await this.setBalance(tokenId, from, newFromBalance);
+
+    const toBalance = await this.getBalance(tokenId, to);
+    const newToBalance = toBalance.add(amount);
+
+    await this.setBalance(tokenId, to, newToBalance);
+    this.events.emit('transfer', new TransferEvent({ tokenId, from, to, amount }));
+  }
+  @runtimeMethod()
+  public async transferSigned(
+    tokenId: TokenId,
+    from: PublicKey,
+    to: PublicKey,
+    amount: Balance
+  ) {
+    assert(this.transaction.sender.value.equals(from), errors.senderNotFrom());
+
+    // await this.transfer(tokenId, from, to, amount);
+  }
   
     public async mint(tokenId: TokenId, address: PublicKey, amount: Balance) {
       const balance = await this.getBalance(tokenId, address);

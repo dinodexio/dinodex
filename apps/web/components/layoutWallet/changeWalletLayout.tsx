@@ -9,6 +9,7 @@ import BigNumber from "bignumber.js";
 import { precision } from "../ui/balance";
 import { PRICE_MINA, PRICE_USD } from "@/constants";
 import { formatNumber, formatPriceUSD } from "@/lib/utils";
+import { useAggregatorStore } from "@/lib/stores/aggregator";
 
 export interface changeWalletLayoutProps {
   onClose: () => void;
@@ -50,6 +51,7 @@ export function ChangeWalletLayout({
   onClose,
   address,
 }: changeWalletLayoutProps) {
+  const { tokens, loadTokens } = useAggregatorStore();
   const { wallet, disconnectWallet } = useWalletStore();
   const balance = useBalance("0", wallet);
   // Memoize balance result and dataWallet
@@ -57,24 +59,32 @@ export function ChangeWalletLayout({
     () =>
       balance
         ? BigNumber(balance)
-            .dividedBy(10 ** precision)
-            .toNumber()
+          .dividedBy(10 ** precision)
+          .toNumber()
         : 0,
     [balance],
   );
-  const dataWallet = useMemo(
-    () => ({
+  const dataWallet = useMemo(() => {
+    let priceMina = tokens.find((token) => token.id === "0")?.price || 0
+    return {
       address: wallet,
       name: "Account 1",
-      value_price: formatPriceUSD(result, "MINA"),
+      value_price: formatPriceUSD(result, "MINA", priceMina),
       mina_coin: formatNumber(result),
-    }),
+    }
+  },
     [wallet, result],
   );
   const listAddresss = useMemo(
     () => [dataWallet, ...LIST_DUMMY_WALLET],
     [dataWallet],
   );
+
+  useEffect(() => {
+    if (!tokens || tokens.length === 0) {
+      loadTokens();
+    }
+  }, [JSON.stringify(tokens)])
 
   return (
     <div
@@ -113,15 +123,15 @@ export function ChangeWalletLayout({
                   <span className="text-[12px] font-[400] text-textBlack opacity-50">
                     {item.address
                       ? item.address.slice(0, 5) +
-                        "..." +
-                        item.address.slice(-5)
+                      "..." +
+                      item.address.slice(-5)
                       : "—"}
                   </span>
                 </div>
               </div>
               <div className="flex flex-col gap-1 text-right">
                 <span className="text-[12px] font-[500] text-textBlack opacity-60">
-                  ${BigNumber(item?.value_price || 0)?.toFixed(2)} USD
+                  ${item?.value_price} USD
                 </span>
                 <div className="flex items-center gap-[3px]">
                   <Image src="/tokens/mina.svg" width={15} height={15} alt="" />

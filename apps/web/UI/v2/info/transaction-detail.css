@@ -1,0 +1,591 @@
+.containerFluid {
+  height: auto;
+  min-height: 100dvh;
+  background: var(--bg-main);
+  font-family: "Inter";
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.detailBody {
+  display: flex;
+  padding: 88px 0px;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+}
+
+.transactionDetail {
+  display: flex;
+  width: 100%;
+  max-width: 870px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.tranSactionDetailTitle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  flex: 1 0 0;
+}
+
+.transactionText {
+  color: var(--h-text);
+
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.transactionDetailText {
+  color: var(--p-text);
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.apiBtn {
+  display: flex;
+  height: 32px;
+  padding: 0px 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  color: var(--t-text);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  cursor: pointer;
+}
+
+.detailTagWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detailTag {
+  display: flex;
+  height: 40px;
+  padding: 0px 8px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+
+  color: var(--s-text);
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.detailTag>span {
+  padding: 0px 8px;
+}
+
+.detailTag:hover {
+color: var(--p-text);
+}
+
+.activeTag > span {
+  color: var(--primary-red-b);
+  border-bottom: 2px solid var(--primary-red-c);
+}
+
+.detailSummaryWrapper {
+  display: flex;
+  height: 198px;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  position: relative;
+}
+
+.statusIconWrapper {
+  display: flex;
+  width: 60px;
+  height: 60px;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 4.37px;
+  border-radius: 0px 0px 32px 32px;
+  background: linear-gradient(to bottom, transparent 54%, #f9f9f9 54%);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.detailSummaryContent {
+  display: flex;
+  height: 166px;
+  padding-bottom: 24px;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 32px;
+  flex-shrink: 0;
+  width: 100%;
+
+  border-radius: 12px;
+  border: 1px solid var(--border-a);
+  background: var(--bg-white-c);
+}
+
+.detailSummary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.iconWrapper {
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.summaryAmount {
+  color: var(--p-text);
+  font-size: 24px;
+}
+
+.summaryUsdAmount {
+  color: var(--t-text);
+  text-align: center;
+  font-size: 14px;
+}
+
+.summaryStatus {
+  text-align: center;
+  font-size: 16px;
+}
+
+.applyStatus {
+  color: var(--text-green-c);
+}
+
+.transactionInfo {
+  display: flex;
+  padding: 8px 24px;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.transactionInfoItem {
+  display: flex;
+  padding: 16px 0px;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  border-bottom: 1px solid var(--devider-c);
+}
+
+.transactionInfoItem:last-child {
+  border-bottom: none;
+}
+
+.transactionInfoText {
+  color: var(--t-text);
+
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.transactionInfoItem > div:first-child {
+  width: 240px;
+}
+
+.paymentTag {
+  display: flex;
+  height: 18px;
+  padding: 0px 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  background: var(--bg-payment);
+
+  color: var(--text-primary);
+  text-align: center;
+  font-size: 12px;
+}
+
+.transactionHashContent {
+}
+
+.arrowIconWrapper {
+  display: flex;
+  width: 16px;
+  height: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  background: var(--primary-red-c);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.arrowIconWrapper > svg > path {
+  transition: all 0.2s ease-in-out;
+}
+
+.arrowIconWrapper:hover {
+  background-color: var(--text-primary);
+  border: 1px solid var(--primary-red-c);
+}
+
+.arrowIconWrapper:hover > svg > path {
+ fill: var(--primary-red-c);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+.iconInfo {
+  display: flex;
+  width: 16px;
+  height: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: var(--bg-gray-a);
+  background-clip: content-box;
+  padding: 2px;
+}
+
+.iconInfo:hover {
+  background-color: var(--h-text);
+  color: var(--text-primary);
+}
+
+.blockTimeText {
+  color: var(--t-text);
+  font-family: "SF Pro Display";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.tranferDetail {
+  display: flex;
+  max-width: 870px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+
+  color: var(--s-text);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.tranferContent {
+  display: flex;
+  padding: 8px 24px 24px 24px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+.tranferContentWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  align-self: stretch;
+}
+
+.labelWrapper {
+  display: flex;
+  width: 240px;
+  align-items: center;
+  gap: 6px;
+}
+
+.labelIcon {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.tranferDetailInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.tranferReciInfo {
+  flex-direction: row;
+}
+
+.tranferSenderAddress {
+  display: flex;
+  height: 28px;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.tranferSenderAvtName {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tranferSenderAvt {
+  width: 18px;
+  height: 18px;
+  border-radius: 18px;
+}
+
+.tranferSenderName {
+  color: var(--p-text);
+  font-weight: 500;
+}
+
+.tranferSenderMemo {
+  display: flex;
+  height: 40px;
+  padding: 0px 12px;
+  align-items: center;
+  gap: 4px;
+
+  border-radius: 8px;
+  background: var(--bg-blue-a);
+}
+
+.tranferSenderFee {
+  display: flex;
+  height: 40px;
+  padding: 0px 12px;
+  align-items: center;
+  gap: 4px;
+  border-radius: 8px;
+  background: var(--bg-white-d);
+
+  color: var(--p-text);
+  font-weight: 500;
+}
+
+.tranferSenderFeeIcon {
+  width: 18px;
+  height: 18px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.transferBalance {
+  display: flex;
+  max-width: 870px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+
+  color: var(--p-text);
+  font-family: Inter;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.headerCell {
+  display: flex;
+  height: 44px;
+  padding: 0px 16px;
+  align-items: center;
+  gap: 10px;
+  flex: 1 0 0;
+
+  color: var(--p-text);
+  font-family: "SF Pro Display";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.containerTable {
+  color: var(--p-text);
+  font-family: "SF Pro Display";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+th,
+td {
+  font-weight: inherit;
+}
+
+.tableRow {
+  height: 72px;
+}
+
+.tableHeadRow {
+  height: 44px;
+}
+
+.tableHeadRow,
+.tableRow {
+  border-bottom: 1px solid var(--devider-b);
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.bodyCell {
+  display: flex;
+  padding: 0px 16px;
+  align-items: center;
+  gap: 10px;
+  flex: 1 0 0;
+}
+
+.iconChangeWrapper {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+}
+
+.iconChangePlus {
+  background-color: var(--bg-green-a);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.iconChangePlus:hover{
+background-color: #89d589;
+}
+
+.iconChangeMinus {
+  background-color: var(--bg-red-b);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.iconChangeMinus:hover{
+background-color: #f28787;
+}
+
+.tableWrapper {
+  width: 1358px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.copyIcon > svg {
+  transition: all 0.2s ease-in-out;
+}
+
+.copyIcon:hover > svg {
+  transform: scale(1.05);
+}
+
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .detailBody {
+    padding: 88px 32px;
+  }
+
+  .transactionInfoItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tranferContentWrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .transactionInfo {
+    padding: 8px 0px;
+  }
+
+  .tranferDetailInfo {
+    padding-left: 22px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .detailBody {
+    padding: 88px 16px;
+  }
+
+  .tranferSenderAvtName {
+    display: none;
+  }
+
+  .detailAddress {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .detailAddress {
+    flex-wrap: wrap;
+  }
+}

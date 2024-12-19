@@ -7,7 +7,7 @@ import { useWalletStore } from "@/lib/stores/wallet";
 import { useObservePool, useSellPath } from "@/lib/stores/xyk";
 import { zodResolver } from "@hookform/resolvers/zod";
 import BigNumber from "bignumber.js";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { addPrecision, removePrecision } from "./xyk/add-liquidity-form";
@@ -26,17 +26,25 @@ import { PublicKey } from "o1js";
 import { debounce } from "lodash";
 import { dataSubmitProps } from "@/types";
 import { tokens } from "@/tokens";
-import { precision } from "@/components/ui/balance";
 import { formatFullValue } from "@/lib/utils";
 
-const INIT_SLIPPAGE = 0.5;
-const MIN_THRESHOLD = new BigNumber("0.00000000000000001");
+const INIT_SLIPPAGE = 0.2;
+// const MIN_THRESHOLD = new BigNumber("0.00000000000000001");
+
+export interface tokenSelectInfoProps {
+  id: string;
+  price: number;
+}
+
+export interface SwapProps {
+  isDetail: boolean;
+  tokenSelectInfo?: tokenSelectInfoProps;
+}
 
 BigNumber.set({ ROUNDING_MODE: BigNumber.ROUND_DOWN });
-export default function Swap({ isDetail }: { isDetail: boolean }) {
+export default function Swap({ isDetail, tokenSelectInfo }: SwapProps) {
   const [loading, setLoading] = useState(false);
   const walletBalance = useRef("0");
-
   const formSchema = z
     .object({
       tokenIn_token: z
@@ -77,6 +85,8 @@ export default function Swap({ isDetail }: { isDetail: boolean }) {
           message: "No Liquidity",
         }),
       slippage: z.any().optional(),
+      tokenIn_price: z.any().optional(),
+      tokenOut_price: z.any().optional(),
       slippage_custom: z.any().optional(),
       transactionDeadline: z.any().optional(),
       route: z.array(z.string()).min(2, { message: "No route found" }),
@@ -119,18 +129,28 @@ export default function Swap({ isDetail }: { isDetail: boolean }) {
     return balance?.toString() || "0";
   };
 
+  // Monitor changes and automatically handle errors where necessary
   useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (!value.tokenIn_token) {
+    const subscription = form.watch((value) => {
+      const { tokenIn_token, tokenOut_token, route } = value;
+
+      // Inline validation logic for watch
+      if (!tokenIn_token) {
         form.setError("tokenIn_token", { message: "Select tokens" });
       } else {
         form.clearErrors("tokenIn_token");
       }
 
-      if (!value.tokenOut_token) {
+      if (!tokenOut_token) {
         form.setError("tokenOut_token", { message: "Select tokens" });
       } else {
         form.clearErrors("tokenOut_token");
+      }
+
+      if (!route || route.length < 2) {
+        form.setError("route", { message: "No route found" });
+      } else {
+        form.clearErrors("route");
       }
     });
 
@@ -143,28 +163,31 @@ export default function Swap({ isDetail }: { isDetail: boolean }) {
       balance: { [key: string]: string | number };
     };
   } = useMemo(() => {
-    return pools.reduce((preResultPools, poolTx) => {
-      const poolKey = PoolKey.fromTokenPair(
-        TokenPair.from(
-          TokenId.from(poolTx.tokenAId),
-          TokenId.from(poolTx.tokenBId),
-        ),
-      ).toBase58();
-      return {
-        ...preResultPools,
-        [poolKey]: {
-          // tokenA: poolTx.tokenAId,
-          // tokenB: poolTx.tokenBId,
-          // balanceA: poolTx.balancesA,
-          // balanceB: poolTx.balancesB,
-          path: [poolTx.tokenAId, poolTx.tokenBId],
-          balance: {
-            [poolTx.tokenAId]: poolTx.balancesA,
-            [poolTx.tokenBId]: poolTx.balancesB,
+    return (
+      pools &&
+      pools?.reduce((preResultPools, poolTx) => {
+        const poolKey = PoolKey.fromTokenPair(
+          TokenPair.from(
+            TokenId.from(poolTx.tokenAId),
+            TokenId.from(poolTx.tokenBId),
+          ),
+        ).toBase58();
+        return {
+          ...preResultPools,
+          [poolKey]: {
+            // tokenA: poolTx.tokenAId,
+            // tokenB: poolTx.tokenBId,
+            // balanceA: poolTx.balancesA,
+            // balanceB: poolTx.balancesB,
+            path: [poolTx.tokenAId, poolTx.tokenBId],
+            balance: {
+              [poolTx.tokenAId]: poolTx.balancesA,
+              [poolTx.tokenBId]: poolTx.balancesB,
+            },
           },
-        },
-      };
-    }, {});
+        };
+      }, {})
+    );
   }, [JSON.stringify(pools), balances.balances, fields.tokenIn_amount]);
 
   const poolKey = useMemo(() => {
@@ -188,9 +211,9 @@ export default function Swap({ isDetail }: { isDetail: boolean }) {
         shouldValidate: true,
       });
     } else {
-      const currentRouterPools: [string, string][] = Object.values(routerPools)
-        // .filter((pool) => pool.pool?.exists)
-        .map(({ path }) => path);
+      const currentRouterPools: [string, string][] = routerPools
+        ? Object.values(routerPools).map(({ path }) => path)
+        : [];
 
       try {
         const graph = prepareGraph(currentRouterPools);
@@ -271,7 +294,7 @@ export default function Swap({ isDetail }: { isDetail: boolean }) {
       amountOut = amountOutWithoutFee.toString();
       amountIn = amountOut;
     }
-    const valueIn = new BigNumber(fields.tokenIn_amount);
+    // const valueIn = new BigNumber(fields.tokenIn_amount);
     if (new BigNumber(amountOut).isNaN()) return;
     if (amountOut !== "0") {
       form.setValue(
@@ -347,6 +370,18 @@ export default function Swap({ isDetail }: { isDetail: boolean }) {
     form.setValue("tokenOut_amount", fields.tokenIn_amount);
     // form.clearErrors();
   }, [fields]);
+
+  useEffect(() => {
+    if ((!tokenSelectInfo || !tokenSelectInfo?.id || !tokenSelectInfo?.price))
+      return;
+    if (fields.tokenIn_token === tokenSelectInfo?.id) {
+      form.setValue("tokenOut_token", '');
+      form.setValue("tokenOut_price", '');
+    } else {
+      form.setValue("tokenOut_token", String(tokenSelectInfo?.id));
+      form.setValue("tokenOut_price", Number(tokenSelectInfo?.price));
+    }
+  }, [tokenSelectInfo]);
 
   return (
     <>

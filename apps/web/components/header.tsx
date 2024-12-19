@@ -2,58 +2,51 @@
 import Link from "next/link";
 import "./style.css";
 import Image from "next/image";
-import { use, useEffect, useState } from "react";
+import {  useState } from "react";
 import useClickOutside from "@/hook/useClickOutside";
-import { useNotifyTransactions, useWalletStore } from "@/lib/stores/wallet";
-import { truncateAddress } from "@/lib/utils";
+// import { useNotifyTransactions, useWalletStore } from "@/lib/stores/wallet";
+// import { truncateAddress } from "@/lib/utils";
 import stylesButton from "./css/button.module.css";
 import stylesHeader from "./css/header.module.css";
-import { Wallet } from "./wallet/wallet";
-import { useBalancesStore, useObserveBalances } from "@/lib/stores/balances";
-import { useChainStore, usePollBlockHeight } from "@/lib/stores/chain";
-import { tokens } from "@/tokens";
-import { useClientStore } from "@/lib/stores/client";
+// import { Wallet } from "./wallet/wallet";
+// import { useBalancesStore, useObserveBalances } from "@/lib/stores/balances";
+// import { useChainStore, usePollBlockHeight } from "@/lib/stores/chain";
+// import { tokens } from "@/tokens";
+// import { useClientStore } from "@/lib/stores/client";
 export default function Header({ type }: { type?: string }) {
-  const {
-    connectWallet,
-    wallet,
-    observeWalletChange,
-    initializeWallet,
-    isWalletOpen,
-    setIsWalletOpen,
-  } = useWalletStore();
-  const { start, client } = useClientStore();
-  const { setLoadBalances } = useBalancesStore();
-  const {
-    balances,
-    loading: balancesLoading,
-    clearBalances,
-  } = useBalancesStore();
-  usePollBlockHeight();
-  const { block } = useChainStore();
-  useNotifyTransactions();
+  // const {
+  //   connectWallet,
+  //   wallet,
+  //   observeWalletChange,
+  //   initializeWallet,
+  //   isWalletOpen,
+  //   setIsWalletOpen,
+  // } = useWalletStore();
+  // const { start, client } = useClientStore();
+  // const {
+  //   balances,
+  //   loading: balancesLoading,
+  //   clearBalances,
+  // } = useBalancesStore();
+  // usePollBlockHeight();
+  // const { block } = useChainStore();
+  // useNotifyTransactions();
 
-  useEffect(() => {
-    wallet && clearBalances(wallet);
-  }, [wallet]);
-  useObserveBalances(tokens, wallet, type);
+  // useEffect(() => {
+  //   wallet && clearBalances(wallet);
+  // }, [wallet]);
+  // useObserveBalances(tokens, wallet, type);
 
-  useEffect(() => {
-    !client && start();
-    observeWalletChange();
-    initializeWallet();
-  }, []);
+  // useEffect(() => {
+  //   !client && start();
+  //   observeWalletChange();
+  //   initializeWallet();
+  // }, []);
 
-  useEffect(() => {
-    if (isWalletOpen) {
-      setLoadBalances(isWalletOpen);
-    }
-  }, [isWalletOpen]);
+  // const ownBalances = wallet ? balances[wallet] : {};
 
-  const ownBalances = wallet ? balances[wallet] : {};
-
-  const loading =
-    balancesLoading && !!(wallet && balances[wallet]?.["0"] === undefined);
+  // const loading =
+  //   balancesLoading && !!(wallet && balances[wallet]?.["0"] === undefined);
 
   const [showMenuMobile, setShowMenuMobile] = useState<boolean>(false);
   let dataHeader = [
@@ -91,6 +84,7 @@ export default function Header({ type }: { type?: string }) {
         <div className="flex w-full items-center justify-between">
           <div
             className={`${stylesHeader["header-content"]} flex items-center gap-6`}
+            style={{zIndex:121}}
           >
             {dataHeader.map((item, index) => {
               return (
@@ -196,7 +190,7 @@ export default function Header({ type }: { type?: string }) {
               </div>
             </div>
           </div>
-          <div
+          {/* <div
             className={`${stylesButton["button-connect-wallet"]} ${wallet ? stylesButton["button-connect-wallet-active"] : ""}`}
             onClick={async () =>
               !wallet ? await connectWallet() : setIsWalletOpen(true)
@@ -210,10 +204,10 @@ export default function Header({ type }: { type?: string }) {
             ) : (
               <span>Connect wallet</span>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
-      <Wallet
+      {/* <Wallet
         loadingBalances={loading}
         blockHeight={block?.height}
         address={wallet}
@@ -221,7 +215,7 @@ export default function Header({ type }: { type?: string }) {
         open={isWalletOpen}
         setIsWalletOpen={setIsWalletOpen}
         forceIsWalletOpen={!!wallet}
-      />
+      /> */}
     </>
   );
 }

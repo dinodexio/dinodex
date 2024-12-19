@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React from "react";
-import { DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import styles from "../../css/pool.module.css";
 import stylesButton from "../../css/button.module.css";

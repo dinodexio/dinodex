@@ -2,7 +2,7 @@
 import { cn, formatPriceUSD } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Loader2Icon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Balance, precision } from "../ui/balance";
 import { USDBalance } from "../ui/usd-balance";
 // @ts-ignore
@@ -26,7 +26,10 @@ import { ChangeWalletLayout } from "../layoutWallet/changeWalletLayout";
 import { useClientStore } from "@/lib/stores/client";
 import { useFaucet } from "@/lib/stores/balances";
 import Link from "next/link";
-import { usePollTransactions } from "@/lib/stores/aggregator";
+import {
+  useAggregatorStore,
+  usePollTransactions,
+} from "@/lib/stores/aggregator";
 
 export interface Balances {
   [tokenId: string]: string | any;
@@ -56,6 +59,7 @@ export function Wallet({
   open,
   setIsWalletOpen,
 }: WalletProps) {
+  const { tokens: listTokens, loadTokens } = useAggregatorStore();
   usePollTransactions();
   const { client } = useClientStore();
   const [menuItemActive, setMenuItemActive] = useState("");
@@ -91,6 +95,12 @@ export function Wallet({
       setMenuItemActive("");
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!listTokens || listTokens.length === 0) {
+      loadTokens();
+    }
+  }, [JSON.stringify(listTokens)]);
 
   const faucet = useFaucet();
 
@@ -142,8 +152,8 @@ export function Wallet({
         </Button>
       </div> */}
       <div
-        className={`fixed bottom-0 left-[0] right-0 top-[100px] ${open ? "visible opacity-100" : "invisible opacity-0"}`}
-        style={{ zIndex: 100 }}
+        className={`fixed bottom-0 left-[0] right-0 top-0 ${open ? "visible opacity-100" : "invisible opacity-0"}`}
+        style={{ zIndex: 120 }}
         onClick={() => setIsWalletOpen && setIsWalletOpen(false)}
       />
       <div
@@ -151,7 +161,7 @@ export function Wallet({
         style={{
           background:
             "linear-gradient(90deg, rgba(255, 255, 255, 0.00) 0%, #898989 100%)",
-          zIndex: 101,
+          zIndex: 121,
         }}
       />
 
@@ -166,7 +176,7 @@ export function Wallet({
               open,
           },
         ])}
-        style={{ zIndex: 102 }}
+        style={{ zIndex: 122 }}
       >
         <div
           className={cn(
@@ -198,7 +208,7 @@ export function Wallet({
                 height={30}
               />
               <span className="text-[20px] font-[500] text-textBlack">
-                MINA
+                tMINA
               </span>
             </div>
             <Image
@@ -281,6 +291,7 @@ export function Wallet({
                         .div(10 ** precision)
                         .toNumber(),
                       "MINA",
+                      listTokens.find((t) => t.id === "0")?.price || 0,
                     )}
                     type="USD"
                   />
@@ -342,7 +353,7 @@ export function Wallet({
               >
                 Token
               </span>
-              <span
+              {/* <span
                 className={`cursor-pointer text-[18px] font-[300] transition-all duration-300 ease-in-out ${listDataWallet === "history" ? "font-[500] text-borderOrColor" : "text-textBlack opacity-[0.29] hover:opacity-[1]"}`}
                 style={{ letterSpacing: 1 }}
                 onClick={() => {
@@ -352,13 +363,15 @@ export function Wallet({
                 }}
               >
                 History
-              </span>
+              </span> */}
             </div>
             <div className="list-token-wallet mb-[20px] mt-[18px] grid max-h-[210px] gap-[15px] overflow-y-scroll">
               {listDataWallet === "token" && (
                 <>
                   {Object.entries(balances ?? {}).map(([tokenId, balance]) => {
                     const token = tokens[tokenId];
+                    const priceToken =
+                      listTokens.find((t) => t.id === tokenId)?.price || 0;
                     if (
                       !token ||
                       (BigInt(tokenId) > BigInt(3) && balance == "0")
@@ -396,7 +409,18 @@ export function Wallet({
                               "text-[12px] font-[300] tracking-[1px] text-textBlack",
                             )}
                           >
-                            <USDBalance balance={undefined} />
+                            <USDBalance
+                              className={styles["list-token-item-name"]}
+                              balance={formatPriceUSD(
+                                BigNumber(balance || "~")
+                                  .div(10 ** precision)
+                                  .toFixed(2)
+                                  .toString(),
+                                token?.ticker || "",
+                                priceToken || 0,
+                              )}
+                              type="USD"
+                            />
                           </p>
                         </div>
                       </div>
@@ -404,7 +428,7 @@ export function Wallet({
                   })}
                 </>
               )}
-              {listDataWallet === "history" && (
+              {/* {listDataWallet === "history" && (
                 <>
                   {LIST_HISTORY?.map((item, index) => (
                     <div
@@ -457,7 +481,7 @@ export function Wallet({
                     </div>
                   ))}
                 </>
-              )}
+              )} */}
             </div>
             {listDataWallet === "token" && (
               <span className="flex w-full cursor-pointer items-center justify-center text-[16px] font-[500] text-borderOrColor hover:underline">
@@ -469,6 +493,7 @@ export function Wallet({
             <Button
               className={`${stylesButton["button-swap"]} ${stylesButton["button-wallet"]} *:w-full`}
               onClick={() => client && address && faucet()}
+              type="button"
             >
               {/* <span>
                 <PiggyBank className="mr-2 h-4 w-4" />

@@ -48,7 +48,7 @@ import dynamic from "next/dynamic";
 import { formatPercentage } from "@/lib/utils";
 import { EMPTY_DATA } from "@/constants";
 import { dataSubmitProps } from "@/types";
-const Header = dynamic(() => import("@/components/header"), {
+const Header = dynamic(() => import("@/components/headerv2"), {
   ssr: false,
 });
 
@@ -458,10 +458,10 @@ export function PoolAdd({ tokenParams, balances }: PoolAddProps) {
 
   return (
     <>
-      <div className="flex w-full flex-col px-[16px] pb-[8px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px]">
+      <div className="flex w-full flex-col">
         <Toaster />
-        <div className="flex basis-11/12 flex-col 2xl:basis-10/12">
-          <Header />
+        <Header />
+        <div className="flex basis-11/12 flex-col px-[16px]  pb-[8px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px] 2xl:basis-10/12">
           <div className="mx-auto mt-[40px] flex w-full max-w-[1065px] flex-col items-center justify-center gap-[25px] sm:mt-[40px] lg:mt-[100px] xl:mt-[113.74px]">
             <Card
               className={`mx-auto flex w-full max-w-[605px] flex-col gap-[15px] rounded-[24px] border-none border-textBlack bg-transparent px-0 py-[0] sm:border-none sm:px-0 sm:py-0 lg:border-solid lg:px-[15px] lg:py-[25px] xl:border-solid xl:px-[15px] xl:py-[25px] ${styles["pool-container"]}`}

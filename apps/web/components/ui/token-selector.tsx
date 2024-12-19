@@ -25,11 +25,12 @@ const tokenOptions = Object.entries(tokens).map(([tokenId, token]) => ({
 }));
 
 export interface TokenSelectorProps {
+  handleResetValue?: () => void;
   disabled?: boolean;
   name: string;
 }
 
-export function TokenSelector({ disabled, name }: TokenSelectorProps) {
+export function TokenSelector({ disabled, name, handleResetValue }: TokenSelectorProps) {
   const [open, setOpen] = React.useState(false);
 
   const form = useFormContext();
@@ -104,6 +105,7 @@ export function TokenSelector({ disabled, name }: TokenSelectorProps) {
                         key={token.value}
                         value={token.value}
                         onSelect={(currentValue) => {
+                          handleResetValue && handleResetValue();
                           form.setValue(inputName, currentValue, {
                             shouldValidate: true,
                             shouldDirty: true,

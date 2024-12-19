@@ -1,6 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { cn, formatBigNumber, formatPriceUSD } from "@/lib/utils";
 import { USDBalance } from "@/components/ui/usd-balance";
@@ -11,6 +11,7 @@ import { precision } from "@/components/ui/balance";
 import { amout, PRICE_MINA } from "@/constants";
 import { TokenSelector } from "@/components/ui/token-selector";
 import { tokens } from "@/tokens";
+import { useAggregatorStore } from "@/lib/stores/aggregator";
 
 export interface TransferFormProps {
   onClose?: () => void;
@@ -29,6 +30,17 @@ export function TransferForm({
   const error = Object.values(form.formState.errors)[0]?.message?.toString();
   const fields = form.getValues();
   const balance = useBalance(fields?.amount_token, wallet.wallet);
+  const { tokens:listToken, loadTokens } = useAggregatorStore();
+  useEffect(() => {
+    if (!listToken || listToken.length === 0) {
+      loadTokens();
+    }
+  }, [JSON.stringify(listToken)])
+
+    const handleResetValue = () => {
+    form.reset()
+    setAmoutPercent(null);
+  }
   return (
     <>
       <div className="flex items-center justify-between pb-[11px] pl-[6px] pr-[8px] pt-[7px]">
@@ -118,12 +130,13 @@ export function TransferForm({
                     balance={formatPriceUSD(
                       fields.amountValue,
                       tokens[fields.amount_token]?.ticker ?? "",
+                      listToken.find((item) => item.id === fields.amount_token)?.price || "~",
                     )}
                     type="USD"
                   />
                 </span>
               </div>
-              <TokenSelector name={"amount"} />
+              <TokenSelector name={"amount"} handleResetValue={handleResetValue} />
             </div>
           </div>
           <div className="flex items-center gap-[7.74px]">
@@ -142,7 +155,8 @@ export function TransferForm({
                         .times(item.value)
                         .div(100)
                         .toNumber();
-                      form.setValue("amountValue", amount.toString(), {
+                      const amountValue = isNaN(amount) ? 0 : amount;
+                      form.setValue("amountValue", amountValue.toString(), {
                         shouldDirty: true,
                         shouldValidate: true,
                         shouldTouch: true,

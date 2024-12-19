@@ -28,7 +28,6 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
   const router = useRouter();
   const [activeItems, setActiveItems] = useState<any>([]);
   const [valueTicker, setValueTicker] = useState<any>(null);
-  // const { setLoadBalances } = useBalancesStore();
 
 
   const toggleActiveItem = (item: any) => {
@@ -46,7 +45,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
 
   const handleActionPool = (type: string, isPooled: boolean = false) => {
     if (!valueTicker?.first || !valueTicker?.second || isPooled) {
-      return router.push(`/${type}`);
+      return router.push(`/${type}/tMINA`);
     }
     router.push(`/${type}/${valueTicker?.first}/${valueTicker?.second}`);
   };
@@ -166,7 +165,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
           </span>
           <div className="flex items-center gap-2">
             <div
-              className={`flex items-center justify-center rounded-[12px] ${stylesButton["btn-pool"]}`}
+              className={`flex items-center justify-center rounded-[12px] disabled:cursor-not-allowed ${stylesButton["btn-pool"]}`}
               onClick={() => handleActionPool("add", true)}
             >
               <span>Create a Pair</span>
@@ -233,7 +232,6 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                   <CardHeader
                     className="flex w-full flex-row items-center justify-between p-0"
                     onClick={() => {
-                      // setLoadBalances(isActive ? false : true);
                       toggleActiveItem(item);
                     }}
                   >

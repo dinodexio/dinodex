@@ -1,0 +1,187 @@
+.containerNavbar {
+  display: flex;
+  padding: 24px 60px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  background: var(--bg-body-color);
+  box-shadow: 0px 1px 24px 0px var(--black-shadow-navbar);
+}
+
+.contentLeftNavbar {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+
+.containerTitleNavbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.boxTitleNavbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.titleNavbar {
+  color: var(--black-text-navbar);
+  text-align: center;
+  font-family: "PPMondwest";
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.boxMenuNav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 12px;
+}
+
+.tabNavbar {
+  display: flex;
+  height: 44px;
+  padding: 0px 24px;
+  align-items: center;
+  gap: 25px;
+  border-radius: 12px;
+  color: #1a1a1a;
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.tabNavbar:hover {
+  background: var(--white-color-bg-navbar);
+  color: var(--orange-color-text-navbar);
+}
+
+.btnConnect {
+  display: flex;
+  width: 180px;
+  height: 44px;
+  padding: 0px 24px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  background: var(--bg-button-active-color);
+}
+
+.textBtnConnect {
+  color: var(--white-color-text);
+  text-align: center;
+  font-family: "SF Pro Display";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  cursor: pointer;
+}
+
+.containerMenuNav_mobile {
+  display: none;
+}
+
+.iconDropDownHeader {
+  display: none;
+  position: relative;
+}
+
+.boxMenuNav_mobile {
+  z-index: 100;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: var(--white-color-bg);
+  box-shadow: 0px 4px 32px 0px var(--black-shadow-navbar);
+  border-radius: 12px;
+  left: 40px;
+  top: 55px;
+  padding: 10px 20px;
+}
+
+@media screen and (max-width: 1100px) {
+  .containerNavbar {
+    padding: 20px 30px;
+    gap: 40px;
+  }
+
+  .titleNavbar {
+    font-size: 24px;
+  }
+
+  .tabNavbar {
+    font-size: 16px;
+  }
+
+  .tabNavbar:hover {
+    font-size: 16px;
+  }
+
+  .containerTitleNavbar {
+    gap: 6px;
+  }
+
+  .contentLeftNavbar {
+    gap: 15px;
+  }
+
+  .boxMenuNav {
+    gap: 4px;
+  }
+
+  .tabNavbar {
+    padding: 0px 10px;
+  }
+
+  .tabNavbar:hover {
+    padding: 0px 10px;
+  }
+
+  .btnConnect {
+    width: 140px;
+    padding: 0px 12px;
+  }
+}
+
+@media screen and (max-width: 730px) {
+  .containerNavbar {
+    padding: 20px 10px;
+  }
+
+  .titleNavbar {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 580px) {
+  .containerTitleNavbar {
+    gap: 12px;
+  }
+
+  .boxMenuNav {
+    display: none;
+  }
+
+  .titleNavbar {
+    display: none;
+  }
+
+  .iconDropDownHeader {
+    display: block;
+  }
+}

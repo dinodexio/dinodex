@@ -303,7 +303,7 @@
 }
 
 .fee-tier-text-table {
-    display: flex;
+    display: none;
     padding: 4px 8px;
     justify-content: center;
     align-items: center;

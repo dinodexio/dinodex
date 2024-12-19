@@ -14,70 +14,87 @@ export type Tokens = Record<string, Token | undefined>;
 
 export const LIST_TOKENS: Tokens = {
   "0": {
-    ticker: "MINA",
-    name: "Mina Protocol",
+    ticker: "tMINA",
+    name: "tMina Protocol",
     logo: "/tokens/mina.svg",
     address: "0xD5745a490f14CdA24bed11156d91Eb7A77c8CB1B",
     website: "https://minaprotocol.com/",
-    explorer: "https://etherscan.io/token/0xd5745a490f14cda24bed11156d91eb7a77c8cb1b",
+    explorer:
+      "https://etherscan.io/token/0xd5745a490f14cda24bed11156d91eb7a77c8cb1b",
   },
   "1": {
-    ticker: "DAI",
-    name: "DAI Stablecoin",
-    logo: "/tokens/dai.svg",
-    address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-    website: "https://makerdao.com/",
-    explorer:
-      "https://etherscan.io/token/0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    ticker: "TREX",
+    name: "Trex",
+    logo: "/tokens/trex.png",
+    address: "",
+    website: "",
+    explorer: "",
   },
   "2": {
-    ticker: "BTC",
-    name: "Bitcoin",
-    logo: "/tokens/btc.svg",
+    ticker: "RAPTOR",
+    name: "Raptor",
+    logo: "/tokens/raptor.png",
+    address: "",
+    website: "",
+    explorer: "",
   },
-  "3": {
-    ticker: "USDC",
-    name: "USD Coin",
-    logo: "/tokens/usdc.svg",
-    address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-    website: "https://www.circle.com/usdc",
-    explorer:
-      "https://polygonscan.com/token/0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-  },
-  "4": {
-    ticker: "USDT",
-    name: "Tether USD",
-    logo: "/tokens/usdt.svg",
-    address: "0x55d398326f99059fF775485246999027B3197955",
-    website:
-      "https://bscscan.com/token/0x55d398326f99059ff775485246999027b3197955",
-    explorer:
-      "https://bscscan.com/token/0x55d398326f99059fF775485246999027B3197955",
-  },
-  "5": {
-    ticker: "ETH",
-    name: "Ethereum",
-    logo: "/tokens/eth.svg",
-    address: '0x202A57ad5FF7c40aA132377C104E03682436eA9C',
-    website: "https://ethereum.org/en/",
-    explorer: "https://etherscan.io/",
-  },
-  "6": {
-    ticker: "WBTC",
-    name: "Wrapped BTC",
-    logo: "/tokens/wbtc.svg",
-    address: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
-    website: "https://arbitrum.io/",
-    explorer:
-      "https://arbiscan.io/token/0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
-  },
-  "7": {
-    ticker: "BNB",
-    name: "BNB",
-    logo: "/tokens/bnb.svg",
-    website: "https://www.binance.com/",
-    explorer: "https://bscscan.com/",
-  },
+  // "1": {
+  //   ticker: "DAI",
+  //   name: "DAI Stablecoin",
+  //   logo: "/tokens/dai.svg",
+  //   address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+  //   website: "https://makerdao.com/",
+  //   explorer:
+  //     "https://etherscan.io/token/0x6B175474E89094C44Da98b954EedeAC495271d0F",
+  // },
+  // "2": {
+  //   ticker: "BTC",
+  //   name: "Bitcoin",
+  //   logo: "/tokens/btc.svg",
+  // },
+  // "3": {
+  //   ticker: "USDC",
+  //   name: "USD Coin",
+  //   logo: "/tokens/usdc.svg",
+  //   address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+  //   website: "https://www.circle.com/usdc",
+  //   explorer:
+  //     "https://polygonscan.com/token/0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+  // },
+  // "4": {
+  //   ticker: "USDT",
+  //   name: "Tether USD",
+  //   logo: "/tokens/usdt.svg",
+  //   address: "0x55d398326f99059fF775485246999027B3197955",
+  //   website:
+  //     "https://bscscan.com/token/0x55d398326f99059ff775485246999027b3197955",
+  //   explorer:
+  //     "https://bscscan.com/token/0x55d398326f99059fF775485246999027B3197955",
+  // },
+  // "5": {
+  //   ticker: "ETH",
+  //   name: "Ethereum",
+  //   logo: "/tokens/eth.svg",
+  //   address: "0x202A57ad5FF7c40aA132377C104E03682436eA9C",
+  //   website: "https://ethereum.org/en/",
+  //   explorer: "https://etherscan.io/",
+  // },
+  // "6": {
+  //   ticker: "WBTC",
+  //   name: "Wrapped BTC",
+  //   logo: "/tokens/wbtc.svg",
+  //   address: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
+  //   website: "https://arbitrum.io/",
+  //   explorer:
+  //     "https://arbiscan.io/token/0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
+  // },
+  // "7": {
+  //   ticker: "BNB",
+  //   name: "BNB",
+  //   logo: "/tokens/bnb.svg",
+  //   website: "https://www.binance.com/",
+  //   explorer: "https://bscscan.com/",
+  // },
 };
 
 function createLPToken(tokenAId: TokenId, tokenBId: TokenId): [string, Token] {
@@ -174,9 +191,7 @@ export const getTokenID = (
   return undefined; // Return undefined if no match found
 };
 
-// Hàm tìm token dựa vào params
 export function findTokenByParams(paramsToken: string) {
-  // Lặp qua tất cả các token trong object tokens
   if (!paramsToken) return undefined;
   for (const tokenId in tokens) {
     const tokenInfo = tokens[tokenId];
@@ -185,10 +200,10 @@ export function findTokenByParams(paramsToken: string) {
       tokenInfo?.ticker?.toLowerCase() === paramsToken.toLowerCase()
     ) {
       return {
-        label: tokenInfo.ticker, // Label là ticker của token (ví dụ: "MINA", "DAI", "BTC", ...)
-        value: tokenId, // Value là mã token (ví dụ: "0", "1", "2")
+        label: tokenInfo.ticker,
+        value: tokenId,
       };
     }
   }
-  return undefined; // Nếu không tìm thấy
+  return undefined;
 }

@@ -1,0 +1,150 @@
+.count-down-campaign {
+    display: flex;
+    gap: 35px;
+}
+
+.count-down-item {
+    --size-contain: 138px;
+    width: 33%;
+    margin: 0 auto;
+}
+
+.count-down-text {
+    color: var(--white-text-color);
+    text-align: center;
+    font-family: Inter;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    margin-top: 12px;
+}
+
+.time-number {
+    position: relative;
+}
+
+
+.time-number .number-display,
+.time-number .number-overlay {
+    width: var(--size-contain);
+    height: var(--size-contain);
+    line-height: var(--size-contain);
+    font-size: calc(var(--size-contain) / 3 * 2);
+    font-family: Inter;
+    color: var(--black-text-color);
+    font-style: normal;
+    font-weight: 700;
+    border-radius: 5px;
+}
+
+.time-number .number-display {
+    overflow: hidden;
+}
+
+.time-number .number-overlay {
+    position: absolute;
+    perspective: calc(var(--size-contain) * 3.5);
+    top: 0;
+}
+
+.time-number .number-display>div,
+.time-number .number-overlay>div {
+    height: 50%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.time-number .number-display>div span,
+.time-number .number-overlay>div span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+
+
+
+.time-number .number-display .number-display__top,
+.time-number .number-overlay .number-overlay__top {
+    top: 0;
+    background-color: var(--white-text-color);
+    border-radius: 5px 5px 0px 0px;
+}
+
+.time-number .number-display .number-display__top span,
+.time-number .number-overlay .number-overlay__top span {
+    top: 0;
+}
+
+.time-number .number-display .number-display__bottom,
+.time-number .number-overlay .number-overlay__bottom {
+    /* bottom: 0; */
+    background-color: var(--white-text-color);
+    border-top: 3px solid var(--black-text-color);
+    box-sizing: border-box;
+    border-radius: 0px 0px 5px 5px;
+}
+
+.time-number .number-display .number-display__bottom span,
+.time-number .number-overlay .number-overlay__bottom span {
+    bottom: 0;
+}
+
+.number-overlay__top {
+    transform-origin: bottom;
+}
+
+.number-overlay__bottom {
+    transform-origin: top;
+}
+
+.number-overlay.flip .number-overlay__top {
+    animation: flip-top 0.8s linear;
+}
+
+.number-overlay.flip .number-overlay__bottom {
+    animation: flip-bottom 0.8s linear;
+}
+
+@keyframes flip-top {
+    0% {
+        transform: rotateX(0deg);
+    }
+
+    50%,
+    100% {
+        transform: rotateX(-90deg);
+    }
+}
+
+@keyframes flip-bottom {
+
+    0%,
+    50% {
+        transform: rotateX(90deg);
+    }
+
+    100% {
+        transform: rotateX(0deg);
+    }
+}
+
+@media (max-width: 1200px) {
+    .count-down-item {
+        --size-contain: calc(100vw / 10);
+    }
+
+    .count-down-text {
+        font-size: calc(100vw / 40);
+    }
+}
+
+@media (max-width: 1024px) {
+
+    .time-number .number-display .number-display__bottom,
+    .time-number .number-overlay .number-overlay__bottom {
+        border-top: 2px solid var(--black-text-color);
+    }
+}

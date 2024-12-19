@@ -7002,3 +7002,159 @@ export const TRANSACTION_TYPES = {
   WITHDRAW: "Withdraw",
   CREATE: "Add Pool",
 }
+
+export const MENU_FOOTER = [
+  // {
+  //     key:'dinodex',
+  //     label:'DinoDex',
+  //     children:[
+  //         {
+  //             label:'About',
+  //             link:'/about'
+  //         },
+  //         {
+  //             label:'Developer Portal',
+  //             link:'portal'
+  //         },
+  //         {
+  //             label:'Help Center',
+  //             link:'help'
+  //         },
+  //     ]
+  // },
+  // {
+  //     key:'bridge',
+  //     label:'Bridge',
+  //     children:[
+  //         {
+  //             label:'Eligned',
+  //             link:'/bridge/eligned'
+  //         },
+  //         {
+  //             label:'Lamdba',
+  //             link:'/bridge/lambda'
+  //         }
+  //     ]
+  // },
+  {
+      key:'trade',
+      label:'Trade',
+      children:[
+          {
+              label:'Swap',
+              link:'/swap'
+          },
+          {
+              label:'Add Pool',
+              link:'/add'
+          },
+          {
+              label:'Create Pool',
+              link:'/add'
+          },
+      ]
+  },
+  {
+      key:'info',
+      label:'Info',
+      children:[
+          {
+              label:'Token',
+              link:'/info/tokens'
+          },
+          {
+              label:'Pool',
+              link:'/info/pools'
+          },
+          {
+              label:'Transaction',
+              link:'info/transactions'
+          },
+      ]
+  },
+  // {
+  //     key:'earn',
+  //     label:'Earn',
+  //     children:[
+  //         {
+  //             label:'Farm / Liquidity',
+  //             link:'/earn/farm'
+  //         },
+  //         {
+  //             label:'Staking',
+  //             link:'/earn/staking'
+  //         },
+  //         {
+  //             label:'Airdrop',
+  //             link:'/earn/airdrop'
+  //         },
+  //     ]
+  // },
+]
+export const MENU_SOCIAL = [
+  {
+      key:'x',
+      icon: '/images/navbar_footer/logoX.svg',
+      link: 'https://x.com/realDinoDex'
+  },
+  // {
+  //     key:'telegram',
+  //     icon: '/images/navbar_footer/logo_tele.svg',
+  //     link: ''
+  // },
+  // {
+  //     key:'instagram',
+  //     icon: '/images/navbar_footer/logo_insta.svg',
+  //     link: ''
+  // },
+  {
+      key:'github',
+      icon: '/images/navbar_footer/logo_github.svg',
+      link: 'https://github.com/dinodexio'
+  },
+  {
+      key:'discord',
+      icon: '/images/navbar_footer/logo_discord.svg',
+      link: 'https://discord.gg/bgkYKgSv'
+  }
+]
+
+export const DATALEADER = [
+  {
+    "walletAddress": "B62qoCEPDmj1nWeaiNGic6mA2ZWkrp6mN3bmheN1Y5jAe9xzvT4fgNR",
+    "totalVolume": "647524403246.5113714402661",
+    "totalVolumeChange": 12,
+    "blockHeightRank": 2999,
+    "preRank": 2,
+    "rank": 1,
+    "pnlChange": 12,
+    "pnl": "647524403246.5113714402661"
+  },
+  {
+    "walletAddress": "B62qp3utjJNZiknBdApspZot6tLSYDKhVazTbwj8RV6gHMDiGK7BEVo",
+    "totalVolume": "500000000000",
+    "totalVolumeChange": -12,
+    "blockHeightRank": 652,
+    "preRank": 1,
+    "rank": 2,
+    "pnlChange": 12,
+    "pnl": "500000000000"
+  },
+  {
+    "walletAddress": "B62qrcfurygf2KH9VnrbA5XAzMChjdrd1NzqTQUm8h4ehsXdXpmsPvY",
+    "totalVolume": "71081757602.913521562891964",
+    "blockHeightRank": 2977,
+    "totalVolumeChange": -1.21,
+    "preRank": 2,
+    "rank": 3,
+    "pnlChange": 1.22,
+    "pnl": "71081757602.913521562891964"
+  }
+]
+
+
+export const TYPE_CHART = {
+  TOTAL_VALUE_LOCK: 'tvl',
+  VOLUME: 'vol',
+  PRICE_TOKEN:'priceToken'
+}
