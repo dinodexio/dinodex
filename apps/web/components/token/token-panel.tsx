@@ -3,17 +3,22 @@ import { Table } from "../table/table";
 import Image from "next/image";
 import { formatNumber, formatterInteger } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { EMPTY_DATA } from "@/constants";
+import { BASE_TOKEN, EMPTY_DATA } from "@/constants";
 import styles from "../css/table.module.css";
-import { useAggregatorStore } from "@/lib/stores/aggregator";
+import { ComputedTokenJSON, useAggregatorStore } from "@/lib/stores/aggregator";
 import BigNumber from "bignumber.js";
 import ChartLine from "../chartComponents/LineChart";
+import { ImageCommon } from "../common/ImageCommon";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface TokenPanelProps {
   valueSearch?: string;
 }
 
-function formatNumberPrecisionVol(value: string | number, isPrice: boolean = false) {
+function formatNumberPrecisionVol(
+  value: string | number,
+  isPrice: boolean = false,
+) {
   if (!value) return EMPTY_DATA;
 
   const priceResult = formatNumber(BigNumber(value).toNumber());
@@ -35,22 +40,23 @@ let columTableToken = [
     key: "numberic",
     width: 57,
     render: (data: any) => {
-      return <span>{data?.index}</span>;
+      return <span>{Number(data?.index) - 1}</span>;
     },
   },
   {
     id: 2,
     title: "Token Name",
     key: "token-name",
-    width: 230,
+    width: 220,
     render: (data: any) => {
       return (
         <div className={styles["token-info"]}>
-          <Image
+          <ImageCommon
             src={data?.logo || ""}
             alt={data?.name || ""}
             width={24}
             height={24}
+            className="rounded-full"
           />
           <span className={styles["token-name-text"]}>
             {data.name
@@ -68,14 +74,19 @@ let columTableToken = [
     id: 3,
     title: "Price",
     key: "price",
-    width: 150,
+    width: 200,
     render: (data: any) => {
       return (
         <span className={styles["price-text"]}>
-          $
-          {Number(data?.price) > 1000000
-            ? formatNumberPrecisionVol(Number(Number(data?.price).toFixed(4)), true)
-            : formatterInteger(Number(Number(data?.price).toFixed(4)))}
+          {`${
+            Number(data?.price) > 1000000
+              ? formatNumberPrecisionVol(
+                  Number(Number(data?.price).toFixed(4)),
+                  true,
+                )
+              : formatterInteger(Number(Number(data?.price).toFixed(4)))
+          }
+                ${BASE_TOKEN}`}
         </span>
       );
     },
@@ -84,7 +95,7 @@ let columTableToken = [
     id: 4,
     title: "1 hour",
     key: "change1h",
-    width: 150,
+    width: 140,
     render: (data: any) => {
       return !data?.change1h ? (
         <span>-</span>
@@ -115,7 +126,7 @@ let columTableToken = [
     id: 5,
     title: "1 day",
     key: "change1d",
-    width: 150,
+    width: 140,
     render: (data: any) => {
       return !data?.change1d ? (
         <span>-</span>
@@ -146,7 +157,7 @@ let columTableToken = [
     id: 6,
     title: "FDV",
     key: "fdv",
-    width: 150,
+    width: 140,
     render: (data: any) => {
       return <span>{formatNumberPrecisionVol(data?.fdv, true)}</span>;
     },
@@ -167,7 +178,7 @@ let columTableToken = [
       </div>
     ),
     key: "volume",
-    width: 150,
+    width: 140,
     render: (data: any) => {
       return <span>{formatNumberPrecisionVol(data?.volume, true)}</span>;
     },
@@ -180,7 +191,12 @@ let columTableToken = [
     render: (data: any) => {
       return (
         <span style={{ display: "block", width: 100, height: 24 }}>
-          <ChartLine tokenData={data?.prices} width={100} height={40} id={`chart-${data.index}`} />
+          <ChartLine
+            tokenData={data?.prices}
+            width={100}
+            height={40}
+            id={`chart-${Number(data?.index)}`}
+          />
         </span>
       );
     },
@@ -188,22 +204,34 @@ let columTableToken = [
 ];
 
 const TokenPanelComponent = ({ valueSearch }: TokenPanelProps) => {
+  const { data: listTokens } = useTokenStore();
   const router = useRouter();
-  const { tokens,loading,loadTokens } = useAggregatorStore();
-
+  const { tokens, loading, loadTokens } = useAggregatorStore();
 
   const filterDataToken = useMemo(() => {
-    let tokensFilter = tokens;
+    let tokensFilter = listTokens
+      ? Object.values(listTokens).length > 0 &&
+        tokens.map((token: any) => {
+          return {
+            ...token,
+            ticker: listTokens[token.id || 0]?.ticker,
+            name: listTokens[token.id || 0]?.name,
+            logo: token.id ? listTokens[token.id]?.logo : "",
+          };
+        })
+      : [];
     if (valueSearch) {
       const lowerValueSearch = valueSearch.toLowerCase();
-      tokensFilter = tokens.filter(
-        (item: any) =>
-          item?.ticker?.toLowerCase()?.includes(lowerValueSearch) ||
-          item?.name?.toLowerCase()?.includes(lowerValueSearch),
-      );
+      if (Array.isArray(tokensFilter)) {
+        tokensFilter = tokensFilter.filter(
+          (item: any) =>
+            item?.ticker?.toLowerCase()?.includes(lowerValueSearch) ||
+            item?.name?.toLowerCase()?.includes(lowerValueSearch),
+        );
+      }
     }
     return tokensFilter;
-  }, [tokens, valueSearch]);
+  }, [tokens, valueSearch, listTokens]);
 
   useEffect(() => {
     loadTokens();
@@ -212,7 +240,13 @@ const TokenPanelComponent = ({ valueSearch }: TokenPanelProps) => {
   return (
     <>
       <Table
-        data={filterDataToken}
+        data={
+          (filterDataToken &&
+            filterDataToken?.filter(
+              (item: ComputedTokenJSON) => item?.id !== "0",
+            )) ||
+          []
+        }
         column={columTableToken}
         onClickTr={(dataToken) => {
           router.push(`/info/tokens/${dataToken?.ticker}`);

@@ -20,6 +20,10 @@ export class Faucet extends RuntimeModule<FaucetConfig> {
     await this.balances.mintAndIncrementSupply(tokenId, address, amount);
   }
 
+  // @runtimeMethod()
+  // public async dripSignedTo(tokenId: TokenId, amount: Balance)  {
+  //   await this.drip(tokenId, this.transaction.sender.value, amount);
+  // }
   @runtimeMethod()
   public async dripSignedTo(tokenId: TokenId, address: PublicKey, amount: Balance)  {
     const isFactoryAddress = this.transaction.sender.value.equals(this.config.factory);

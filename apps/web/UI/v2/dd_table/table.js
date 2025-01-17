@@ -69,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let isDown = false;
   let startX;
   let scrollLeft;
-  console.log("tableWrapper", tableWrapper);
 
   tableWrapper.addEventListener("mousedown", (e) => {
     isDown = true;

@@ -135,6 +135,9 @@ export class XYK extends RuntimeModule<XYKConfig> {
     assert(areTokensDistinct, errors.tokensNotDistinct());
     assert(poolDoesNotExist, errors.poolAlreadyExists());
 
+    //for campaign
+    assert(tokenAId.equals(TokenId.from(0)) || tokenBId.equals(TokenId.from(0)), errors.tokensNotDistinct());
+
     // transfer liquidity from the creator to the pool
     await this.balances.transfer(tokenAId, creator, poolKey, tokenAAmount);
     await this.balances.transfer(tokenBId, creator, poolKey, tokenBAmount);
@@ -165,61 +168,6 @@ export class XYK extends RuntimeModule<XYKConfig> {
    * @param amountBLimit
    */
   public async addLiquidity(
-    provider: PublicKey,
-    tokenAId: TokenId,
-    tokenBId: TokenId,
-    tokenAAmount: Balance,
-    tokenBAmountLimit: Balance
-  ) {
-    const tokenPair = TokenPair.from(tokenAId, tokenBId);
-    // tokenAId = tokenPair.tokenAId;
-    // tokenBId = tokenPair.tokenBId;
-    const poolKey = PoolKey.fromTokenPair(tokenPair);
-    const poolDoesExists = await this.poolExists(poolKey);
-    const amountANotZero = tokenAAmount.greaterThan(Balance.from(0));
-
-    const reserveA = await this.balances.getBalance(tokenAId, poolKey);
-    const reserveB = await this.balances.getBalance(tokenBId, poolKey);
-    const reserveANotZero =  reserveA.greaterThan(Balance.from(0));
-    const adjustedReserveA = Balance.from(
-      Provable.if<Balance>(reserveANotZero, Balance, reserveA, Balance.from(1))
-    );
-
-    // TODO: why do i need Balance.from on the `amountA` argument???
-    const amountB = mulDiv(tokenAAmount, reserveB, adjustedReserveA);
-    const isAmountBLimitSufficient =
-      tokenBAmountLimit.greaterThanOrEqual(amountB);
-
-    const lpTokenId = LPTokenId.fromTokenPair(tokenPair);
-    const lpTokenTotalSupply = await this.balances.getCirculatingSupply(lpTokenId);
-
-    // TODO: ensure tokens are provided in the right order, not just ordered by the TokenPair
-    // otherwise the inputs for the following math will be in the wrong order
-    const lpTokensToMint = mulDiv(lpTokenTotalSupply, tokenAAmount, adjustedReserveA);
-
-    assert(poolDoesExists, errors.poolDoesNotExist());
-    assert(amountANotZero, errors.amountAIsZero());
-    assert(reserveANotZero, errors.reserveAIsZero());
-    assert(isAmountBLimitSufficient, errors.amountBLimitInsufficient());
-
-    await this.balances.transfer(tokenAId, provider, poolKey, tokenAAmount);
-    await this.balances.transfer(tokenBId, provider, poolKey, amountB);
-    await this.balances.mintAndIncrementSupply(lpTokenId, provider, lpTokensToMint);
-    this.events.emit( "addLiquidity", new AddLiquidityEvent({ provider, tokenAId, tokenBId, tokenAAmount, tokenBAmount: amountB, tokenLPAmount: lpTokensToMint}));
-
-  }
-
-  /**
-   * Provides liquidity to an existing pool, if the pool exists and the
-   * provider has sufficient balance. Additionally mints LP tokens for the provider.
-   *
-   * @param provider
-   * @param tokenAId
-   * @param tokenBId
-   * @param amountA
-   * @param amountBLimit
-   */
-  public async addLiquidity2(
     provider: PublicKey,
     tokenAId: TokenId,
     tokenBId: TokenId,
@@ -474,7 +422,7 @@ export class XYK extends RuntimeModule<XYKConfig> {
     tokenBAmountLimit: Balance
   ) {
     const provider = this.transaction.sender.value;
-    await this.addLiquidity2(
+    await this.addLiquidity(
       provider,
       tokenAId,
       tokenBId,

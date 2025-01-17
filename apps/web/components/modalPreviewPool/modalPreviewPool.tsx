@@ -40,13 +40,13 @@ export function ModalPreviewPool({
             <div
               style={{ gap: 0, display:'flex' }}
             >
-              <Image
+              <img
                 src={"/" + dataPool?.tokenPool?.first?.logo}
                 width={26}
                 height={26}
                 alt=""
               />
-              <Image
+              <img
                 src={"/" + dataPool?.tokenPool?.second?.logo}
                 width={26}
                 height={26}
@@ -69,7 +69,7 @@ export function ModalPreviewPool({
         <div className={styles["content-preview-pool-token"]}>
           <div className={styles["preview-pool-token-item"]}>
             <div className={styles["preview-pool-token-item-info"]}>
-              <Image
+              <img
                 src={"/" + dataPool?.tokenPool?.first?.logo}
                 width={26}
                 height={26}
@@ -85,7 +85,7 @@ export function ModalPreviewPool({
           </div>
           <div className={styles["preview-pool-token-item"]}>
             <div className={styles["preview-pool-token-item-info"]}>
-              <Image
+              <img
                 src={"/" + dataPool?.tokenPool?.second?.logo}
                 width={26}
                 height={26}

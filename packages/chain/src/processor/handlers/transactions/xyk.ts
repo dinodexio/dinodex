@@ -7,9 +7,11 @@ import { Balance, TokenId } from "@proto-kit/library";
 import { TokenPair } from "../../../runtime/modules/dex/token-pair";
 import { PoolKey } from "../../../runtime/modules/dex/pool-key";
 import { TYPE_POOL_ACTIONS } from "../../utils/constants";
-import { dijkstra, prepareGraph } from "../../../environments/client.config";
+import { dijkstra, prepareGraph } from "../../../runtime/modules/dex/router";
+import { LPTokenId } from "../../../runtime/modules/dex/lp-token-id"
 import BigNumber from "bignumber.js";
 import { Bool, Field, PublicKey } from "o1js";
+import { PathProcessor, upsertBalance } from "../../utils/util";
 
 type RouterSwapValueType = {
   poolKey: string
@@ -25,6 +27,9 @@ type PoolType = {
   tokenBAmount: string
 }
 
+const STABLE_COIN_USDT = "0"
+
+
 const getCreatorAddress = (publicKey: Field, isOddCreator: Field) => {
   const creatorAddress = PublicKey.from({
     x: publicKey,
@@ -36,6 +41,7 @@ const getCreatorAddress = (publicKey: Field, isOddCreator: Field) => {
 
 export const calculatePriceToken = (pools: PoolType[], vector: string[]) => {
   let rateTokenWithTokenBase = BigNumber(1)
+  if (vector.length == 0) return rateTokenWithTokenBase.toNumber()
   for (var i = 0; i < vector.length - 1; i++) {
     const tokenOne = vector[i]
     const tokenTwo = vector[i + 1]
@@ -81,10 +87,14 @@ export const handleXYKSwap = async (
       tokenToAmount
     ] = eventSwap.data
 
-    // TODO if amout swap is Balance Zero then break loop
+    // TODO if amount swap is Balance Zero then break loop
     if (tokenFromAmount.toBigInt() === BigInt(0) || tokenToAmount.toBigInt() === BigInt(0)) {
       break
     }
+
+    // update Balance waitForUpdate
+    const addressWallet = tx.tx.sender
+    tx.status.toBoolean() && await upsertBalance(client, tx.stateTransitions, addressWallet, [tokenFromId, tokenToId])
 
     const tokenPair = TokenPair.from(TokenId.from(tokenFromId), TokenId.from(tokenToId))
     const poolKey = PoolKey.fromTokenPair(tokenPair)
@@ -146,26 +156,26 @@ export const handleXYKSwap = async (
     })
 
     for (let i = 0; i < vectorPrice.length; i++) {
-      const vectorInfor = vectorPrice[i]
-      const priceToken = calculatePriceToken(poolsOfVector, vectorInfor.vector as string[])
-      priceToken && (tokenPrices[vectorInfor.tokenId] = priceToken)
-      priceToken && await client.token.upsert({
+      const vectorInfo = vectorPrice[i]
+      const priceToken = calculatePriceToken(poolsOfVector, vectorInfo.vector as string[])
+      priceToken && (tokenPrices[vectorInfo.tokenId] = priceToken)
+      tx.status.toBoolean() && priceToken && await client.token.upsert({
         create: {
-          tokenId: vectorInfor.tokenId,
+          tokenId: vectorInfo.tokenId,
           price: priceToken
         },
         update: {
           price: priceToken
         },
         where: {
-          tokenId: vectorInfor.tokenId
+          tokenId: vectorInfo.tokenId
         }
       })
 
-      priceToken && await client.historyToken.create({
+      tx.status.toBoolean() && priceToken && await client.historyToken.create({
         data: {
-          tokenId: vectorInfor.tokenId,
-          tokenStableId: vectorInfor.tokenStableId,
+          tokenId: vectorInfo.tokenId,
+          tokenStableId: vectorInfo.tokenStableId,
           price: priceToken,
           blockHeight: Number(block.height)
         }
@@ -173,15 +183,8 @@ export const handleXYKSwap = async (
     }
   }
 
-
   // Process insert to PoolAction
   for (let router of routers) {
-    const currentPoolValue = await client.pool.findFirst({
-      where: {
-        poolKey: router.poolKey
-      },
-    });
-
     const tokenPair = TokenPair.from(
       TokenId.from(router.from.id),
       TokenId.from(router.to.id)
@@ -189,19 +192,39 @@ export const handleXYKSwap = async (
 
     const isAFrom = tokenPair.tokenAId.toString() === router.from.id
 
+    const newAmountTokenFromId =
+      PathProcessor.searchStateTransaction(
+        tx.stateTransitions,
+        PathProcessor.balancesPool({
+          tokenIdTarget: TokenId.from(router.from.id),
+          tokenAId: TokenId.from(router.from.id),
+          tokenBId: TokenId.from(router.to.id)
+        })
+      )
+
+    const newAmountTokenToId =
+      PathProcessor.searchStateTransaction(
+        tx.stateTransitions,
+        PathProcessor.balancesPool({
+          tokenIdTarget: TokenId.from(router.to.id),
+          tokenAId: TokenId.from(router.from.id),
+          tokenBId: TokenId.from(router.to.id)
+        })
+      )
+
     const newTokenAAmount = isAFrom
-      ? (BigInt(currentPoolValue?.tokenAAmount || 0) + BigInt(router.from.amount)).toString()
-      : (BigInt(currentPoolValue?.tokenAAmount || 0) - BigInt(router.to.amount)).toString()
+      ? newAmountTokenFromId
+      : newAmountTokenToId
 
     const newTokenBAmount = !isAFrom
-      ? (BigInt(currentPoolValue?.tokenBAmount || 0) + BigInt(router.from.amount)).toString()
-      : (BigInt(currentPoolValue?.tokenBAmount || 0) - BigInt(router.to.amount)).toString()
+      ? newAmountTokenFromId
+      : newAmountTokenToId
 
 
-    await client.pool.update({
+    tx.status.toBoolean() && await client.pool.update({
       data: {
-        tokenAAmount: newTokenAAmount,
-        tokenBAmount: newTokenBAmount,
+        tokenAAmount: newTokenAAmount.toString(),
+        tokenBAmount: newTokenBAmount.toString(),
         updateBlockHeight: Number(block.height.toString())
       },
       where: {
@@ -211,7 +234,7 @@ export const handleXYKSwap = async (
 
     await client.poolAction.create({
       data: {
-        hash: block.hash.toString(),
+        hash: tx.tx.hash().toString(),
         blockHeight: Number(block.height),
         creator: tx.tx.sender.toBase58(),
         status: tx.status.toBoolean(),
@@ -227,6 +250,20 @@ export const handleXYKSwap = async (
         tokenBPrice: tokenPrices[tokenPair.tokenBId.toString()] || 0
       }
     });
+
+    tx.status.toBoolean() && await client.historyPool.create({
+      data: {
+        hash: tx.tx.hash().toString(),
+        blockHeight: Number(block.height),
+        poolKey: router.poolKey,
+        tokenAId: tokenPair.tokenAId.toString(),
+        tokenAAmount: newTokenAAmount.toString(),
+        tokenAPrice: tokenPrices[tokenPair.tokenAId.toString()] || 0,
+        tokenBId: tokenPair.tokenBId.toString(),
+        tokenBAmount: newTokenBAmount.toString(),
+        tokenBPrice: tokenPrices[tokenPair.tokenBId.toString()] || 0,
+      }
+    })
   }
 }
 
@@ -236,10 +273,9 @@ export const handleXYKCreatePool = async (
   tx: TransactionExecutionResult
 ) => {
 
-  const STABLE_COIN_USDT = "4"
   // Init price StableCoin
   {
-    await client.token.upsert({
+    tx.status.toBoolean() && await client.token.upsert({
       create: {
         tokenId: STABLE_COIN_USDT,
         price: 1
@@ -252,7 +288,7 @@ export const handleXYKCreatePool = async (
       }
     })
 
-    await client.routeStable.upsert({
+    tx.status.toBoolean() && await client.routeStable.upsert({
       create: {
         tokenId: STABLE_COIN_USDT,
         tokenStableId: STABLE_COIN_USDT,
@@ -283,7 +319,7 @@ export const handleXYKCreatePool = async (
   const poolKey = PoolKey.fromTokenPair(tokenPair)
   const isVectorAB = tokenPair.tokenAId.toString() === tokenAId.toString()
 
-  await client.pool.create({
+  tx.status.toBoolean() && await client.pool.create({
     data: {
       poolKey: poolKey.toBase58(),
       tokenAId: tokenPair.tokenAId.toString(),
@@ -295,6 +331,11 @@ export const handleXYKCreatePool = async (
       updateBlockHeight: Number(block.height.toString())
     },
   });
+
+  // update Balance waitForUpdate
+  const lpTokenId = LPTokenId.fromTokenPair(tokenPair)
+  const addressWallet = tx.tx.sender
+  tx.status.toBoolean() && await upsertBalance(client, tx.stateTransitions, addressWallet, [tokenAId, tokenBId, lpTokenId])
 
   // Process Price
   let tokenPrices: { [key: string]: number | null } = {}
@@ -315,14 +356,30 @@ export const handleXYKCreatePool = async (
       return resultPath
     }, [])
 
-    if (allPath.length > 0) {
-      const graph = prepareGraph(allPath)
-      const routeTokenA = dijkstra(graph, tokenPair.tokenAId.toString(), STABLE_COIN_USDT)
-      const routeTokenB = dijkstra(graph, tokenPair.tokenBId.toString(), STABLE_COIN_USDT)
+    // Add new path for pool
+    allPath.push([tokenAId.toString(), tokenBId.toString()])
 
+    if (allPath.length > 0 && tx.status.toBoolean()) {
+      const graph = prepareGraph(allPath)
+      let routeTokenA = dijkstra(graph, tokenPair.tokenAId.toString(), STABLE_COIN_USDT)
+      let routeTokenB = dijkstra(graph, tokenPair.tokenBId.toString(), STABLE_COIN_USDT)
+
+      if (!routeTokenA && (tokenPair.tokenAId.toString() === STABLE_COIN_USDT )) {
+        routeTokenA = {
+          distance: 0,
+          path: []
+        }
+      }
+
+      if (!routeTokenB && (tokenPair.tokenBId.toString() === STABLE_COIN_USDT )) {
+        routeTokenB = {
+          distance: 0,
+          path: []
+        }
+      }
       if (routeTokenA) {
         const vectorA = [tokenPair.tokenAId.toString(), ...routeTokenA.path]
-        routeTokenA && await client.routeStable.upsert({
+        tx.status.toBoolean() && routeTokenA && await client.routeStable.upsert({
           where: {
             tokenId_tokenStableId: {
               tokenId: tokenPair.tokenAId.toString(),
@@ -341,7 +398,7 @@ export const handleXYKCreatePool = async (
 
         const priceA = calculatePriceToken(allPool, vectorA)
         priceA && (tokenPrices[tokenPair.tokenAId.toString()] = priceA)
-        priceA && await client.token.upsert({
+        tx.status.toBoolean() && priceA && await client.token.upsert({
           create: {
             tokenId: tokenPair.tokenAId.toString(),
             price: priceA
@@ -354,7 +411,7 @@ export const handleXYKCreatePool = async (
           }
         })
 
-        priceA && await client.historyToken.create({
+        tx.status.toBoolean() && priceA && await client.historyToken.create({
           data: {
             tokenId: tokenPair.tokenAId.toString(),
             tokenStableId: STABLE_COIN_USDT,
@@ -367,7 +424,7 @@ export const handleXYKCreatePool = async (
       if (routeTokenB) {
         const vectorB = [tokenPair.tokenBId.toString(), ...routeTokenB.path]
 
-        await client.routeStable.upsert({
+        tx.status.toBoolean() && await client.routeStable.upsert({
           where: {
             tokenId_tokenStableId: {
               tokenId: tokenPair.tokenBId.toString(),
@@ -386,7 +443,7 @@ export const handleXYKCreatePool = async (
 
         const priceB = calculatePriceToken(allPool, vectorB)
         priceB && (tokenPrices[tokenPair.tokenBId.toString()] = priceB)
-        priceB && await client.token.upsert({
+        tx.status.toBoolean() && priceB && await client.token.upsert({
           create: {
             tokenId: tokenPair.tokenBId.toString(),
             price: priceB
@@ -399,7 +456,7 @@ export const handleXYKCreatePool = async (
           }
         })
 
-        priceB && await client.historyToken.create({
+        tx.status.toBoolean() && priceB && await client.historyToken.create({
           data: {
             tokenId: tokenPair.tokenBId.toString(),
             tokenStableId: STABLE_COIN_USDT,
@@ -411,9 +468,27 @@ export const handleXYKCreatePool = async (
     }
   }
 
+  const newTokenAAmount = PathProcessor.searchStateTransaction(
+    tx.stateTransitions,
+    PathProcessor.balancesPool({
+      tokenIdTarget: tokenPair.tokenAId,
+      tokenAId: tokenPair.tokenAId,
+      tokenBId: tokenPair.tokenBId,
+    })
+  )
+
+  const newTokenBAmount = PathProcessor.searchStateTransaction(
+    tx.stateTransitions,
+    PathProcessor.balancesPool({
+      tokenIdTarget: tokenPair.tokenBId,
+      tokenAId: tokenPair.tokenAId,
+      tokenBId: tokenPair.tokenBId,
+    })
+  )
+
   await client.poolAction.create({
     data: {
-      hash: block.hash.toString(),
+      hash: tx.tx.hash().toString(),
       blockHeight: Number(block.height),
       creator: tx.tx.sender.toBase58(),
       status: tx.status.toBoolean(),
@@ -423,13 +498,26 @@ export const handleXYKCreatePool = async (
       type: TYPE_POOL_ACTIONS.CREATE_POOL,
       tokenAId: tokenPair.tokenAId.toString(),
       tokenBId: tokenPair.tokenBId.toString(),
-      tokenAAmount: isVectorAB ? tokenAAmount.toString() : tokenBAmount.toString(),
-      tokenBAmount: !isVectorAB ? tokenAAmount.toString() : tokenBAmount.toString(),
+      tokenAAmount: newTokenAAmount.toString(),
+      tokenBAmount: newTokenBAmount.toString(),
       tokenAPrice: tokenPrices[tokenPair.tokenAId.toString()] || 0,
       tokenBPrice: tokenPrices[tokenPair.tokenBId.toString()] || 0
     }
   });
 
+  tx.status.toBoolean() && await client.historyPool.create({
+    data: {
+      hash: tx.tx.hash().toString(),
+      blockHeight: Number(block.height),
+      poolKey: poolKey.toBase58(),
+      tokenAId: tokenPair.tokenAId.toString(),
+      tokenAAmount: newTokenAAmount.toString(),
+      tokenAPrice: tokenPrices[tokenPair.tokenAId.toString()] || 0,
+      tokenBId: tokenPair.tokenBId.toString(),
+      tokenBAmount: newTokenBAmount.toString(),
+      tokenBPrice: tokenPrices[tokenPair.tokenBId.toString()] || 0,
+    }
+  })
 
 }
 
@@ -454,18 +542,33 @@ export const handleXYKAddLiquidity = async (
   const poolKey = PoolKey.fromTokenPair(tokenPair)
   const isVectorAB = tokenPair.tokenAId.toString() === tokenAId.toString()
 
-  const currentPoolValue = await client.pool.findFirst({
-    where: {
-      poolKey: poolKey.toBase58()
-    },
-  });
+  // update Balance waitForUpdate
+  const lpTokenId = LPTokenId.fromTokenPair(tokenPair)
+  const addressWallet = tx.tx.sender
+  tx.status.toBoolean() && await upsertBalance(client, tx.stateTransitions, addressWallet, [tokenAId, tokenBId, lpTokenId])
 
-  const newTokenAAmountAdd = isVectorAB ? tokenAAmount : tokenBAmount
-  const newTokenBAmountAdd = !isVectorAB ? tokenAAmount : tokenBAmount
-  await client.pool.update({
+  const newTokenAAmount = PathProcessor.searchStateTransaction(
+    tx.stateTransitions,
+    PathProcessor.balancesPool({
+      tokenIdTarget: tokenPair.tokenAId,
+      tokenAId: tokenPair.tokenAId,
+      tokenBId: tokenPair.tokenBId,
+    })
+  )
+
+  const newTokenBAmount = PathProcessor.searchStateTransaction(
+    tx.stateTransitions,
+    PathProcessor.balancesPool({
+      tokenIdTarget: tokenPair.tokenBId,
+      tokenAId: tokenPair.tokenAId,
+      tokenBId: tokenPair.tokenBId,
+    })
+  )
+
+  tx.status.toBoolean() && await client.pool.update({
     data: {
-      tokenAAmount: (BigInt(currentPoolValue?.tokenAAmount || 0) + newTokenAAmountAdd.toBigInt()).toString(),
-      tokenBAmount: (BigInt(currentPoolValue?.tokenBAmount || 0) + newTokenBAmountAdd.toBigInt()).toString(),
+      tokenAAmount: newTokenAAmount.toString(),
+      tokenBAmount: newTokenBAmount.toString(),
       updateBlockHeight: Number(block.height.toString())
     },
     where: {
@@ -483,7 +586,7 @@ export const handleXYKAddLiquidity = async (
   })
   await client.poolAction.create({
     data: {
-      hash: block.hash.toString(),
+      hash: tx.tx.hash().toString(),
       blockHeight: Number(block.height),
       creator: tx.tx.sender.toBase58(),
       status: tx.status.toBoolean(),
@@ -499,6 +602,20 @@ export const handleXYKAddLiquidity = async (
       tokenBPrice: tokenPrices.find((token) => token.tokenId === tokenPair.tokenBId.toString())?.price || 0
     }
   });
+
+  tx.status.toBoolean() && await client.historyPool.create({
+    data: {
+      hash: tx.tx.hash().toString(),
+      blockHeight: Number(block.height),
+      poolKey: poolKey.toBase58(),
+      tokenAId: tokenPair.tokenAId.toString(),
+      tokenAAmount: newTokenAAmount.toString(),
+      tokenAPrice: tokenPrices.find((token) => token.tokenId === tokenPair.tokenAId.toString())?.price || 0,
+      tokenBId: tokenPair.tokenBId.toString(),
+      tokenBAmount: newTokenBAmount.toString(),
+      tokenBPrice: tokenPrices.find((token) => token.tokenId === tokenPair.tokenBId.toString())?.price || 0,
+    }
+  })
 }
 
 
@@ -523,18 +640,33 @@ export const handleXYKRemoveLiquidity = async (
   const poolKey = PoolKey.fromTokenPair(tokenPair)
   const isVectorAB = tokenPair.tokenAId.toString() === tokenAId.toString()
 
-  const currentPoolValue = await client.pool.findFirst({
-    where: {
-      poolKey: poolKey.toBase58()
-    },
-  });
+  // update Balance waitForUpdate
+  const lpTokenId = LPTokenId.fromTokenPair(tokenPair)
+  const addressWallet = tx.tx.sender
+  tx.status.toBoolean() && await upsertBalance(client, tx.stateTransitions, addressWallet, [tokenAId, tokenBId, lpTokenId])
 
-  const newTokenAAmountAdd = isVectorAB ? tokenAAmount : tokenBAmount
-  const newTokenBAmountAdd = !isVectorAB ? tokenAAmount : tokenBAmount
-  await client.pool.update({
+  const newTokenAAmount = PathProcessor.searchStateTransaction(
+    tx.stateTransitions,
+    PathProcessor.balancesPool({
+      tokenIdTarget: tokenPair.tokenAId,
+      tokenAId: tokenPair.tokenAId,
+      tokenBId: tokenPair.tokenBId,
+    })
+  )
+
+  const newTokenBAmount = PathProcessor.searchStateTransaction(
+    tx.stateTransitions,
+    PathProcessor.balancesPool({
+      tokenIdTarget: tokenPair.tokenBId,
+      tokenAId: tokenPair.tokenAId,
+      tokenBId: tokenPair.tokenBId,
+    })
+  )
+
+  tx.status.toBoolean() && await client.pool.update({
     data: {
-      tokenAAmount: (BigInt(currentPoolValue?.tokenAAmount || 0) - newTokenAAmountAdd.toBigInt()).toString(),
-      tokenBAmount: (BigInt(currentPoolValue?.tokenBAmount || 0) - newTokenBAmountAdd.toBigInt()).toString(),
+      tokenAAmount: newTokenAAmount.toString(),
+      tokenBAmount: newTokenBAmount.toString(),
       updateBlockHeight: Number(block.height.toString())
     },
     where: {
@@ -552,7 +684,7 @@ export const handleXYKRemoveLiquidity = async (
   })
   await client.poolAction.create({
     data: {
-      hash: block.hash.toString(),
+      hash: tx.tx.hash().toString(),
       blockHeight: Number(block.height),
       creator: tx.tx.sender.toBase58(),
       status: tx.status.toBoolean(),
@@ -568,4 +700,17 @@ export const handleXYKRemoveLiquidity = async (
       tokenBPrice: tokenPrices.find((token) => token.tokenId === tokenPair.tokenBId.toString())?.price || 0
     }
   });
+  tx.status.toBoolean() && await client.historyPool.create({
+    data: {
+      hash: tx.tx.hash().toString(),
+      blockHeight: Number(block.height),
+      poolKey: poolKey.toBase58(),
+      tokenAId: tokenPair.tokenAId.toString(),
+      tokenAAmount: newTokenAAmount.toString(),
+      tokenAPrice: tokenPrices.find((token) => token.tokenId === tokenPair.tokenAId.toString())?.price || 0,
+      tokenBId: tokenPair.tokenBId.toString(),
+      tokenBAmount: newTokenBAmount.toString(),
+      tokenBPrice: tokenPrices.find((token) => token.tokenId === tokenPair.tokenBId.toString())?.price || 0,
+    }
+  })
 }

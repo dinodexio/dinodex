@@ -12,23 +12,9 @@ import styles from "../css/table.module.css";
 import { precision } from "../ui/balance";
 import { DataTokenTransactionPanel, TokenTransactionPanelProps } from "@/types";
 import { SkeletonLoading } from "./SkeletonLoading";
-import { EMPTY_DATA } from "@/constants";
+import { BASE_TOKEN, EMPTY_DATA } from "@/constants";
 import BigNumber from "bignumber.js";
-
-function formatNumberPrecisionVol(value: string | number, isPrice: boolean = false) {
-  if (!value) return EMPTY_DATA;
-
-  const priceResult = formatNumber(BigNumber(value).toNumber());
-  return `${
-    priceResult == "<0.01"
-      ? isPrice
-        ? "< $0.01"
-        : priceResult
-      : isPrice
-        ? `$${priceResult}`
-        : priceResult
-  }`;
-}
+import { ImageCommon } from "../common/ImageCommon";
 
 
 export function TransactionPanel({
@@ -41,7 +27,7 @@ export function TransactionPanel({
       id: 1,
       title: "Time",
       key: "time-transaction",
-      width: 140,
+      width: 130,
       render: (data: DataTokenTransactionPanel) => {
         return <span>{formatTimeAgo(data?.timestamp)}</span>;
       },
@@ -50,7 +36,7 @@ export function TransactionPanel({
       id: 2,
       title: "Type",
       key: "Type-transaction",
-      width: 90,
+      width: 70,
       render: (data: DataTokenTransactionPanel) => {
         return (
           <span
@@ -63,7 +49,7 @@ export function TransactionPanel({
     },
     {
       id: 3,
-      title: loading ? <SkeletonLoading loading={loading} className="w-[98%] h-[20px]" /> : `$${titleToken || "Token"}`,
+      title: loading ? <SkeletonLoading loading={loading} className="w-[98%] h-[20px]" /> : `${BASE_TOKEN}`,
       key: "usdt-transaction",
       width: 120,
       render: (data: DataTokenTransactionPanel) => {
@@ -85,7 +71,7 @@ export function TransactionPanel({
       id: 4,
       title: "For",
       key: "for-transaction",
-      width: 145,
+      width: 180,
       render: (data: DataTokenTransactionPanel) => {
         return (
           <div className={styles["token-item"]}>
@@ -96,30 +82,15 @@ export function TransactionPanel({
                 precision,
               )}
             </span>
-            <Image
+            <ImageCommon
               src={data.logoCounterpart || ""}
               alt="token"
-              width={20}
-              height={20}
+              width={16}
+              height={16}
+              className="rounded-full"
             />
             <span>{truncateString(data?.tickerCounterpart, 5)}</span>
           </div>
-        );
-      },
-    },
-    {
-      id: 5,
-      title: "USD",
-      key: "usd-transaction",
-      width: 120,
-      render: (data: DataTokenTransactionPanel) => {
-        return (
-          <span>
-            $
-            {Number(data?.price) > 1000000
-              ? formatNumberPrecisionVol(Number(Number(data?.price).toFixed(4)), true)
-              : formatterInteger(Number(Number(data?.price).toFixed(4)))}
-          </span>
         );
       },
     },
@@ -146,6 +117,7 @@ export function TransactionPanel({
         onClickTr={() => {}}
         classTable="table-layout"
         loading={loading}
+        isHeightFull={false}
       />
     </>
   );

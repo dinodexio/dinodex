@@ -18,8 +18,10 @@ export interface ChartDouAreaProps {
 }
 
 export interface ChartPriceTokenProps {
-  data?: any
-  onHover?: (dataHover: any) => void
+  data: { createAt: string; price: number, id: number }[];
+  onHover?: (dataHover: any) => void;
+  filterTimeValue?: string;
+  priceToken?: number
 }
 
 export interface ChartPoolBarProps {
@@ -52,7 +54,7 @@ export interface DataTransactionPanel {
   tokenAPrice?: number | string;
   tokenBPrice?: number | string;
   creator?: string;
-  priceusd?: number | string;
+  priceusd?: number | string | any;
 }
 
 export interface TransactionPanelProps {
@@ -121,6 +123,14 @@ export interface TokenSelectedInfo {
   amount?: string | number;
 }
 
+export interface tokenModal {
+  label: string;
+  ticker: string;
+  value: string | number;
+  price: string | number;
+  balance: string | number
+}
+
 export interface TransactionPanelProcessed extends ComputedTransactionJSON {
   token: {
     first: TokenSelectedInfo;
@@ -146,6 +156,7 @@ export interface LeaderboardData {
   blockHeightRank: number;
   preRank?: number;
   rank: number;
+  index: number | string;
   pnl:number | string;
   pnlChange: number
 }

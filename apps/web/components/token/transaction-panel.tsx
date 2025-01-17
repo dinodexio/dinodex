@@ -10,22 +10,23 @@ import { Table } from "../table/table";
 import React, { useMemo } from "react";
 import {
   ADDLIQUIDITY,
-  BLOCK_TIME,
+  BASE_TOKEN,
   CREATEPOOL,
   EMPTY_DATA,
   REMOVELIQUIDITY,
-  SELLPATH
+  SELLPATH,
 } from "@/constants";
-import { tokens } from "@/tokens";
 import Link from "next/link";
 import {
   useAggregatorStore,
   usePollTransactions,
 } from "@/lib/stores/aggregator";
-import Image from "next/image";
+
 import BigNumber from "bignumber.js";
 import { formatBigNumber, precision } from "../ui/balance";
 import { TransactionPanelProcessed } from "@/types";
+import { ImageCommon } from "../common/ImageCommon";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface TransactionPanelProps {
   valueSearch: string;
@@ -133,24 +134,26 @@ let columTableTransaction = [
           {convertMethodname(data?.type)}
         </span>
         <div className={styles["transaction-item"]}>
-          <Image
+          <ImageCommon
             src={data?.token?.first?.logo || "/icon/empty-token.svg"}
             alt="token"
-            width="20"
-            height="20"
+            width={20}
+            height={20}
+            className="rounded-full"
           />
-          <span>{truncateString(data?.token?.first?.ticker, 4)}</span>
+          <span>{truncateString(data?.token?.first?.ticker, 5)}</span>
         </div>
         for
         <div className={styles["transaction-item"]}>
-          <Image
+          <ImageCommon
             src={data?.token?.second?.logo || "/icon/empty-token.svg"}
             alt="token"
-            width="20"
-            height="20"
+            width={20}
+            height={20}
+            className="rounded-full"
           />
           <span>
-            {truncateString(data?.token?.second?.ticker, 4) || EMPTY_DATA}
+            {truncateString(data?.token?.second?.ticker, 5) || EMPTY_DATA}
           </span>
         </div>
       </div>
@@ -158,29 +161,30 @@ let columTableTransaction = [
   },
   {
     id: 3,
-    title: <span>USD</span>,
+    title: <span>{BASE_TOKEN}</span>,
     key: "usd",
-    width: 143,
+    width: 163,
     render: (data: TransactionPanelProcessed) => {
-      return <span>${data?.priceusd}</span>;
+      return <span>{`${data?.priceusd} ${BASE_TOKEN}`}</span>;
     },
   },
   {
     id: 4,
     title: <span>Token amount</span>,
     key: "token-amount",
-    width: 218,
+    width: 208,
     render: (data: TransactionPanelProcessed) => {
       return (
         <div className={styles["token-item"]}>
           <span>{formatNumber(data?.token?.first?.amount || "")}</span>
-          <Image
-            src={data?.token?.first?.logo || "/icon/empty-token.svg"}
+          <ImageCommon
+            src={data?.token?.first?.logo || ""}
             alt="token"
-            width="20"
-            height="20"
+            width={20}
+            height={20}
+            className="rounded-full"
           />
-          <span>{truncateString(data?.token?.first?.ticker, 4)}</span>
+          <span>{truncateString(data?.token?.first?.ticker, 5)}</span>
         </div>
       );
     },
@@ -189,18 +193,19 @@ let columTableTransaction = [
     id: 5,
     title: <span>Token amount</span>,
     key: "token-amount",
-    width: 218,
+    width: 208,
     render: (data: TransactionPanelProcessed) => {
       return (
         <div className={styles["token-item"]}>
           <span>{formatNumber(data.token.second.amount || 0)}</span>
-          <Image
+          <ImageCommon
             src={data?.token?.second?.logo || "/icon/empty-token.svg"}
             alt="token"
-            width="20"
-            height="20"
+            width={20}
+            height={20}
+            className="rounded-full"
           />
-          <span>{truncateString(data?.token?.second?.ticker, 4)}</span>
+          <span>{truncateString(data?.token?.second?.ticker, 5)}</span>
         </div>
       );
     },
@@ -211,58 +216,79 @@ let columTableTransaction = [
     key: "wallet",
     width: 168,
     render: (data: TransactionPanelProcessed) => {
-      return <span>{data?.creator?.slice(0, 6)}...{data?.creator?.slice(-4)}</span>;
+      return (
+        <span>
+          {data?.creator?.slice(0, 6)}...{data?.creator?.slice(-4)}
+        </span>
+      );
     },
   },
 ];
 
 const TransactionPanelComponent = ({ valueSearch }: TransactionPanelProps) => {
+  const { data: tokens } = useTokenStore();
   const { transactions, loading } = useAggregatorStore();
   usePollTransactions();
   const processedTransactions = useMemo<TransactionPanelProcessed[]>(() => {
     if (!transactions) return [];
 
-    return transactions?.filter?.((el: any) => el?.data !== null)?.map((item: any) => {
-      let tokenData: any = {};
-      if (
-        item.type === ADDLIQUIDITY ||
-        item.type === CREATEPOOL ||
-        item.type === REMOVELIQUIDITY
-      ) {
-        tokenData = {
-          first: {
-            ...tokens[item.tokenAId],
-            amount: formatBigNumber(item.tokenAAmount),
-          },
-          second: {
-            ...tokens[item.tokenBId],
-            amount: formatBigNumber(item?.tokenBAmount),
-          },
-        };
-      } else if (item.type === SELLPATH) {
-        tokenData = {
-          first: {
-            ...tokens[item.directionAB ? item.tokenAId : item.tokenBId],
-            amount: formatBigNumber(item.directionAB ? item.tokenAAmount : item.tokenBAmount),
-          },
-          second: {
-            ...tokens[item.directionAB ? item.tokenBId : item.tokenAId],
-            amount: formatBigNumber(item.directionAB ? item.tokenBAmount : item.tokenAAmount),
-          },
-        };
-      }
+    return transactions
+      ?.filter?.((el: any) => el?.data !== null)
+      ?.map((item: any) => {
+        let tokenData: any = {};
+        if (
+          item.type === ADDLIQUIDITY ||
+          item.type === CREATEPOOL ||
+          item.type === REMOVELIQUIDITY
+        ) {
+          tokenData = {
+            first: {
+              ...tokens[item.tokenAId],
+              amount: formatBigNumber(item.tokenAAmount),
+            },
+            second: {
+              ...tokens[item.tokenBId],
+              amount: formatBigNumber(item?.tokenBAmount),
+            },
+          };
+        } else if (item.type === SELLPATH) {
+          tokenData = {
+            first: {
+              ...tokens[item.directionAB ? item.tokenAId : item.tokenBId],
+              amount: formatBigNumber(
+                item.directionAB ? item.tokenAAmount : item.tokenBAmount,
+              ),
+            },
+            second: {
+              ...tokens[item.directionAB ? item.tokenBId : item.tokenAId],
+              amount: formatBigNumber(
+                item.directionAB ? item.tokenBAmount : item.tokenAAmount,
+              ),
+            },
+          };
+        }
 
-      let priceTransaction = item.directionAB 
-      ? removePrecision(BigNumber(item?.tokenAAmount || 0).times(item?.tokenAPrice).toString(), precision)
-      : removePrecision(BigNumber(item?.tokenBAmount || 0).times(item?.tokenBPrice).toString(), precision)
-      
-      return {
-        ...item,
-        token: tokenData,
-        address: truncateAddress(item?.sender),
-        priceusd: formatNumber(priceTransaction.toString()),
-      };
-    });
+        let priceTransaction = item.directionAB
+          ? removePrecision(
+              BigNumber(item?.tokenAAmount || 0)
+                .times(item?.tokenAPrice)
+                .toString(),
+              precision,
+            )
+          : removePrecision(
+              BigNumber(item?.tokenBAmount || 0)
+                .times(item?.tokenBPrice)
+                .toString(),
+              precision,
+            );
+
+        return {
+          ...item,
+          token: tokenData,
+          address: truncateAddress(item?.sender),
+          priceusd: formatNumber(priceTransaction.toString()),
+        };
+      });
   }, [transactions]);
   // // Filter the transactions based on search value
   const filteredTransactions = useMemo(() => {
@@ -278,18 +304,18 @@ const TransactionPanelComponent = ({ valueSearch }: TransactionPanelProps) => {
       );
     });
   }, [processedTransactions, valueSearch]);
-  
+
   return (
     <>
       <Table
         loading={loading}
         data={filteredTransactions}
         column={useMemo(() => columTableTransaction, [filteredTransactions])}
-        onClickTr={() => { }}
+        onClickTr={() => {}}
         classTable={""}
       />
     </>
   );
-}
+};
 
 export const TransactionPanel = React.memo(TransactionPanelComponent);

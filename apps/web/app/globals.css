@@ -4,6 +4,13 @@
 
 /* import fonts */
 @font-face {
+  font-family: "Unbounded";
+  src: url("/fonts/Unbounded/Unbounded-Medium.ttf") format("opentype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
   font-family: "SF Pro Display";
   src: url("/fonts/SFProDisplay/SF-Pro-Display-Bold.otf") format("opentype");
   font-weight: bold;
@@ -166,6 +173,54 @@
     --black-overlay: rgba(0, 0, 0, 0.5);
     --brown-color-bg: rgba(255, 96, 59, 0.25);
     --gray-color-shadow: rgba(26, 26, 26, 0.3);
+
+    --text-primary: #fafafa;
+    --text-main: #1a1a1a;
+    --text-dark: #000;
+    --text-green-a: #1e9218;
+    --text-green-b: #758228;
+    --text-green-c: #59c259;
+    --text-yellow-a: #d1923f;
+  
+    --s-text: #575c66;
+    --p-text: #1e2024;
+    --t-text: #828a99;
+    --h-text: #adb9cc;
+  
+    --primary-red-a: #eb5836;
+    --primary-red-b: #ff603b;
+    --primary-red-c: #ff8366;
+    --primary-red-d: #CC5254;
+  
+    --bg-main: #f7f4f2;
+    --bg-transaction:#FFFDFC;
+    --bg-white-a: #fffefc;
+    --bg-white-b: #fffbf7;
+    --bg-white-c: #fdfdfd;
+    --bg-white-d: #faf9eb;
+    --bg-gray-a: #e6e6e6;
+    --bg-gray-b: #f0f2f5;
+    --bg-gray-c: #d9d9d9;
+    --bg-gray-d: #f9f9f9;
+    --bg-blue-a: #e9f4f3;
+    --bg-green-a: #70c270;
+    --bg-red-a: #ffe2db;
+    --bg-red-b: #e06565;
+    --bg-yellow-a: #FAEDDC;
+  
+    --yellow-bg-a: #ffcabd;
+  
+  
+    --bg-detail: linear-gradient(180deg, #f7f7f7 0%, #fff 100%);
+    --bg-payment: linear-gradient(90deg, #5bdebd 0%, #55d586 100%);
+  
+    --devider: #dcd2cf;
+    --devider-a: rgba(0, 0, 0, 0.16);
+    --devider-b: rgba(0, 0, 0, 0.12);
+    --devider-c: rgba(0, 0, 0, 0.04);
+    --border-a: rgba(0, 0, 0, 0.05);
+  
+    --box-shadow-a: 0px 4px 32px 0px rgba(0, 0, 0, 0.08);
   }
 }
 

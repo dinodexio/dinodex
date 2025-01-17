@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/dialog";
 import { ModalListToken } from "../modalListToken/modalListToken";
 import { ModalPreviewPool } from "../modalPreviewPool/modalPreviewPool";
-import { tokens } from "@/tokens";
 import { Button } from "../ui/button";
 import {
   useAddLiquidity,
@@ -40,6 +39,7 @@ import {
 import { precision, removeTrailingZeroes } from "../ui/balance";
 import { useRouter } from "next/navigation";
 import { dataSubmitProps } from "@/types";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface PoolAddProps {
   walletElement?: JSX.Element;
@@ -65,6 +65,7 @@ const initDataPoolCreate = {
 };
 
 export function PoolAdd({ walletElement }: PoolAddProps) {
+  const { data: tokens } = useTokenStore();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { wallet } = useWalletStore();

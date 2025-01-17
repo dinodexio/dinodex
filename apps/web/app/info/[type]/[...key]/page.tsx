@@ -1,21 +1,31 @@
 "use client";
 import AsyncInfoTokenDetailPageDynamic from "@/containers/async-info-token-detail-page-dynamic";
 import AsyncInfoPoolDetailPageDynamic from "@/containers/async-info-pool-detail-page-dynamic";
-import "reflect-metadata";
+import { usePathname } from "next/navigation";
 
 export default function Page({
   params,
 }: {
-  params: { key: string; type: string };
+  params: { key: string; type: "tokens" | "pools" };
 }) {
-  return (
-    <>
-      {params?.type === "tokens" && (
+  const pathname = usePathname();
+
+  if (params.type === "tokens") {
+    return (
+      <div key={pathname}>
         <AsyncInfoTokenDetailPageDynamic params={params} />
-      )}
-      {params?.type === "pools" && (
+      </div>
+    );
+  }
+
+  if (params.type === "pools") {
+    return (
+      <div key={pathname}>
         <AsyncInfoPoolDetailPageDynamic params={params} />
-      )}
-    </>
-  );
+      </div>
+    );
+  }
+
+  return null;
 }
+

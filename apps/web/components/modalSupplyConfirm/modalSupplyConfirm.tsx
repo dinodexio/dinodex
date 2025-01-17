@@ -1,13 +1,13 @@
-import Image from "next/image";
 import React, { useEffect } from "react";
 import "../style.css";
-import { Dialog, DialogClose } from "../ui/dialog";
+import { DialogClose } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { tokens } from "@/tokens";
 import styles from "../css/modalPreviewPool.module.css";
 import stylesButton from "../css/button.module.css";
 import { LayoutWaitingAndSuccess } from "../modalRemovePool/layoutModal/layoutWaitingAndSuccess";
 import { useFormContext } from "react-hook-form";
+import { ImageCommon } from "../common/ImageCommon";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface modalSupplyComfirmProps {
   valuePer?: any;
@@ -40,6 +40,7 @@ export function ModalSupplyComfirm({
   tokenInAmount,
   tokenOutAmount,
 }: modalSupplyComfirmProps) {
+  const { data: tokens } = useTokenStore();
   const [layoutModalRemovePool, setLayoutModalRemovePool] = React.useState({
     confirm: true,
     waiting: false,
@@ -51,35 +52,35 @@ export function ModalSupplyComfirm({
   const form = useFormContext();
   const fields = form.getValues();
 
-  const clickConfirm = async () => {
-    setLayoutModalRemovePool({
-      ...layoutModalRemovePool,
-      confirm: false,
-      waiting: true,
-      success: false,
-      error: false,
-    });
-    const resultConfirm: any = await form.handleSubmit(onClickAddPool)();
-    if (resultConfirm === true) {
-      setLayoutModalRemovePool({
-        ...layoutModalRemovePool,
-        confirm: false,
-        success: true,
-        error: false,
-        waiting: false,
-      });
-    } else {
-      setLayoutModalRemovePool({
-        ...layoutModalRemovePool,
-        success: false,
-        waiting: false,
-        confirm: false,
-        error: true,
-        message:
-          resultConfirm?.message || "Something went wrong. Please try again",
-      });
-    }
-  };
+  // const clickConfirm = async () => {
+  //   setLayoutModalRemovePool({
+  //     ...layoutModalRemovePool,
+  //     confirm: false,
+  //     waiting: true,
+  //     success: false,
+  //     error: false,
+  //   });
+  //   const resultConfirm: any = await form.handleSubmit(onClickAddPool)();
+  //   if (resultConfirm === true) {
+  //     setLayoutModalRemovePool({
+  //       ...layoutModalRemovePool,
+  //       confirm: false,
+  //       success: true,
+  //       error: false,
+  //       waiting: false,
+  //     });
+  //   } else {
+  //     setLayoutModalRemovePool({
+  //       ...layoutModalRemovePool,
+  //       success: false,
+  //       waiting: false,
+  //       confirm: false,
+  //       error: true,
+  //       message:
+  //         resultConfirm?.message || "Something went wrong. Please try again",
+  //     });
+  //   }
+  // };
 
   const handleClosePool = (isClear?: boolean) => {
     onClosePool && onClosePool(isClear);
@@ -133,18 +134,18 @@ export function ModalSupplyComfirm({
                 className={styles["content-modal-preview-header-token"]}
                 style={{ gap: 0 }}
               >
-                <Image
+                <ImageCommon
                   src={(tokens[tokenIn_token ?? ""]?.logo as string) || ""}
                   width={28}
                   height={28}
-                  className="h-5 w-5 sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
+                  className="h-5 w-5 rounded-[50%] sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
                   alt=""
                 />
-                <Image
+                <ImageCommon
                   src={(tokens[tokenOut_token ?? ""]?.logo as string) || ""}
                   width={28}
                   height={28}
-                  className="h-5 w-5 sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
+                  className="h-5 w-5 rounded-[50%] sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
                   alt=""
                   style={{ marginLeft: "-11px" }}
                 />
@@ -164,11 +165,12 @@ export function ModalSupplyComfirm({
                     {tokenIn} Deposited
                   </span>
                   <span className="flex items-center gap-1 text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                    <Image
+                    <ImageCommon
                       src={(tokens[tokenIn_token ?? ""]?.logo as string) || ""}
                       width={28}
                       height={28}
                       alt=""
+                      className="rounded-[50%]"
                     />
                     {tokenInAmount}
                   </span>
@@ -178,11 +180,12 @@ export function ModalSupplyComfirm({
                     {tokenOut} Deposited
                   </span>
                   <span className="flex items-center gap-1 text-[16px] font-[500] text-black sm:text-[16px] lg:text-[20px] xl:text-[20px]">
-                    <Image
+                    <ImageCommon
                       src={(tokens[tokenOut_token ?? ""]?.logo as string) || ""}
                       width={28}
                       height={28}
                       alt=""
+                      className="rounded-[50%]"
                     />
                     {tokenOutAmount}
                   </span>

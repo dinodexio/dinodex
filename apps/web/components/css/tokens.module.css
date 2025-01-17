@@ -87,6 +87,7 @@
   background: var(--white-text-color);
   position: absolute;
   width: max-content;
+  z-index: 110;
   top: 30px;
   right: 0;
   opacity: 0;
@@ -97,7 +98,6 @@
 .network-content-menu-show {
   opacity: 1;
   visibility: visible;
-  z-index: 110;
 }
 
 .network-content-menu-header,

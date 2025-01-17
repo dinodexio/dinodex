@@ -4,9 +4,9 @@ import Image from "next/image";
 import stylesButton from "../../css/button.module.css";
 import { formatPriceUSD, truncateAddress, truncateString } from "@/lib/utils";
 import { USDBalance } from "@/components/ui/usd-balance";
-import { tokens } from "@/tokens";
-import { Balance, precision } from "@/components/ui/balance";
-import { EMPTY_DATA, PRICE_MINA } from "@/constants";
+import { precision } from "@/components/ui/balance";
+import { EMPTY_DATA } from "@/constants";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface TransferConfirmProps {
   loading: boolean;
@@ -21,6 +21,7 @@ export function TransferConfirm({
   onSubmit,
   isConfirm,
 }: TransferConfirmProps) {
+  const { data: tokens } = useTokenStore();
   const form = useFormContext();
   const fields = form.getValues();
   return (
@@ -48,7 +49,7 @@ export function TransferConfirm({
                 {fields?.amountValue}
               </span>
               <div className="flex items-center gap-[5.2px]">
-                <Image
+                <img
                   src={tokens[fields.amount_token]?.logo || ""}
                   width={18}
                   height={18}
@@ -80,7 +81,7 @@ export function TransferConfirm({
         </div>
         <div className="flex flex-col gap-[10.4px]">
           <span className="text-center text-[9.202px] font-[500] italic text-textBlack opacity-[0.5]">
-            Dinodex only supports Mina's B62 addresses
+            DinoDex only supports Mina's B62 addresses
           </span>
           <div className="flex flex-col gap-[9.501px]">
             <div className="flex items-center justify-between">
@@ -88,11 +89,7 @@ export function TransferConfirm({
                 Price
               </span>
               <span className="text-[10.484px] font-[500] text-textBlack">
-                1 MINA ={" "}
-                <USDBalance
-                  balance={formatPriceUSD(1, "MINA")}
-                />{" "}
-                USDC
+                1 MINA = <USDBalance balance={formatPriceUSD(1, "MINA")} /> USDC
               </span>
             </div>
             <div className="flex items-center justify-between">

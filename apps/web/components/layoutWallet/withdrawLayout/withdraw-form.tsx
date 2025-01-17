@@ -2,21 +2,16 @@ import { useFormContext } from "react-hook-form";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  cn,
-  formatBigNumber,
-  formatPriceUSD,
-  truncateString,
-} from "@/lib/utils";
+import { cn, formatPriceUSD, truncateString } from "@/lib/utils";
 import { USDBalance } from "@/components/ui/usd-balance";
-import { tokens } from "@/tokens";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { useBalance } from "@/lib/stores/balances";
 import BigNumber from "bignumber.js";
 import { Balance, precision } from "@/components/ui/balance";
-import { amout, EMPTY_DATA, PRICE_MINA, PRICE_USD } from "@/constants";
+import { amout, EMPTY_DATA } from "@/constants";
 import { TokenSelector } from "@/components/ui/token-selector";
 import { useAggregatorStore } from "@/lib/stores/aggregator";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface WithdrawFormProps {
   onClose?: () => void;
@@ -29,6 +24,7 @@ export function WithdrawForm({
   handleChangeStatusLayout,
   // handleOpenSelectToken,
 }: WithdrawFormProps) {
+  const { data: tokens } = useTokenStore();
   const wallet = useWalletStore();
   const [amountPercent, setAmoutPercent] = useState(null);
   const form = useFormContext();
@@ -36,17 +32,17 @@ export function WithdrawForm({
   const fields = form.getValues();
   const balance = useBalance(fields?.amount_token, wallet.wallet);
   const tokenName = tokens[fields?.amount_token]?.ticker || "";
-  const { tokens:listToken, loadTokens } = useAggregatorStore();
+  const { tokens: listToken, loadTokens } = useAggregatorStore();
   useEffect(() => {
     if (!listToken || listToken.length === 0) {
       loadTokens();
     }
-  }, [JSON.stringify(listToken)])
+  }, [JSON.stringify(listToken)]);
 
   const handleResetValue = () => {
-    form.reset()
+    form.reset();
     setAmoutPercent(null);
-  }
+  };
   return (
     <>
       <div className="flex items-center justify-between pb-[11px] pl-[6px] pr-[8px] pt-[7px]">
@@ -117,18 +113,22 @@ export function WithdrawForm({
                   inputMode="decimal" // Suggests a numeric keyboard on mobile devices
                 />
                 <span className="text-[9.202px] font-[500] italic text-textBlack opacity-50">
-                <USDBalance
+                  <USDBalance
                     balance={formatPriceUSD(
                       fields.amountValue,
                       tokens[fields.amount_token]?.ticker ?? "",
-                      listToken.find((item) => item.id === fields.amount_token)?.price || "~",
+                      listToken.find((item) => item.id === fields.amount_token)
+                        ?.price || "~",
                     )}
                     type="USD"
                   />
                 </span>
               </div>
             </div>
-            <TokenSelector name={"amount"} handleResetValue={handleResetValue} />
+            <TokenSelector
+              name={"amount"}
+              handleResetValue={handleResetValue}
+            />
           </div>
           <div className="flex items-center gap-[7.74px]">
             {amout?.map((item: any, index) => {
@@ -192,14 +192,14 @@ export function WithdrawForm({
                 MINA
               </span>
               <span className="text-[12px] font-[500] text-textBlack opacity-60">
-              <USDBalance
-                    balance={formatPriceUSD(
-                      fields.amountValue,
-                      tokens[fields.amount_token]?.ticker ?? "",
-                      listToken.find((item) => item.id === '0')?.price || "~",
-                    )}
-                    type="USD"
-                  />
+                <USDBalance
+                  balance={formatPriceUSD(
+                    fields.amountValue,
+                    tokens[fields.amount_token]?.ticker ?? "",
+                    listToken.find((item) => item.id === "0")?.price || "~",
+                  )}
+                  type="USD"
+                />
               </span>
             </div>
           </div>

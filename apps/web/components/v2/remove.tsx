@@ -11,7 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { tokens } from "@/tokens";
 import { Button } from "../ui/button";
 import { useObservePool, useRemoveLiquidity } from "@/lib/stores/xyk";
 import { usePoolKey } from "@/lib/xyk/usePoolKey";
@@ -36,6 +35,7 @@ import { formatBigNumber } from "@/lib/utils";
 import { dataSubmitProps } from "@/types";
 import { Input } from "../ui/input";
 import useClickOutside from "@/hook/useClickOutside";
+import { useTokenStore } from "@/lib/stores/token";
 const Header = dynamic(() => import("@/components/headerv2"), {
   ssr: false,
 });
@@ -54,6 +54,7 @@ const valueDeposit = [
 ];
 
 export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
+  const { data: tokens } = useTokenStore();
   // const router = useRouter();
   const [loading, setLoading] = useState(false);
   const removeLiquidity = useRemoveLiquidity();
@@ -243,8 +244,8 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                     className="relative flex h-[42px] items-center gap-1 p-[6px]"
                     ref={settingRef}
                   >
-                    <span className="text-[20px] font-[400] text-textBlack opacity-60 absolute right-[40px]">
-                      {settingSlippage.value ? `${settingSlippage.value}%` : ''}
+                    <span className="absolute right-[40px] text-[20px] font-[400] text-textBlack opacity-60">
+                      {settingSlippage.value ? `${settingSlippage.value}%` : ""}
                     </span>
                     <Image
                       src="/images/swap/setting-icon.svg"
@@ -471,7 +472,7 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                       )}
                     </span>
                     <div className="flex items-center gap-[5px]">
-                      <Image
+                      <img
                         src={tokens[tokenParams?.tokenA?.value]?.logo || ""}
                         width={28}
                         height={28}
@@ -492,12 +493,12 @@ export function PoolRemove({ tokenParams, balances }: PoolRemoveProps) {
                       )}
                     </span>
                     <div className="flex items-center gap-[5px]">
-                      <Image
+                      <img
                         src={tokens[tokenParams?.tokenB?.value]?.logo || ""}
                         width={28}
                         height={28}
                         alt=""
-                        className="h-5 w-5 sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
+                        className="h-5 w-5 rounded-[50%] sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
                       />
                       <span className="text-[16px] font-[500] text-textBlack sm:text-[16px] lg:text-[18px] xl:text-[18px]">
                         {tokenParams?.tokenB?.label}

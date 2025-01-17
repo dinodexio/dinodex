@@ -1,0 +1,214 @@
+.bodyCell {
+    display: flex;
+    padding: 0px 16px;
+    align-items: center;
+    gap: 10px;
+    flex: 1 0 0;
+  }
+  
+  .ageCell {
+    color: var(--s-text);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 28px;
+  }
+  
+  .amountCell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
+  }
+  
+  .amountValue {
+    display: flex;
+    align-items: center;
+    line-height: normal;
+  }
+  
+  .tableDecimalText {
+    color: var(--s-text);
+    font-size: 12px;
+    font-weight: 400;
+  }
+  
+  .currencyName {
+    color: var(--t-text);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 18px;
+  }
+  
+  .memoText {
+    color: var(--s-text);
+  
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+  }
+  
+  .memoName {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    flex: 1 0 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  
+  .blockCell {
+    gap: 4px;
+    font-size: 10px;
+    line-height: 18px;
+    color: var(--s-text);
+  }
+  
+  .acountAvt {
+    width: 18px;
+    height: 18px;
+    border-radius: 18px;
+  }
+  
+  .tableWrapper {
+    width: 1358px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  .headerCell {
+    display: flex;
+    height: 44px;
+    padding: 0px 16px;
+    align-items: center;
+    gap: 10px;
+    flex: 1 0 0;
+  }
+  
+  .containerTable {
+    color: var(--p-text);
+    font-family: "SF Pro Display";
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 28px;
+  }
+  
+  /* th,
+  td {
+    font-weight: inherit;
+  } */
+  
+  .tableRow {
+    height: 72px;
+  }
+  
+  
+  .tableHeadRow {
+    height: 44px;
+  }
+  
+  .tableHeadRow,
+  .tableRow {
+    border-bottom: 1px solid var(--devider-b);
+  }
+  
+  .tableRow:last-child {
+    border-bottom: none;
+  }
+  
+  .typeValue {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .detailsBtn {
+    display: flex;
+    height: 40px;
+    padding: 0px 12px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    background: #ebebeb;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  
+    color: var(--s-text);
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .detailsBtn:hover {
+    background-color: var(--text-primary);
+  }
+  
+  .transferInfo {
+    display: flex;
+    min-width: 124px;
+    padding: 0px 32px 0px 16px;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .tranferSender {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .sender {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .senderName {
+    font-size: 14px;
+    line-height: normal;
+  }
+  
+  .transactionAddress {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  .transactionValue {
+    color: var(--primary-red-c);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .pendingCell {
+    display: flex;
+    padding: 0px 16px;
+    align-items: center;
+  }
+  
+  .pendingTag {
+    display: flex;
+    height: 20px;
+    padding: 0px 6px;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border-radius: 12px;
+    background: var(--bg-yellow-a);
+  
+    color: var(--text-yellow-a);
+  }
+  
+  .pendingIcon {
+    width: 10px;
+    height: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  

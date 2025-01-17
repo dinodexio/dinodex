@@ -16,12 +16,21 @@
   
   .boxTitleFooter {
     display: flex;
-    align-items: center;
     gap: 2px;
-    /* align-self: stretch; */
-    /* width: fit-content; */
+    align-self: stretch;
   }
-  
+
+  .imageDino{
+    height: 35px;
+    width: 35px;
+    align-self: stretch;
+  }
+
+  .imageDino{
+    height: 35px;
+    width: 35px;
+  }
+
   .titleFooter {
     color: var(--black-color-text);
     text-align: center;
@@ -142,6 +151,10 @@
       justify-content: center;
       gap: 2px;
     }
+
+    .containerTagFooter {
+      gap: 250px;
+    }
   }
   
   @media screen and (max-width: 550px) {
@@ -151,6 +164,15 @@
   
     .boxInfoContact{
       gap: 15px;
+    }
+    .containerTagFooter {
+      gap: 150px;
+    }
+  }
+
+  @media screen and (max-width: 350px) {
+    .containerTagFooter {
+      gap: 50px;
     }
   }
 

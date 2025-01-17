@@ -4,9 +4,8 @@ import Image from "next/image";
 import stylesButton from "../../css/button.module.css";
 import { formatPriceUSD, truncateAddress } from "@/lib/utils";
 import { USDBalance } from "@/components/ui/usd-balance";
-import { tokens } from "@/tokens";
 import { Balance } from "@/components/ui/balance";
-import { PRICE_MINA } from "@/constants";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface TransferConfirmProps {
   loading: boolean;
@@ -19,6 +18,7 @@ export function WithdrawConfirm({
   onClose,
   onSubmit,
 }: TransferConfirmProps) {
+  const { data: tokens } = useTokenStore();
   const form = useFormContext();
   const fields = form.getValues();
   return (
@@ -46,7 +46,7 @@ export function WithdrawConfirm({
                 {fields?.amountValue}
               </span>
               <div className="flex items-center gap-[5.2px]">
-                <Image
+                <img
                   src={tokens[fields.amount_token]?.logo || ""}
                   width={18}
                   height={18}

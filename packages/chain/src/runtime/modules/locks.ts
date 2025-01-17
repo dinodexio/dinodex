@@ -1,9 +1,10 @@
-import { Balance, Balances, TokenId, UInt64 } from "@proto-kit/library";
+import { Balance, Balances, TokenId } from "@proto-kit/library";
 import {
   RuntimeModule,
   runtimeMethod,
   runtimeModule,
   state,
+  RuntimeEvents
 } from "@proto-kit/module";
 import { StateMap, assert } from "@proto-kit/protocol";
 import { Field, PublicKey, Struct, Bool,  UInt64 as o1Uint64 } from "o1js";
@@ -12,6 +13,10 @@ import { inject } from "tsyringe";
 export class LockId extends Field {}
 
 export class BlockHeight extends o1Uint64 {}
+
+export class LockEvent extends Struct({tokenId: TokenId, address: PublicKey, amount: Balance, expiresAt: BlockHeight, lockId: LockId}){}
+export class UnlockEvent extends Struct({tokenId: TokenId, address: PublicKey, amount: Balance, lockId: LockId}){}
+
 
 export class LockKey extends Struct({
   address: PublicKey,
@@ -34,13 +39,18 @@ export class Locks extends RuntimeModule {
     LockId
   );
 
+  public events = new RuntimeEvents({
+    lock: LockEvent,
+    unlock: UnlockEvent,
+  });
+
   public constructor(@inject("Balances") public balances: Balances) {
     super();
   }
 
   public async lock(
-    address: PublicKey,
     tokenId: TokenId,
+    address: PublicKey,
     amount: Balance,
     expiresAt: BlockHeight
   ) {
@@ -63,6 +73,7 @@ export class Locks extends RuntimeModule {
     await this.balances.burn(tokenId, address, amount);
     await this.locks.set(key, lock);
     await this.lastAddressLockId.set(address, lockId);
+    this.events.emit("lock", new LockEvent({tokenId, address, amount, expiresAt, lockId}));
   }
 
   public async unlock(tokenId: TokenId, address: PublicKey, lockId: LockId) {
@@ -82,13 +93,14 @@ export class Locks extends RuntimeModule {
 
     await this.locks.set(key, updatedLock);
     await this.balances.mint(key.tokenId, key.address, lock.value.amount);
+    this.events.emit("unlock", new UnlockEvent({tokenId, address, amount: lock.value.amount, lockId}));
   }
 
   @runtimeMethod()
   public async lockSigned(tokenId: TokenId, amount: Balance, expiresAt: BlockHeight) {
     const address = this.transaction.sender.value;
 
-    await this.lock(address, tokenId, amount, expiresAt);
+    await this.lock(tokenId, address, amount, expiresAt);
   }
 
   @runtimeMethod()

@@ -118,7 +118,7 @@ export function PoolJoin({}: PoolJoinProps) {
                   >
                     {dataPoolCreate.tokenPool.first ? (
                       <div className="flex items-center gap-[8px]">
-                        <Image
+                        <img
                           src={"/" + dataPoolCreate.tokenPool.first.logo}
                           alt="logo"
                           width={24}

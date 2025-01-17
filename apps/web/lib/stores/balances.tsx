@@ -7,12 +7,12 @@ import { PublicKey } from "o1js";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useChainStore } from "./chain";
 import { useNotifications, useWalletStore } from "./wallet";
-import { getTokenID, Tokens } from "@/tokens";
 import { usePoolKey } from "../xyk/usePoolKey";
 import { LPTokenId } from "chain";
 import BigNumber from "bignumber.js";
 import { dataSubmitProps } from "@/types";
-import { TRANSACTION_TYPES } from "@/constants";
+import { FAUCET_FAILED, FAUCET_SUCCESS, TRANSACTION_TYPES } from "@/constants";
+import { useTokenStore } from "./token";
 
 export interface BalanceDataJSON {
   address: string;
@@ -40,11 +40,8 @@ export interface BalancesState {
     address: string,
   ) => Promise<void>;
 
-  loadBalances: (
-    client: Client,
-    address?: string,
-  ) => Promise<void>;
-
+  loadBalances: (client: Client, address?: string) => Promise<void>;
+  setLoadBalances: (isLoadBalances: boolean) => void;
   clearBalances: (address?: string) => void;
   faucet: (client: Client, address: string) => Promise<PendingTransaction>;
   loadTotalSupply: (client: Client, tokenId: string) => Promise<void>;
@@ -103,6 +100,13 @@ export const useBalancesStore = create<
       });
     },
 
+    setLoadBalances(value: boolean) {
+      const isLoadBalances = value;
+      set((state) => {
+        state.isLoadBalances = isLoadBalances;
+      });
+    },
+
     async loadBalances(client: Client, address?: string) {
       if (!address) return;
       const response = await fetch(
@@ -117,7 +121,7 @@ export const useBalancesStore = create<
            query loadBalances {
              balances(
                   where: {address: {equals: "${address}"}},
-                  take: 10
+                  take: 50
                 ) {
                   address
                   amount
@@ -129,21 +133,22 @@ export const useBalancesStore = create<
           }),
         },
       );
-      const data: { data: { balances: BalanceDataJSON[] } } = await response.json();
-      let balancesWaiForUpdate = data.data.balances.filter(balance => balance.waitForUpdate)
-      let balancesNotWaiForUpdate = data.data.balances.filter(balance => !balance.waitForUpdate)
+      const data: { data: { balances: BalanceDataJSON[] } } =
+        await response.json();
+      let balancesWaiForUpdate = data.data.balances.filter(
+        (balance) => balance.waitForUpdate,
+      );
+      let balancesNotWaiForUpdate = data.data.balances.filter(
+        (balance) => !balance.waitForUpdate,
+      );
       set((state) => {
         if (!Object.keys(state.balances).includes(address)) {
           state.balances[address] = {};
         }
         for (let i = 0; i < balancesNotWaiForUpdate.length; i++) {
-          const {
-            amount,
-            tokenId
-          } = balancesNotWaiForUpdate[i]
-          state.balances[address][tokenId] = amount.toString() || '0';
+          const { amount, tokenId } = balancesNotWaiForUpdate[i];
+          state.balances[address][tokenId] = amount.toString() || "0";
         }
-
       });
       for (var i = 0; i < balancesWaiForUpdate.length; i++) {
         const { tokenId } = balancesWaiForUpdate[i];
@@ -151,7 +156,7 @@ export const useBalancesStore = create<
       }
     },
     async loadBalance(client: Client, tokenId: string, address: string) {
-      if (!address) return
+      if (!address) return;
       set((state) => {
         state.loading = true;
       });
@@ -249,7 +254,8 @@ export const useObserveBalancePool = (tokenId?: string, address?: string) => {
 
 export const useObserveBalances = (
   address?: string,
-  type?: string,
+  type?: "swap" | "add" | "remove" | string,
+  isCheckBlock: boolean = true,
 ) => {
   const client = useClientStore();
   const chain = useChainStore();
@@ -293,11 +299,19 @@ export const useObserveBalances = (
   // }, [client.client, address, isLoadBalances]);
 
   // TODO: call change every block call
-    useEffect(() => {
+  useEffect(() => {
     if (!client.client || !address || !tokenId) return;
     balances.loadBalances(client.client, address);
-
-  }, [client.client, chain.block?.height, address]);
+    if (
+      type !== "swap" &&
+      !type?.includes("add") &&
+      !type?.includes("remove") &&
+      !type?.includes("info/tokens") &&
+      balances.isLoadBalances
+    ) {
+      balances.setLoadBalances(false);
+    }
+  }, [client.client, isCheckBlock ? chain.block?.height : null, address]);
 
   return balance;
 };
@@ -307,6 +321,7 @@ export const useObservePooled = (
   tickerB?: string,
   balance?: number | string,
 ) => {
+  const { getTokenID } = useTokenStore();
   // Memoize tokenA and tokenB based on ticker inputs
   const tokenA = useMemo(
     () => getTokenID("ticker", tickerA as string) as string,
@@ -366,31 +381,34 @@ export const useFaucet = () => {
   // const balances = useBalancesStore();
   const wallet = useWalletStore();
 
-  const notify = useNotifications()
+  const notify = useNotifications();
 
   return useCallback(async () => {
     if (!client.client || !wallet.wallet) return;
 
     const responseSignMessage = await (window as any).mina.signMessage({
-      message: "Hello, Dinodex!"
+      message: "Hello, Dinodex!",
     });
 
-    const pendingTransaction = await fetch(`${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/dripBundle`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const pendingTransaction = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/dripBundle`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: wallet.wallet,
+          signature: responseSignMessage.signature || {},
+        }),
       },
-      body: JSON.stringify({
-        address: wallet.wallet,
-        signature: responseSignMessage.signature || {}
-      }),
-    }).then((res) => res.json());
+    ).then((res) => res.json());
     if (!pendingTransaction.error) {
-      wallet.addPendingTransaction(PendingTransaction.fromJSON(pendingTransaction.message), "Faucet");
+      // wallet.addPendingTransaction(PendingTransaction.fromJSON(pendingTransaction.message), "Faucet");
+      notify({ message: pendingTransaction.message, type: FAUCET_SUCCESS });
     } else {
-      notify({ message: pendingTransaction.message, type: "Faucet" })
+      notify({ message: pendingTransaction.message, type: FAUCET_FAILED });
     }
-
   }, [client.client, wallet.wallet]);
 };
 

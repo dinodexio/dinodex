@@ -3,9 +3,9 @@ import "../../style.css";
 import Image from "next/image";
 import Link from "next/link";
 import { LIST_STATUS } from "@/constants";
-import { tokens } from "@/tokens";
 import { Balance } from "../../ui/balance";
 import { USDBalance } from "../../ui/usd-balance";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface Balances {
   [tokenId: string]: string | undefined;
@@ -78,11 +78,13 @@ let dataFakeListPool = [
 ];
 
 export function ListPool({ balances }: ListPoolProps) {
+  const { data: tokens } = useTokenStore();
   const [showFullListPool, setShowFullListPool] = useState(true);
   const poolBalances = Object.entries(balances ?? {}).map(
     ([tokenId, balance]) => {
       const token = tokens[tokenId];
-      if (!token || (BigInt(tokenId) > BigInt(3) && balance == "0")) return null;
+      if (!token || (BigInt(tokenId) > BigInt(3) && balance == "0"))
+        return null;
       if (token?.name === "LP Token")
         return {
           ...token,

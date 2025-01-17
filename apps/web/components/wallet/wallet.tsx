@@ -2,21 +2,14 @@
 import { cn, formatPriceUSD } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Loader2Icon } from "lucide-react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Balance, precision } from "../ui/balance";
 import { USDBalance } from "../ui/usd-balance";
 // @ts-ignore
 import truncateMiddle from "truncate-middle";
-import { tokens } from "@/tokens";
 import Image from "next/image";
 import stylesButton from "../css/button.module.css";
-import {
-  MENU_WALLET,
-  LIST_HISTORY,
-  WALLET_NEMU_ACTIVE,
-  PRICE_USD,
-  PRICE_MINA,
-} from "@/constants";
+import { BASE_TOKEN, MENU_WALLET, WALLET_NEMU_ACTIVE } from "@/constants";
 import styles from "../css/wallet.module.css";
 import { DepositLayout } from "../layoutWallet/depositLayout";
 import { WithdrawLayout } from "../layoutWallet/withdrawLayout/withdrawLayout";
@@ -26,10 +19,10 @@ import { ChangeWalletLayout } from "../layoutWallet/changeWalletLayout";
 import { useClientStore } from "@/lib/stores/client";
 import { useFaucet } from "@/lib/stores/balances";
 import Link from "next/link";
-import {
-  useAggregatorStore,
-  usePollTransactions,
-} from "@/lib/stores/aggregator";
+import { useAggregatorStore } from "@/lib/stores/aggregator";
+import { ImageCommon } from "../common/ImageCommon";
+import { useTokenStore } from "@/lib/stores/token";
+import { CopyContainer } from "../detail/copy-container";
 
 export interface Balances {
   [tokenId: string]: string | any;
@@ -38,7 +31,7 @@ export interface Balances {
 export interface WalletProps {
   address?: string;
   blockHeight?: string;
-  balances?: Balances;
+  balances: Balances;
   loadingBalances?: boolean;
   open: boolean;
   setIsWalletOpen?: (open: boolean) => void;
@@ -59,8 +52,9 @@ export function Wallet({
   open,
   setIsWalletOpen,
 }: WalletProps) {
+  const { data: tokens } = useTokenStore();
   const { tokens: listTokens, loadTokens } = useAggregatorStore();
-  usePollTransactions();
+  // usePollTransactions();
   const { client } = useClientStore();
   const [menuItemActive, setMenuItemActive] = useState("");
   const [listDataWallet, setListDataWallet] = useState("token");
@@ -93,6 +87,9 @@ export function Wallet({
   useEffect(() => {
     if (!open) {
       setMenuItemActive("");
+      document.body.style.overflow = "auto";
+    } else {
+      document.body.style.overflow = "hidden";
     }
   }, [open]);
 
@@ -103,6 +100,31 @@ export function Wallet({
   }, [JSON.stringify(listTokens)]);
 
   const faucet = useFaucet();
+
+  const totalBalance = useMemo(() => {
+    let total = 0;
+    Object.keys(balances || {}).forEach((tokenId) => {
+      const balance = balances[tokenId];
+      const priceToken = listTokens.find((t) => t.id === tokenId)?.price || 0;
+      if (
+        balance &&
+        priceToken &&
+        !isNaN(priceToken as number) &&
+        isFinite(priceToken as number)
+      ) {
+        const balanceUSD = parseFloat(
+          BigNumber(balance || "0")
+            .div(10 ** precision)
+            .times(priceToken)
+            .toFixed(2),
+        );
+        if (isFinite(balanceUSD)) {
+          total += balanceUSD;
+        }
+      }
+    });
+    return total;
+  }, [balances, listTokens, precision]);
 
   return (
     <div className="group">
@@ -196,6 +218,7 @@ export function Wallet({
               "blur-md": false,
             },
           )}
+          style={{ scrollbarWidth: "none" }}
         >
           <div
             className={`flex items-center justify-between ${styles["wallet-header"]}`}
@@ -208,7 +231,7 @@ export function Wallet({
                 height={30}
               />
               <span className="text-[20px] font-[500] text-textBlack">
-                tMINA
+                {tokens["0"]?.ticker}
               </span>
             </div>
             <Image
@@ -243,16 +266,18 @@ export function Wallet({
                 <p className="text-[20px] font-[500] text-textBlack">
                   {address ? truncateMiddle(address, 5, 5, "...") : "—"}
                 </p>
-                <Image
-                  src="/icon/copy-or-icon.svg"
-                  alt="logo"
-                  width={16}
-                  height={16}
-                  className="cursor-pointer"
-                  onClick={() => {
-                    navigator.clipboard.writeText(address || "");
-                    alert("copied!");
-                  }}
+                <CopyContainer
+                  value={address || ''}
+                  content={<Image
+                    src="/icon/copy-or-icon.svg"
+                    alt="logo"
+                    width={16}
+                    height={16}
+                    className="cursor-pointer"
+                  />}
+                  showIcon={false}
+                  className="border-none shadow-none px-[0] py-[0] hover:bg-white"
+                  stylePopUp={{top:30}}
                 />
               </div>
             </div>
@@ -277,7 +302,11 @@ export function Wallet({
               <div className="h-[43px]">
                 <span className="text-[32px] font-[500] text-textBlack">
                   {showInfoWallet ? (
-                    <Balance balance={balances?.["0"] ?? "0"} tokenId="0" />
+                    // <Balance balance={balances?.["0"] ?? "0"} tokenId="0" />
+                    <span>
+                      {totalBalance.toFixed(2) ?? "—"}{" "}
+                      {tokens["0"]?.ticker || "tMINA"}
+                    </span>
                   ) : (
                     "*****"
                   )}
@@ -287,16 +316,14 @@ export function Wallet({
                 {showInfoWallet ? (
                   <USDBalance
                     balance={formatPriceUSD(
-                      BigNumber(balances?.["0"])
-                        .div(10 ** precision)
-                        .toNumber(),
+                      totalBalance,
                       "MINA",
                       listTokens.find((t) => t.id === "0")?.price || 0,
                     )}
                     type="USD"
                   />
                 ) : (
-                  "~$*****"
+                  `~${BASE_TOKEN} *****`
                 )}
               </span>
             </div>
@@ -305,9 +332,10 @@ export function Wallet({
             {MENU_WALLET?.map((item) => {
               return (
                 <div
-                  className={`flex w-[89px] cursor-pointer flex-col items-center ${styles["menu-item"]}`}
+                  // className={`flex w-[89px] cursor-pointer flex-col items-center ${styles["menu-item"]}`}
+                  className={`flex w-[89px] cursor-not-allowed flex-col items-center opacity-50 ${styles["menu-item"]}`}
                   key={item.value}
-                  onClick={() => setMenuItemActive(item.value)}
+                // onClick={() => setMenuItemActive(item.value)}
                 >
                   <div className="relative">
                     <Image
@@ -365,7 +393,12 @@ export function Wallet({
                 History
               </span> */}
             </div>
-            <div className="list-token-wallet mb-[20px] mt-[18px] grid max-h-[210px] gap-[15px] overflow-y-scroll">
+            <div
+              className={cn(
+                "list-token-wallet mb-[20px] mt-[18px] grid gap-[15px] overflow-y-scroll",
+                styles["list-token-wallet"],
+              )}
+            >
               {listDataWallet === "token" && (
                 <>
                   {Object.entries(balances ?? {}).map(([tokenId, balance]) => {
@@ -383,9 +416,9 @@ export function Wallet({
                         key={tokenId}
                       >
                         <div className="flex items-center">
-                          <img
-                            className="mr-[10px] h-8 w-8"
-                            src={token?.logo}
+                          <ImageCommon
+                            src={token?.logo || ""}
+                            className="mr-[10px] h-8 w-8 rounded-full"
                           />
                           <div>
                             <p className="text-[16px] font-[500] text-textBlack">
@@ -402,7 +435,7 @@ export function Wallet({
                               "text-[16px] font-[500] text-textBlack",
                             )}
                           >
-                            <Balance balance={balance} />
+                            <Balance balance={balance} formatInteger={true} />
                           </p>
                           <p
                             className={cn(
@@ -530,13 +563,16 @@ export function Wallet({
                   />
                 </Link>
 
-                <Image
-                  src={"/images/social/discord.svg"}
-                  alt="logo"
-                  width={22}
-                  height={22}
-                  style={{ cursor: "pointer" }}
-                />
+                <Link href="https://discord.gg/ZvbkEd2H7X" target="_blank">
+                  {" "}
+                  <Image
+                    src={"/images/social/discord.svg"}
+                    alt="logo"
+                    width={22}
+                    height={22}
+                    style={{ cursor: "pointer" }}
+                  />
+                </Link>
               </div>
               <div className="flex flex-col items-end gap-[2px]">
                 <p

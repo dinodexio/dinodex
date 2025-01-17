@@ -4,12 +4,13 @@ import stylesButton from "../../css/button.module.css";
 import Image from "next/image";
 import Link from "next/link";
 import { EMPTY_DATA } from "@/constants";
-import { getTokenByTicker, tokens } from "@/tokens";
 import { Balance } from "../../ui/balance";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Loader } from "@/components/ui/Loader";
-import { useBalancesStore, useObservePooled } from "@/lib/stores/balances";
+import { useObservePooled } from "@/lib/stores/balances";
 import { useRouter } from "next/navigation";
+import { ImageCommon } from "@/components/common/ImageCommon";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface Balances {
   [tokenId: string]: string | undefined;
@@ -25,6 +26,7 @@ type PoolBalance = {
 };
 
 export function ListPool({ balances, loading, wallet }: ListPoolProps) {
+  const { data: tokens, getTokenByTicker } = useTokenStore();
   const router = useRouter();
   const [activeItems, setActiveItems] = useState<any>([]);
   const [valueTicker, setValueTicker] = useState<any>(null);
@@ -45,7 +47,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
 
   const handleActionPool = (type: string, isPooled: boolean = false) => {
     if (!valueTicker?.first || !valueTicker?.second || isPooled) {
-      return router.push(`/${type}/tMINA`);
+      return router.push(`/${type}/${tokens["0"]?.ticker}`);
     }
     router.push(`/${type}/${valueTicker?.first}/${valueTicker?.second}`);
   };
@@ -107,11 +109,11 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
   let dataPool: PoolBalance[] =
     poolBalances && poolBalances.length > 0
       ? poolBalances
-          .filter((el: PoolBalance | null) => el !== null)
-          ?.map((el: PoolBalance | null, index: number) => ({
-            ...el,
-            id: index + 1,
-          }))
+        .filter((el: PoolBalance | null) => el !== null)
+        ?.map((el: PoolBalance | null, index: number) => ({
+          ...el,
+          id: index + 1,
+        }))
       : [];
 
   return (
@@ -132,7 +134,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
             className="absolute bottom-0 left-0 right-0 top-0 rounded-[12px]"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
-          <div className="flex flex-col items-start justify-center gap-[15px]">
+          <div className="flex flex-col items-start justify-center gap-[4px] sm:gap-[4px] lg:gap-[12px] xl:gap-[15px]">
             <span
               className="z-10 text-[17px] font-[600] text-textBlack"
               style={{ fontSize: 17 }}
@@ -184,7 +186,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
             </div>
           </div>
         </div>
-        {loading ? (
+        {loading && dataPool?.length > 0 ? (
           <div className="flex items-center justify-center rounded-[12px] border border-textBlack pb-[15px] pt-[15px] text-[20px] font-[400] text-textBlack">
             <Loader w={6} h={6} />
           </div>
@@ -193,30 +195,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
             No liquidity found
           </div>
         ) : (
-          <>
-            {/* <div
-              className="flex items-center justify-between rounded-[12px] border border-textBlack"
-              style={{ padding: "15px 20px", marginBottom: 12 }}
-            >
-              <span
-                className="text-[12px] sm:text-[12px] lg:text-[16px] xl:text-[16px]"
-                style={{ color: "#FF603B", fontWeight: 400 }}
-              >
-                Account analytics and accrued fee
-              </span>
-              <span
-                className="text-[14px] sm:text-[14px] lg:text-[20px] xl:text-[20px]"
-                style={{ color: "#FF603B", fontWeight: 400 }}
-              >
-                Manage
-              </span>
-              <Image
-                src="/icon/arrow-icon-or.svg"
-                width={20}
-                height={20}
-                alt="arrow icon"
-              />
-            </div> */}
+          <div style={{ height: "calc(50vh - 50px)", overflow: "auto", scrollbarWidth: "none",padding: "0 1px" }}>
             {dataPool?.map((item: any, index: number) => {
               const isActive = activeItems.includes(item.id);
               const toggleIconRotation = isActive
@@ -237,20 +216,14 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                   >
                     <div className="flex items-center gap-1">
                       <div className="flex items-center">
-                        <Image
-                          src={item?.tokenSelectedPool?.first?.logo}
-                          width={25}
-                          height={25}
-                          alt="first token logo"
-                          className="h-[21px] w-[21px] sm:h-[21px] sm:w-[21px] lg:h-[25px] lg:w-[25px] xl:h-[25px] xl:w-[25px]"
+                        <ImageCommon
+                          src={item?.tokenSelectedPool?.first?.logo || ""}
+                          className="h-[21px] w-[21px] sm:h-[21px] sm:w-[21px] lg:h-[25px] lg:w-[25px] xl:h-[25px] xl:w-[25px] rounded-[50%]"
                         />
-                        <Image
-                          src={item?.tokenSelectedPool?.second?.logo}
-                          width={25}
-                          height={25}
-                          alt="second token logo"
+                        <ImageCommon
+                          src={item?.tokenSelectedPool?.second?.logo || ""}
                           style={{ marginLeft: "-11px" }}
-                          className="h-[21px] w-[21px] sm:h-[21px] sm:w-[21px] lg:h-[25px] lg:w-[25px] xl:h-[25px] xl:w-[25px]"
+                          className="h-[21px] w-[21px] rounded-[50%] sm:h-[21px] sm:w-[21px] lg:h-[25px] lg:w-[25px] xl:h-[25px] xl:w-[25px]"
                         />
                       </div>
                       <span className="lg:[20px] sm:[18px] text-[18px] font-[400] leading-none text-black opacity-75 xl:text-[20px]">
@@ -302,8 +275,8 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                               isActive ? String(dataPooled?.first) : undefined
                             }
                           />
-                          <Image
-                            src={item?.tokenSelectedPool?.first?.logo}
+                          <ImageCommon
+                            src={item?.tokenSelectedPool?.first?.logo || ""}
                             width={18}
                             height={18}
                             alt="first pooled token logo"
@@ -320,8 +293,8 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                               isActive ? String(dataPooled?.second) : undefined
                             }
                           />
-                          <Image
-                            src={item?.tokenSelectedPool?.second?.logo}
+                          <ImageCommon
+                            src={item?.tokenSelectedPool?.second?.logo || ''}
                             width={18}
                             height={18}
                             alt="second pooled token logo"
@@ -344,25 +317,8 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                           {"<0.1%"}
                         </span>
                       </div>
-                      {/* <div className="mt-[2px] flex items-center justify-center">
-                        <span className={styles["text-or"]}>
-                          View accrued fees and analytics
-                          <Image
-                            src="/icon/arrow-icon-or.svg"
-                            width={20}
-                            height={20}
-                            alt="arrow icon"
-                          />
-                        </span>
-                      </div> */}
                     </div>
                     <div className={styles["content-item-button"]}>
-                      {/* <div
-                        className={`${stylesButton["button-swap"]} ${stylesButton["btn-pool-info"]}`}
-                        onClick={() => handleActionPool("add")}
-                      >
-                        <span>Migrate</span>
-                      </div> */}
                       <div
                         className={`${stylesButton["button-swap"]} ${stylesButton["btn-pool-info"]}`}
                         onClick={() => handleActionPool("add")}
@@ -380,7 +336,7 @@ export function ListPool({ balances, loading, wallet }: ListPoolProps) {
                 </Card>
               );
             })}
-          </>
+          </div>
         )}
       </Card>
     </>

@@ -109,7 +109,7 @@
 }
 
 .boxMenuNav_mobile {
-  z-index: 100;
+  z-index: 1000;
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -133,7 +133,9 @@
   align-items: center;
   gap: 6px;
   cursor: pointer;
+  height: 44px;
 }
+
 
 @media screen and (max-width: 1100px) {
   .containerNavbar {
@@ -193,7 +195,7 @@
 
 @media screen and (max-width: 655px) {
   .containerTitleNavbar {
-    gap: 12px;
+    gap: 0px;
   }
 
   .boxMenuNav {
@@ -206,5 +208,15 @@
 
   .iconDropDownHeader {
     display: block;
+  }
+
+  .btnWalletAcount {
+    padding: 8px 10px;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .addressText {
+    font-size: 14px;
   }
 }

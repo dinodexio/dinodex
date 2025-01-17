@@ -7,9 +7,9 @@ interface BalancesConfig {
   totalSupply: Balance;
 }
 
-export class MintEvent extends Struct({tokenId: TokenId, address: PublicKey, amount: Balance}){}
-export class BurnEvent extends Struct({tokenId: TokenId, address: PublicKey, amount: Balance}){}
-export class TransferEvent extends Struct({ tokenId: TokenId, from: PublicKey, to: PublicKey, amount: Balance}){}
+export class MintEvent extends Struct({ tokenId: TokenId, address: PublicKey, amount: Balance }) { }
+export class BurnEvent extends Struct({ tokenId: TokenId, address: PublicKey, amount: Balance }) { }
+export class TransferEvent extends Struct({ tokenId: TokenId, from: PublicKey, to: PublicKey, amount: Balance }) { }
 
 @runtimeModule()
 export class Balances extends BaseBalances<BalancesConfig> {
@@ -24,7 +24,7 @@ export class Balances extends BaseBalances<BalancesConfig> {
     burn: BurnEvent,
     transfer: TransferEvent,
   });
-    //overwrite
+  //overwrite
   public async transfer(
     tokenId: TokenId,
     from: PublicKey,
@@ -57,22 +57,22 @@ export class Balances extends BaseBalances<BalancesConfig> {
 
     // await this.transfer(tokenId, from, to, amount);
   }
-  
-    public async mint(tokenId: TokenId, address: PublicKey, amount: Balance) {
-      const balance = await this.getBalance(tokenId, address);
-      const newBalance = balance.add(amount);
-      await this.setBalance(tokenId, address, newBalance);
-      this.events.emit('mint', new MintEvent({tokenId, address, amount}));
-    }
-  
-    public async burn(tokenId: TokenId, address: PublicKey, amount: Balance) {
-      const balance = await this.getBalance(tokenId, address);
-      Provable.log("Balance", balance, amount);
-      const newBalance = balance.sub(amount);
-      await this.setBalance(tokenId, address, newBalance);
-      this.events.emit('burn', new BurnEvent({tokenId, address, amount}));
-    }
-    //end overwrite
+
+  public async mint(tokenId: TokenId, address: PublicKey, amount: Balance) {
+    const balance = await this.getBalance(tokenId, address);
+    const newBalance = balance.add(amount);
+    await this.setBalance(tokenId, address, newBalance);
+    this.events.emit('mint', new MintEvent({ tokenId, address, amount }));
+  }
+
+  public async burn(tokenId: TokenId, address: PublicKey, amount: Balance) {
+    const balance = await this.getBalance(tokenId, address);
+    Provable.log("Balance", balance, amount);
+    const newBalance = balance.sub(amount);
+    await this.setBalance(tokenId, address, newBalance);
+    this.events.emit('burn', new BurnEvent({ tokenId, address, amount }));
+  }
+  //end overwrite
 
   public async getCirculatingSupply(tokenId: TokenId) {
     return Balance.from((await this.circulatingSupply.get(tokenId)).value);

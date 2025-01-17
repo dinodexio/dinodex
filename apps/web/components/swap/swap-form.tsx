@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "../css/swap.module.css";
 import stylesModal from "../css/modal.module.css";
 import stylesButton from "../css/button.module.css";
-import { EMPTY_DATA, SLIPPAGE } from "@/constants";
+import { EMPTY_DATA } from "@/constants";
 import Image from "next/image";
 import {
   Dialog,
@@ -15,16 +15,16 @@ import {
 } from "@/components/ui/dialog";
 import { ModalListToken } from "../modalListToken/modalListToken";
 import { Button } from "../ui/button";
-import { tokens } from "@/tokens";
 import { client, PoolKey, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
-import { Balance } from "../ui/balance";
+import { Balance, precision } from "../ui/balance";
 import { cn, formatPriceUSD, truncateString } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
 import { Input } from "../ui/input";
-import { useBalancesStore } from "@/lib/stores/balances";
 import useClickOutside from "@/hook/useClickOutside";
 import { USDBalance } from "../ui/usd-balance";
+import BigNumber from "bignumber.js";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface SwapProps {
   token?: any;
@@ -47,6 +47,7 @@ export function Swap({
   balances,
   isDetail,
 }: SwapProps) {
+  const { data: tokens } = useTokenStore();
   const form = useFormContext();
   const error = Object.values(form.formState.errors)[0]?.message?.toString();
   const [openSetting, setOpenSetting] = useState(false);
@@ -55,17 +56,6 @@ export function Swap({
   const settingRef = useClickOutside<HTMLDivElement>(() => {
     setOpenSetting(false);
   });
-
-  // const unitPriceWrapped = useMemo(() => {
-  //   const fields = form.getValues();
-
-  //   if (!unitPrice || !fields.tokenIn_token || !fields.tokenOut_token) return;
-  //   return {
-  //     tokenIn: tokens[fields.tokenIn_token]?.ticker,
-  //     tokenOut: tokens[fields.tokenOut_token]?.ticker,
-  //     unitPrice,
-  //   };
-  // }, [unitPrice]);
 
   const [typeOpenModal, setTypeOpenModal] = useState<string>("tokenIn");
 
@@ -134,8 +124,8 @@ export function Swap({
     <Dialog>
       <div
         className={`${styles["swap-container"]} ${isDetail
-            ? `${styles["token-swap-container"]} ${styles["pc-swap-token"]}`
-            : ""
+          ? `${styles["token-swap-container"]} ${styles["pc-swap-token"]}`
+          : ""
           }`}
       >
         <div
@@ -167,14 +157,14 @@ export function Swap({
               </span>
               <div className="flex w-full items-center justify-between">
                 <span
-                  className={`text-[18px] font-[400] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[24px] ${styles["popup-setting-label"]}`}
+                  className={`text-[18px] font-[400] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[24px] ${styles["popup-setting-label"]}`}
                 >
                   Max Slippage
                 </span>
                 <div className="flex items-center gap-[12px] rounded-[12px] bg-[#EBEBEB] pr-[12px] shadow-content">
                   <div
-                    className={`flex cursor-pointer items-center justify-center rounded-[12px] bg-bgWhiteColor px-3 py-[6px] text-[18px] font-[400]
-                       shadow-content transition duration-300 ease-in-out hover:bg-[#EBEBEB] sm:text-[18px] lg:text-[20px] xl:text-[20px]
+                    className={`flex cursor-pointer items-center justify-center rounded-[12px] bg-bgWhiteColor px-3 py-[6px] text-[16px] font-[400]
+                       shadow-content transition duration-300 ease-in-out hover:bg-[#EBEBEB] sm:text-[16px] lg:text-[20px] xl:text-[20px]
                       ${fields.slippage_custom ? "text-textBlack" : "text-borderOrColor"}
                       `}
                     onClick={() => {
@@ -245,7 +235,7 @@ export function Swap({
               </div>
               <div className="flex w-full items-center justify-between">
                 <span
-                  className={`text-[18px] font-[400] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[24px] ${styles["popup-setting-label"]}`}
+                  className={`text-[18px] font-[400] text-textBlack sm:text-[16px] lg:text-[20px] xl:text-[24px] ${styles["popup-setting-label"]}`}
                 >
                   Transaction deadline
                 </span>
@@ -329,8 +319,8 @@ export function Swap({
                   })}
                   placeholder="0"
                   type="text"
-                  maxLength={30} // Enforces maximum input length at the browser level
-                  inputMode="decimal" // Suggests a numeric keyboard on mobile devices
+                  maxLength={30}
+                  inputMode="decimal"
                   onInput={(e: React.FormEvent<HTMLInputElement>) =>
                     adjustFontSize(e.currentTarget)
                   }
@@ -351,7 +341,7 @@ export function Swap({
                   >
                     {fields?.tokenIn_token ? (
                       <>
-                        <Image
+                        <img
                           src={tokens[fields.tokenIn_token]?.logo || ""}
                           alt="logo"
                           width={24}
@@ -379,9 +369,26 @@ export function Swap({
                   balance={USDBalances.tokenIn}
                   type="USD"
                 />
-                <span className={styles["swap-item-footer-text"]}>
-                  Balance: <Balance balance={balance?.toString() || "~"} />
-                </span>
+                <div className="flex flex-row items-center gap-2">
+                  <span className={styles["swap-item-footer-text"]}>
+                    Balance: <Balance balance={balance?.toString() || "~"} />
+                  </span>
+                  {balance && BigNumber(balance).toNumber() > 0 ? (
+                    <div
+                      className="flex h-[25px] cursor-pointer items-center justify-center rounded-[6px] border-none px-2 py-1 text-[14px] font-[400] text-textBlack hover:bg-[#EBEBEB] sm:text-[14px] lg:text-[16px] xl:text-[16px]"
+                      style={{
+                        transition: "all 0.3s ease",
+                        boxShadow: "0px 2px 8px 0px rgba(0, 0, 0, 0.25)",
+                      }}
+                      onClick={() => {
+                        let maxBalance = BigNumber(balance).dividedBy(10 ** precision).toNumber();
+                        form.setValue("tokenIn_amount", maxBalance.toString());
+                      }}
+                    >
+                      MAX
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
             <div className={styles["swap-button"]} onClick={() => changeSwap()}>
@@ -419,7 +426,7 @@ export function Swap({
                   >
                     {fields.tokenOut_token ? (
                       <>
-                        <Image
+                        <img
                           src={tokens[fields.tokenOut_token]?.logo || ""}
                           alt="logo"
                           width={24}
@@ -477,61 +484,6 @@ export function Swap({
             </div>
           )}
         </div>
-
-        {/* <div className={styles["slippage-container"]}>
-          <div className={styles["slippage-head"]}>Slippage</div>
-          {SLIPPAGE?.map((item, index) => (
-            <div
-              className={`${styles["slippage-item"]} ${
-                item?.value === fields.slippage && !fields.slippage_custom
-                  ? styles["slippage-item-active"]
-                  : ""
-              }`}
-              onClick={() => {
-                form.setValue("slippage_custom", null, { shouldDirty: true });
-                form.setValue("slippage", item?.value, {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                });
-                form.trigger("slippage");
-              }}
-              data-slippage={item?.value}
-              key={index}
-            >
-              {item?.label}
-            </div>
-          ))}
-          <div className={`${styles["slippage-head"]} flex items-center`}>
-            <Input
-              {...form.register("slippage_custom")}
-              placeholder="0.1"
-              type="number"
-              className={cn([
-                styles["slippage-input-custom"],
-                "border-0 bg-transparent outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
-              ])}
-            />
-            <span
-              className={`ml-[-10px] ${fields.slippage_custom === null ? "opacity-30" : "opacity-100"}`}
-            >
-              %
-            </span>
-          </div>
-        </div> */}
-        {/* <div className="flex items-center">
-              <p className={cn("mr-1.5 text-lg text-textBlack")}>
-                {unitPriceWrapped ? (
-                  `1 ${unitPriceWrapped.tokenIn} = ${unitPrice} ${unitPriceWrapped.tokenOut}`
-                ) : (
-                  <></>
-                )}
-              </p>
-              {unitPriceWrapped && (
-                <p className={cn("text-lg text-textBlack")}>
-                  (<USDBalance />)
-                </p>
-              )}
-            </div> */}
         <DialogOverlay className={styles["bg-overlay"]} />
         <DialogContent
           className={`${stylesModal["modal-container"]} bg-white px-[19.83px] pb-[33.88px] pt-[21.49px]`}

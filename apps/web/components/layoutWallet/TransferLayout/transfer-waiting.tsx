@@ -1,8 +1,8 @@
 import { useFormContext } from "react-hook-form";
 import Image from "next/image";
 import { truncateAddress } from "@/lib/utils";
-import { tokens } from "@/tokens";
 import styles from "../../css/wallet.module.css";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface TransferWaitingProps {
   loading: boolean;
@@ -15,6 +15,7 @@ export function TransferWaiting({
   onClose,
   statusLayout,
 }: TransferWaitingProps) {
+  const { data: tokens } = useTokenStore();
   const form = useFormContext();
   const fields = form.getValues();
   return (
@@ -39,7 +40,7 @@ export function TransferWaiting({
             className={`${styles["loading-waiting"]} h-[108px] w-[108px] ${statusLayout.waiting ? "opacity-100" : "opacity-0"}`}
             style={{ transition: "opacity 0.3s ease" }}
           />
-          <Image
+          <img
             src={tokens[fields.amount_token]?.logo || ""}
             alt="logo"
             width={50}

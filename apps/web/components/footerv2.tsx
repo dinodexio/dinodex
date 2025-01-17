@@ -9,12 +9,11 @@ export function Footer() {
                 <div className={styleFooter["contentFooterTop"]}>
                     <div className={styleFooter["boxTitleFooter"]}>
                         <img
-                            width="35px"
-                            height="35px"
+                           className={styleFooter["imageDino"]}
                             src="/images/navbar_footer/dino_image.svg"
                             alt=""
                         />
-                        <span className={styleFooter["titleFooter"]} style={{ fontFamily: 'PPMondwest', color: 'var(--black-text-color)' }}> DinoDEX</span>
+                        <span className={styleFooter["titleFooter"]} style={{ fontFamily: 'PPMondwest', color: 'var(--black-text-color)' }}> DinoDex</span>
                     </div>
                     <div className={styleFooter["containerTagFooter"]}>
                         {MENU_FOOTER.map((item, index) => (

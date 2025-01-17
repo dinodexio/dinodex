@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { use, useRef } from "react";
+import React, { useRef } from "react";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { QRCodeSVG } from "qrcode.react";
 import styles from '../css/wallet.module.css'

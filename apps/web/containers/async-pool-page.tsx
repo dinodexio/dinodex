@@ -9,10 +9,9 @@ import { useWalletStore } from "@/lib/stores/wallet";
 export default function Pool() {
   const { wallet } = useWalletStore();
   const { balances, loading: balancesLoading } = useBalancesStore();
-
   const ownBalances = wallet ? balances[wallet] : {};
   const loading =
-    balancesLoading && !!(wallet && balances[wallet]?.["0"] === undefined);
+  balancesLoading && !!(wallet && balances[wallet]?.["0"] === undefined);
   return (
     <>
       <PoolComponent

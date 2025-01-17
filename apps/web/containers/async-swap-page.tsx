@@ -1,13 +1,13 @@
 "use client";
 
 import { SwapForm as SwapComponent } from "@/components/swap";
-import { Swap as SwapForm } from "@/components/swap/swap-form";
-// import { Swap as SwapForm } from "@/components/swap/swap";
+// import { Swap as SwapForm } from "@/components/swap/swap-form";
+import { SwapFormUpdate as SwapForm } from "@/components/swap/swap-form-update";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { useObservePool, useSellPath } from "@/lib/stores/xyk";
 import { zodResolver } from "@hookform/resolvers/zod";
 import BigNumber from "bignumber.js";
-import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { addPrecision, removePrecision } from "./xyk/add-liquidity-form";
@@ -16,7 +16,6 @@ import {
   useBalancesStore,
   // useObserveBalancePool,
 } from "@/lib/stores/balances";
-// import { pools } from "@/tokens";
 import { dijkstra, PoolKey, prepareGraph, TokenPair } from "chain";
 import { BalancesKey, TokenId } from "@proto-kit/library";
 import { Form } from "@/components/ui/form";
@@ -25,8 +24,9 @@ import { useClientStore } from "@/lib/stores/client";
 import { PublicKey } from "o1js";
 import { debounce } from "lodash";
 import { dataSubmitProps } from "@/types";
-import { tokens } from "@/tokens";
-import { formatFullValue } from "@/lib/utils";
+import { formatFullValue, getTokenId } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useTokenStore } from "@/lib/stores/token";
 
 const INIT_SLIPPAGE = 0.2;
 // const MIN_THRESHOLD = new BigNumber("0.00000000000000001");
@@ -43,8 +43,14 @@ export interface SwapProps {
 
 BigNumber.set({ ROUNDING_MODE: BigNumber.ROUND_DOWN });
 export default function Swap({ isDetail, tokenSelectInfo }: SwapProps) {
+  const { data: tokens } = useTokenStore();
+  const { tokens: listTokens, loadTokens } = useAggregatorStore();
+  const { setLoadBalances } = useBalancesStore();
   const [loading, setLoading] = useState(false);
   const walletBalance = useRef("0");
+  const tokenA = useSearchParams().get("tokenA");
+  const tokenB = useSearchParams().get("tokenB");
+  const router = useRouter();
   const formSchema = z
     .object({
       tokenIn_token: z
@@ -128,6 +134,24 @@ export default function Swap({ isDetail, tokenSelectInfo }: SwapProps) {
     const balance = await client.query.runtime.Balances.balances.get(key);
     return balance?.toString() || "0";
   };
+
+  useEffect(() => {
+    if (!listTokens || listTokens.length === 0) return;
+    if (tokenA && tokenB) {
+      const tokenAId = getTokenId(tokens, tokenA);
+      const tokenBId = getTokenId(tokens, tokenB);
+      const priceA = listTokens.find((item) => item.id === tokenAId)?.price;
+      const priceB = listTokens.find((item) => item.id === tokenBId)?.price;
+      form.setValue("tokenIn_token", tokenAId || "", { shouldValidate: true });
+      form.setValue("tokenOut_token", tokenBId || "", { shouldValidate: true });
+      form.setValue("tokenIn_price", priceA, { shouldValidate: true });
+      form.setValue("tokenOut_price", priceB, { shouldValidate: true });
+      form.trigger("tokenIn_token");
+      form.trigger("tokenOut_token");
+      const currentPath = window.location.pathname;
+      router.replace(currentPath, { scroll: false });
+    }
+  }, [tokenA, tokenB, form, JSON.stringify(listTokens)]);
 
   // Monitor changes and automatically handle errors where necessary
   useEffect(() => {
@@ -362,26 +386,44 @@ export default function Swap({ isDetail, tokenSelectInfo }: SwapProps) {
     }
   };
 
-  const changeSwap = useCallback(() => {
-    // form.reset();
-    form.setValue("tokenIn_token", fields.tokenOut_token);
-    form.setValue("tokenOut_token", fields.tokenIn_token);
-    form.setValue("tokenIn_amount", fields.tokenOut_amount);
-    form.setValue("tokenOut_amount", fields.tokenIn_amount);
-    // form.clearErrors();
+  const changeSwap = useCallback(async () => {
+    const tempTokenIn = fields.tokenOut_token;
+    const tempTokenOut = fields.tokenIn_token;
+    const tempAmountIn = fields.tokenOut_amount;
+    const priceTokenIn = fields.tokenOut_price;
+    const priceTokenOut = fields.tokenIn_price;
+
+    form.setValue("tokenIn_token", tempTokenIn);
+    form.setValue("tokenOut_token", tempTokenOut);
+    form.setValue("tokenIn_amount", tempAmountIn);
+    form.setValue("tokenIn_price", priceTokenIn);
+    form.setValue("tokenOut_price", priceTokenOut);
   }, [fields]);
 
   useEffect(() => {
-    if ((!tokenSelectInfo || !tokenSelectInfo?.id || !tokenSelectInfo?.price))
+    if (!tokenSelectInfo || !tokenSelectInfo?.id || !tokenSelectInfo?.price)
       return;
     if (fields.tokenIn_token === tokenSelectInfo?.id) {
-      form.setValue("tokenOut_token", '');
-      form.setValue("tokenOut_price", '');
+      form.setValue("tokenOut_token", "");
+      form.setValue("tokenOut_price", "");
     } else {
       form.setValue("tokenOut_token", String(tokenSelectInfo?.id));
       form.setValue("tokenOut_price", Number(tokenSelectInfo?.price));
     }
-  }, [tokenSelectInfo]);
+  }, [JSON.stringify(tokenSelectInfo)]);
+
+  useEffect(() => {
+    if (!form.formState.isValid) {
+      setLoadBalances(false);
+    }
+    else{
+      setLoadBalances(true);
+    }
+  }, [form.formState.isValid]);
+
+  useEffect(() => {
+    loadTokens()
+  },[])
 
   return (
     <>
@@ -403,7 +445,6 @@ export default function Swap({ isDetail, tokenSelectInfo }: SwapProps) {
           />
         </form>
       </Form>
-      {/* <SwapComponent swapForm={<SwapForm type="tokenIn" token="" />} /> */}
     </>
   );
 }

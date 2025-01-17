@@ -1,7 +1,7 @@
 import { useToast } from "@/components/ui/use-toast";
 import { PendingTransaction, UnsignedTransaction } from "@proto-kit/sequencer";
 import { MethodIdResolver } from "@proto-kit/module";
-import { use, useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 // @ts-ignore
@@ -11,10 +11,11 @@ import { useClientStore } from "./client";
 import { useChainStore } from "./chain";
 import { Field, PublicKey, Signature, UInt64 } from "o1js";
 import Image from "next/image";
-import { TRANSACTION_TYPES } from "@/constants";
+import { FAUCET_SUCCESS, TRANSACTION_TYPES } from "@/constants";
 import { dataSubmitProps } from "@/types";
 import stylesWallet from "../../components/css/wallet.module.css";
 import { formatFullValue, truncateAddress } from "../utils";
+import { ImageCommon } from "@/components/common/ImageCommon";
 
 export interface WalletState {
   wallet?: string;
@@ -52,7 +53,7 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
         }
         // Get the list of accounts
         const accounts = await mina.getAccounts();
-        console.log("accountInfo", accounts);
+        // console.log("accountInfo", accounts);
 
         if (accounts.length > 0) {
           const [wallet] = accounts;
@@ -149,8 +150,7 @@ export const useWalletStore = create<WalletState, [["zustand/immer", never]]>(
 
 function removeEventListeners() {
   if (typeof mina !== "undefined") {
-    // Xóa các trình nghe sự kiện như accountsChanged
-    mina.on("accountsChanged", () => { }); // Hàm không có tác dụng để xóa trình nghe
+    mina.on("accountsChanged", () => {}); 
   }
 }
 
@@ -190,54 +190,6 @@ export const useNotifyTransactions = () => {
       // const [moduleName, methodName] = resolvedMethodDetails;
 
       const hash = truncateMiddle(transaction.hash().toString(), 8, 8, "...");
-      // : ${moduleName}.${methodName}
-      // function title() {
-      //   switch (status) {
-      //     case "PENDING":
-      //       // return `⏳ ${type} sent`;
-      //       return (
-      //         <span className="flex items-center gap-[4px] text-[26px] font-[500] text-textBlack sm:text-[18px] lg:text-[26px] xl:text-[26px]">
-      //           <img
-      //             src="/icon/pending-icon.svg"
-      //             width={30}
-      //             height={30}
-      //             alt=""
-      //             style={{ marginLeft: "-36px" }}
-      //           />
-      //           {type} sent
-      //         </span>
-      //       );
-      //     case "SUCCESS":
-      //       // return ` ${type} Successful`;
-      //       return (
-      //         <span className="flex items-center gap-[4px] text-[26px] font-[500] text-textBlack sm:text-[18px] lg:text-[26px] xl:text-[26px]">
-      //           <img
-      //             src="/icon/success-icon.svg"
-      //             width={30}
-      //             height={30}
-      //             alt=""
-      //             style={{ marginLeft: "-36px" }}
-      //           />
-      //           {type} Successful
-      //         </span>
-      //       );
-      //     case "FAILURE":
-      //       // return `❌ ${type} Failed`;
-      //       return (
-      //         <span className="flex items-center gap-[4px] text-[26px] font-[500] text-textBlack sm:text-[18px] lg:text-[26px] xl:text-[26px]">
-      //           <img
-      //             src="/icon/failed-ico.svg"
-      //             width={30}
-      //             height={30}
-      //             alt=""
-      //             style={{ marginLeft: "-36px" }}
-      //           />
-      //           {type} Failed
-      //         </span>
-      //       );
-      //   }
-      // }
-
       function description() {
         const { dataTransaction } = wallet;
 
@@ -264,9 +216,9 @@ export const useNotifyTransactions = () => {
             case TRANSACTION_TYPES.SWAP:
               return (
                 <p className="h-[14px] text-[12px] text-textBlack opacity-50">
-                  {type} {dataTransaction?.amountA}{" "}
+                  {type} {Number(dataTransaction?.amountA).toFixed(5)}{" "}
                   {dataTransaction?.tickerA || ""} for{" "}
-                  {formatFullValue(dataTransaction?.amountB || "0")}{" "}
+                  {formatFullValue(Number(dataTransaction?.amountB).toFixed(5) || "0")}{" "}
                   {dataTransaction?.tickerB || ""}
                 </p>
               );
@@ -304,13 +256,13 @@ export const useNotifyTransactions = () => {
           width?: number | undefined,
           height?: number | undefined,
         ) => (
-          <img
-            src={src}
+          <ImageCommon
+            src={src || ''}
             width={width ? width : 18}
             height={height ? height : 18}
             alt={alt}
             className={className}
-          // style={{ marginLeft: "-36px" }}
+            // style={{ marginLeft: "-36px" }}
           />
         );
 
@@ -336,14 +288,14 @@ export const useNotifyTransactions = () => {
               return {
                 iconSrc:
                   type === TRANSACTION_TYPES.ADD ||
-                    type === TRANSACTION_TYPES.REMOVE ||
-                    type === TRANSACTION_TYPES.CREATE
+                  type === TRANSACTION_TYPES.REMOVE ||
+                  type === TRANSACTION_TYPES.CREATE
                     ? [dataTransaction?.logoA, dataTransaction?.logoB]
                     : "/icon/success-icon.svg",
                 message:
                   type !== TRANSACTION_TYPES.ADD &&
-                    type !== TRANSACTION_TYPES.REMOVE &&
-                    type !== TRANSACTION_TYPES.CREATE
+                  type !== TRANSACTION_TYPES.REMOVE &&
+                  type !== TRANSACTION_TYPES.CREATE
                     ? `${type} Successful`
                     : type,
               };
@@ -351,8 +303,8 @@ export const useNotifyTransactions = () => {
               return {
                 iconSrc:
                   type === TRANSACTION_TYPES.ADD ||
-                    type === TRANSACTION_TYPES.REMOVE ||
-                    type === TRANSACTION_TYPES.CREATE
+                  type === TRANSACTION_TYPES.REMOVE ||
+                  type === TRANSACTION_TYPES.CREATE
                     ? [dataTransaction?.logoA, dataTransaction?.logoB]
                     : "/icon/failed-ico.svg",
                 message: `${type} Failed`,
@@ -367,8 +319,8 @@ export const useNotifyTransactions = () => {
         return (
           <>
             {type !== TRANSACTION_TYPES.ADD &&
-              type !== TRANSACTION_TYPES.REMOVE &&
-              type !== TRANSACTION_TYPES.CREATE ? (
+            type !== TRANSACTION_TYPES.REMOVE &&
+            type !== TRANSACTION_TYPES.CREATE ? (
               <div
                 className={`flex flex-col items-start ${stylesWallet["content-toast"]}`}
               >
@@ -512,8 +464,14 @@ export const useNotifyTransactions = () => {
 export const useNotifications = () => {
   const { toast } = useToast();
 
-  return useCallback(({ message, type }: { message: string, type: string }) => {
-    function description({ message = '', type = '' }: { message: string, type: string }) {
+  return useCallback(({ message, type }: { message: string; type: string }) => {
+    function description({
+      message = "",
+      type = "",
+    }: {
+      message: string;
+      type: string;
+    }) {
       return (
         <>
           <div
@@ -522,15 +480,19 @@ export const useNotifications = () => {
             <span className="flex h-[12px] items-center gap-[4px] text-[20px] font-medium text-textBlack">
               <div style={{ marginLeft: "-24px" }}>
                 <img
-                  src={"/icon/failed-ico.svg"}
+                  src={
+                    type === FAUCET_SUCCESS
+                      ? "/icon/success-icon.svg"
+                      : "/icon/failed-ico.svg"
+                  }
                   width={18}
                   height={18}
-                  alt={"dinodex-transaction-fail"}
+                  alt={"dinodex-transaction"}
                   className={stylesWallet["img-toast"]}
-                // style={{ marginLeft: "-36px" }}
+                  // style={{ marginLeft: "-36px" }}
                 />
               </div>
-              {`${type} Failed`}
+              {type === FAUCET_SUCCESS ? "Faucet Success" : "Faucet Failed"}
             </span>
             {message}
             <Image
@@ -543,13 +505,12 @@ export const useNotifications = () => {
             />
           </div>
         </>
-      )
+      );
     }
     toast({
       title: "",
       description: description({ message, type }),
       className: `bg-bgWhiteColor text-textBlack border-none shadow-content rounded-[12px] w-full ${stylesWallet["toast-container"]}`,
-    })
-  }, []
-  );
-}
+    });
+  }, []);
+};

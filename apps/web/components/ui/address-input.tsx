@@ -42,7 +42,7 @@ export function AddressInput({
         </div>
         <div className="mt-2.5">
           <p className="text-[9.202px] font-[500] italic text-textBlack opacity-60">
-            Dinodex only supports Mina's B62 addresses
+            DinoDex only supports Mina's B62 addresses
           </p>
         </div>
       </div>

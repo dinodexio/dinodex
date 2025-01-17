@@ -1,9 +1,9 @@
 "use client";
 import { EMPTY_DATA } from "@/constants";
-import { tokens } from "@/tokens";
 import BigNumber from "bignumber.js";
 import { useMemo } from "react";
-import { Skeleton } from "./skeleton";
+import { formatNumberWithPrice } from "@/lib/utils";
+import { useTokenStore } from "@/lib/stores/token";
 
 export const precision = 9;
 
@@ -13,6 +13,7 @@ export interface BalanceProps {
   type?: "number" | "default"; // Added 'type' parameter to the interface
   loading?: boolean;
   decimals?: number;
+  formatInteger?: boolean;
 }
 
 export function removeTrailingZeroes(balance: string) {
@@ -42,7 +43,9 @@ export function Balance({
   tokenId,
   type = "default",
   decimals = 2,
+  formatInteger,
 }: BalanceProps) {
+  const { data: tokens } = useTokenStore();
   const formattedBalance = useMemo(() => {
     if (!balance) return "~";
 
@@ -53,7 +56,9 @@ export function Balance({
     if (isNaN(Number(result))) {
       return "~";
     }
-    const resultTrimmed = BigNumber(result).toString();
+    const resultTrimmed = formatInteger
+      ? formatNumberWithPrice(BigNumber(result).toNumber(), true, 0, true)
+      : BigNumber(result).toString();
     return <>{resultTrimmed}</>;
   }, [balance, type]);
 

@@ -1,7 +1,7 @@
 "use client";
 import { Toaster } from "@/components/ui/toaster";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "../css/pool.module.css";
 import stylesModal from "../css/modal.module.css";
 import stylesButton from "../css/button.module.css";
@@ -15,7 +15,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ModalListToken } from "../modalListToken/modalListToken";
-import { tokens } from "@/tokens";
 import { Button } from "../ui/button";
 import { Balance, precision, removeTrailingZeroes } from "../ui/balance";
 import { Card, CardContent, CardHeader } from "../ui/card";
@@ -25,12 +24,14 @@ import { PoolPosition } from "./position";
 import { Balances } from "../wallet/wallet";
 import { Footer } from "../footer";
 import dynamic from "next/dynamic";
-import { formatPercentage, truncateString } from "@/lib/utils";
+import { cn, formatPercentage, truncateString } from "@/lib/utils";
 import { EMPTY_DATA } from "@/constants";
 import { useFormContext } from "react-hook-form";
 import { Input } from "../ui/input";
 import { initCheckForm } from "@/containers/async-pool-add-page";
 import useClickOutside from "@/hook/useClickOutside";
+import { ImageCommon } from "../common/ImageCommon";
+import { useTokenStore } from "@/lib/stores/token";
 const Header = dynamic(() => import("@/components/headerv2"), {
   ssr: false,
 });
@@ -61,6 +62,7 @@ export function PoolAdd({
   tokenBBalance,
   onSubmit,
 }: PoolAddProps) {
+  const { data: tokens } = useTokenStore();
   const form = useFormContext();
   const error = Object.values(form.formState.errors)[0]?.message?.toString();
   const fields = form.getValues();
@@ -82,6 +84,13 @@ export function PoolAdd({
   };
   const nameToken = `${typeOpenModal}_token`;
 
+  // const isWrong = (idTokenA: string | number, idTokenB: string | number) => {
+  //   console.log('idTokenA',idTokenA,'idTokenB',idTokenB)
+  //   let arr = [Number(idTokenA), Number(idTokenB)]
+  //   return arr.includes(1) && arr.includes(2)
+
+  // }
+
   const handleSelectToken = (token: any) => {
     form.setValue(nameToken, token?.value);
     form.trigger(nameToken);
@@ -97,7 +106,6 @@ export function PoolAdd({
       typeOpenModal === "tokenB"
         ? token?.ticker
         : tokens[currentTokenB]?.ticker;
-
     // Update the URL with the selected tokens
     window.history.replaceState(null, "", `/add/${tokenA}/${tokenB}`);
   };
@@ -124,15 +132,13 @@ export function PoolAdd({
       : null,
   };
 
-  // console.log('tokenB_amount', form.getValues('tokenB_amount'))
-
   return (
     <>
       <div className="flex w-full flex-col">
         <Toaster />
         <Header />
-        <div className="flex basis-11/12 flex-col 2xl:basis-10/12 px-[16px] pb-[8px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px]">
-          <div className="mx-auto mt-[40px] flex w-full max-w-[1065px] flex-col items-center justify-center gap-[25px] sm:mt-[40px] lg:mt-[100px] xl:mt-[113.74px]">
+        <div className="flex basis-11/12 flex-col px-[16px] pb-[8px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px] 2xl:basis-10/12">
+          <div className="mx-auto mt-[40px] flex w-full max-w-[1065px] flex-col items-center justify-center gap-[25px]">
             <Card
               className={`mx-auto flex w-full max-w-[605px] flex-col gap-[15px] rounded-[24px] border-none bg-bgWhiteColor px-[8px] py-[8px] shadow-popup sm:px-[8px] sm:py-[8px] lg:px-[15px] lg:pb-[20px] lg:pt-[25px] xl:px-[15px] xl:pb-[20px] xl:pt-[25px]`}
             >
@@ -168,9 +174,6 @@ export function PoolAdd({
                   <div
                     className={`${styles["popup-setting"]} ${openSetting ? styles["popup-setting-open"] : ""}`}
                   >
-                    {/* <span className={`text-center text-[20px] font-[500] text-textBlack sm:text-[20px] lg:text-[20px] xl:text-[24px] ${styles["popup-setting-title"]}`}>
-                      Swap setting
-                    </span> */}
                     <div className="flex w-full items-center justify-between">
                       <span
                         className={`text-[18px] font-[400] text-textBlack sm:text-[18px] lg:text-[20px] xl:text-[20px] ${styles["popup-setting-label"]}`}
@@ -343,17 +346,24 @@ export function PoolAdd({
                               form.setValue("tokenA_amount", value);
                             },
                           })}
-                          className="w-[50%] border-none bg-transparent p-0 text-[30px] font-[400] text-textBlack outline-none placeholder:opacity-[0.4] focus-visible:ring-0 focus-visible:ring-offset-0"
+                          className={cn(
+                            "w-[50%] border-none bg-transparent p-0 text-[30px] font-[400] text-textBlack outline-none placeholder:opacity-[0.4] focus-visible:ring-0 focus-visible:ring-offset-0",
+                            styles.inputAddLiquidity,
+                          )}
                           placeholder="0"
                           maxLength={70}
                           inputMode="decimal"
                           type="text"
                         />
                         <DialogTrigger
-                          className={`flex h-[36px] items-center gap-[4px] rounded-[18px] px-[18px]  py-[6px] ${fields?.tokenA_token
-                              ? "bg-[#C5B4E3] hover:bg-[#C5B4E3]"
-                              : "hover:bg-[#EBEBEB]"
-                            }`}
+                          className={cn(
+                            `flex h-[36px] items-center gap-[4px] rounded-[18px] py-[5.471px] pl-[10px] pr-[11px] ${
+                              fields?.tokenA_token
+                                ? "bg-[#C5B4E3] hover:bg-[#C5B4E3]"
+                                : "hover:bg-[#EBEBEB]"
+                            }`,
+                            styles.addLiquidityButton,
+                          )}
                           style={{
                             transition: "all 0.3s ease",
                             boxShadow:
@@ -363,12 +373,12 @@ export function PoolAdd({
                         >
                           {fields.tokenA_token ? (
                             <div className="flex items-center gap-[8px]">
-                              <Image
-                                src={tokens[fields?.tokenA_token]?.logo ?? ""}
+                              <ImageCommon
+                                src={tokens[fields.tokenA_token]?.logo ?? ""}
                                 alt="logo"
                                 width={24}
                                 height={24}
-                                className="h-[18px] w-[18px] sm:h-[18px] sm:w-[18px] lg:h-6 lg:w-6 xl:h-6 xl:w-6"
+                                className="h-[18px] w-[18px] rounded-[50%] sm:h-[18px] sm:w-[18px] lg:h-6 lg:w-6 xl:h-6 xl:w-6"
                               />
                               <span className="text-[14px] font-[400] text-textBlack sm:text-[14px] lg:text-[18px] xl:text-[18px]">
                                 {tokens[fields?.tokenA_token]?.ticker ??
@@ -391,7 +401,11 @@ export function PoolAdd({
                       {fields.tokenA_token && (
                         <div className="flex items-center justify-end gap-[10px]">
                           <span className="text-[14px] font-[400] text-textBlack sm:text-[14px] lg:text-[18px] xl:text-[18px]">
-                            Balance: <Balance balance={tokenABalance ?? "0"} />
+                            Balance:{" "}
+                            <Balance
+                              balance={tokenABalance ?? "0"}
+                              formatInteger={true}
+                            />
                           </span>
                           <div
                             className="flex h-[25px] cursor-pointer items-center justify-center rounded-[6px] border-none px-2 py-1 text-[14px] font-[400] text-textBlack hover:bg-[#EBEBEB] sm:text-[14px] lg:text-[16px] xl:text-[16px]"
@@ -448,17 +462,24 @@ export function PoolAdd({
                               form.setValue("tokenB_amount", value);
                             },
                           })}
-                          className="w-[50%] border-none bg-transparent p-0 text-[30px] font-[400] text-textBlack outline-none placeholder:opacity-[0.4] focus-visible:ring-0 focus-visible:ring-offset-0"
+                          className={cn(
+                            "w-[50%] border-none bg-transparent p-0 text-[30px] font-[400] text-textBlack outline-none placeholder:opacity-[0.4] focus-visible:ring-0 focus-visible:ring-offset-0",
+                            styles.inputAddLiquidity,
+                          )}
                           disabled={poolExists}
                           placeholder="0"
                           maxLength={70}
                           type="text"
                         />
                         <DialogTrigger
-                          className={`flex h-[36px] items-center gap-[4px] rounded-[18px] border-none px-[18px] py-[6px] ${fields.tokenB_token
-                              ? "bg-[#9FE4C9] hover:bg-[#9FE4C9]"
-                              : "hover:bg-[#EBEBEB] "
-                            }`}
+                          className={cn(
+                            `flex h-[36px] items-center gap-[4px] rounded-[18px] border-none py-[5.471px] pl-[10px] pr-[11px] ${
+                              fields.tokenB_token
+                                ? "bg-[#9FE4C9] hover:bg-[#9FE4C9]"
+                                : "hover:bg-[#EBEBEB] "
+                            }`,
+                            styles.addLiquidityButton,
+                          )}
                           style={{
                             transition: "all 0.3s ease",
                             boxShadow:
@@ -468,12 +489,12 @@ export function PoolAdd({
                         >
                           {fields.tokenB_token ? (
                             <div className="flex items-center gap-[8px]">
-                              <Image
+                              <ImageCommon
                                 src={tokens[fields.tokenB_token]?.logo ?? ""}
                                 alt="logo"
                                 width={24}
                                 height={24}
-                                className="h-[18px] w-[18px] sm:h-[18px] sm:w-[18px] lg:h-6 lg:w-6 xl:h-6 xl:w-6"
+                                className="h-[18px] w-[18px] rounded-[50%] sm:h-[18px] sm:w-[18px] lg:h-6 lg:w-6 xl:h-6 xl:w-6"
                               />
                               <span className="text-[14px] font-[400] text-textBlack sm:text-[14px] lg:text-[18px] xl:text-[18px]">
                                 {tokens[fields.tokenB_token]?.ticker}
@@ -495,7 +516,11 @@ export function PoolAdd({
                       {fields.tokenB_token && (
                         <div className="flex items-center justify-end gap-[10px]">
                           <span className="text-[14px] font-[400] text-textBlack sm:text-[14px] lg:text-[18px] xl:text-[18px]">
-                            Balance: <Balance balance={tokenBBalance ?? "0"} />
+                            Balance:{" "}
+                            <Balance
+                              balance={tokenBBalance ?? "0"}
+                              formatInteger={true}
+                            />
                           </span>
                           {!poolExists && (
                             <div
@@ -519,16 +544,16 @@ export function PoolAdd({
                           Prices and pool share
                         </span>
                         <div className="flex w-full items-center justify-between rounded-[12px] px-[20px] py-[20px] shadow-content sm:px-[20px] lg:px-[20px] xl:px-[20px]">
-                          <div className="flex w-[33%] max-w-[180px] flex-col items-center gap-[10px]">
-                            <span className="text-[15px] font-[500] text-textBlack sm:text-[15px] lg:text-[18px] xl:text-[18px]">
+                          <div className="flex  max-w-[180px] flex-col items-center gap-[10px]">
+                            <span className="text-[12px] font-[500] text-textBlack sm:text-[15px] lg:text-[18px] xl:text-[18px]">
                               {isFinite(parseFloat(valuePer?.perB ?? ""))
-                                ? new Intl.NumberFormat('en-US', {
-                                  minimumFractionDigits: 0,
-                                  maximumFractionDigits: 3,
-                                }).format(Number(valuePer?.perB))
+                                ? new Intl.NumberFormat("en-US", {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 3,
+                                  }).format(Number(valuePer?.perB))
                                 : "~"}
                             </span>
-                            <span className="text-[15px] font-[600] text-textBlack opacity-[0.6] sm:text-[15px] lg:text-[18px] xl:text-[18px]">
+                            <span className="text-[12px] font-[600] text-textBlack opacity-[0.6] sm:text-[15px]  lg:text-[18px] xl:text-[18px]">
                               {tokens[fields?.tokenB_token]?.ticker ||
                                 EMPTY_DATA}{" "}
                               per{" "}
@@ -536,16 +561,16 @@ export function PoolAdd({
                                 EMPTY_DATA}
                             </span>
                           </div>
-                          <div className="flex w-[33%] max-w-[180px] flex-col items-center gap-[10px]">
-                            <span className="text-[15px] font-[500] text-textBlack sm:text-[15px] lg:text-[18px] xl:text-[18px]">
+                          <div className="flex  max-w-[180px] flex-col items-center gap-[10px]">
+                            <span className="text-[12px] font-[500] text-textBlack sm:text-[15px] lg:text-[18px] xl:text-[18px]">
                               {isFinite(parseFloat(valuePer?.perA ?? ""))
-                                ? new Intl.NumberFormat('en-US', {
-                                  minimumFractionDigits: 0,
-                                  maximumFractionDigits: 3,
-                                }).format(Number(valuePer?.perA))
+                                ? new Intl.NumberFormat("en-US", {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 3,
+                                  }).format(Number(valuePer?.perA))
                                 : "~"}
                             </span>
-                            <span className="text-[15px] font-[600] text-textBlack opacity-[0.6] sm:text-[15px] lg:text-[18px] xl:text-[18px]">
+                            <span className="text-[12px] font-[600] text-textBlack opacity-[0.6] sm:text-[15px] lg:text-[18px] xl:text-[18px]">
                               {tokens[fields?.tokenA_token]?.ticker ||
                                 EMPTY_DATA}{" "}
                               per{" "}
@@ -553,13 +578,13 @@ export function PoolAdd({
                                 EMPTY_DATA}
                             </span>
                           </div>
-                          <div className="flex w-[33%] max-w-[180px] flex-col items-center gap-[10px]">
-                            <span className="text-[15px] font-[500] text-textBlack sm:text-[15px] lg:text-[18px] xl:text-[18px]">
+                          <div className="flex  max-w-[180px] flex-col items-center gap-[10px]">
+                            <span className="text-[12px] font-[500] text-textBlack sm:text-[15px] lg:text-[18px] xl:text-[18px]">
                               {formatPercentage(fields.shareOfPool ?? "") ??
                                 "~"}
                               %
                             </span>
-                            <span className="text-[15px] font-[600] text-textBlack opacity-[0.6] sm:text-[15px] lg:text-[18px] xl:text-[18px]">
+                            <span className="text-[12px] font-[600] text-textBlack opacity-[0.6] sm:text-[15px] lg:text-[18px] xl:text-[18px]">
                               Share of pool
                             </span>
                           </div>
@@ -597,9 +622,9 @@ export function PoolAdd({
                       loading={loading}
                       disabled={!form.formState.isValid}
                       className={`${stylesButton["button-swap"]} ${stylesButton["btn-approve-new"]}  ${stylesButton["btn-preview"]}`}
-                    // onClick={(event) => {
-                    //   event.preventDefault();
-                    // }}
+                      // onClick={(event) => {
+                      //   event.preventDefault();
+                      // }}
                     >
                       <span>
                         {error ??

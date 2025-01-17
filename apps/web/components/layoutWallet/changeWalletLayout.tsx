@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { use, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import styles from "../css/wallet.module.css";
 import stylesButton from "../css/button.module.css";
 import { useWalletStore } from "@/lib/stores/wallet";
@@ -76,7 +76,7 @@ export function ChangeWalletLayout({
     [wallet, result],
   );
   const listAddresss = useMemo(
-    () => [dataWallet, ...LIST_DUMMY_WALLET],
+    () => [dataWallet],
     [dataWallet],
   );
 
@@ -89,7 +89,7 @@ export function ChangeWalletLayout({
   return (
     <div
       className={`absolute top-[50%] flex w-[95%] max-w-[310px] 
-            translate-y-[-50%] flex-col gap-[12px] rounded-[20px] bg-bgWhiteColor p-3 shadow-popup`}
+            translate-y-[-50%] flex-col rounded-[20px] bg-bgWhiteColor p-3 shadow-popup`}
       style={{ zIndex: 102 }}
     >
       <div className="flex items-center justify-between px-[6px] py-[7px]">

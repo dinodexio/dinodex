@@ -1,16 +1,18 @@
 import { convertSmallNumberToPercent, formatNumber } from "@/lib/utils";
 import { Table } from "../table/table";
-import Image from "next/image";
 import styles from "../css/table.module.css";
 import { Balances } from "../pool/v2/list-pool";
-import { EMPTY_DATA } from "@/constants";
+import { BASE_TOKEN, EMPTY_DATA } from "@/constants";
 import React, { useEffect, useMemo } from "react";
-import { useAggregatorStore, usePollPools } from "@/lib/stores/aggregator";
+import { useAggregatorStore } from "@/lib/stores/aggregator";
 import BigNumber from "bignumber.js";
 // import { removePrecision } from "@/lib/utils";
 // import { precision } from "../ui/balance";
 import { useRouter } from "next/navigation";
 import { DataPoolsPanel } from "@/types";
+import { ImageCommon } from "../common/ImageCommon";
+import { useTokenStore } from "@/lib/stores/token";
+import { precision } from "../ui/balance";
 
 export interface PoolPanelProps {
   balances?: Balances;
@@ -43,10 +45,10 @@ function formatNumberPrecisionVol(
 
   // Format output based on isPrice and threshold comparison
   if (isLessThanThreshold) {
-    return isPrice ? "<$0.01" : "<0.01";
+    return isPrice ? `<0.01 ${BASE_TOKEN}` : "<0.01";
   }
 
-  return isPrice ? `$${priceResult}` : priceResult;
+  return isPrice ? `${priceResult} ${BASE_TOKEN}` : priceResult;
 }
 
 let columTablePool = [
@@ -63,14 +65,14 @@ let columTablePool = [
     id: 2,
     title: "Pool",
     key: "token-name",
-    width: 230,
+    width: 210,
     render: (data: DataPoolsPanel) => {
       return (
         <div className={styles["token-info"]}>
           <div className={styles["token-info-logo"]}>
             <div className="relative h-6 w-6 overflow-hidden">
-              <Image
-                className="absolute left-1/2"
+              <ImageCommon
+                className="absolute left-1/2 rounded-full"
                 src={data?.tokenselected?.first?.logo}
                 alt={data?.tokenselected?.first?.name}
                 width={24}
@@ -78,8 +80,8 @@ let columTablePool = [
               />
             </div>
             <div className="relative h-6 w-6 overflow-hidden">
-              <Image
-                className="absolute right-1/2"
+              <ImageCommon
+                className="absolute right-1/2 rounded-full"
                 src={data?.tokenselected?.second?.logo}
                 alt={data?.tokenselected?.second?.name}
                 width={24}
@@ -101,7 +103,7 @@ let columTablePool = [
     id: 3,
     title: "TVL",
     key: "tvl",
-    width: 163,
+    width: 183,
     render: (data: DataPoolsPanel) => {
       return (
         <span className={styles["price-text"]}>
@@ -165,16 +167,37 @@ let columTablePool = [
 ];
 
 const PoolPanelComponent = ({ balances, valueSearch }: PoolPanelProps) => {
+  const { data: tokens } = useTokenStore();
   const router = useRouter();
-  const { pools: poolBalances = [], loading, loadPools } = useAggregatorStore();
-
-  // usePollPools();
+  const { pools: poolBalances = [], loading, loadPools, tokens: tokenPrice, loadTokens } = useAggregatorStore();
 
   const filterDataPool = useMemo(() => {
-    if (!valueSearch) return poolBalances;
+    if (!poolBalances) return [];
+
+    // Map data to include `tokenselected`
+    const dataPools = poolBalances.map((pool: any) => {
+      let tokenAPrice = tokenPrice[pool.tokenAId]?.price || 0;
+      let tokenBPrice = tokenPrice[pool.tokeBId]?.price || 0;
+      return {
+        ...pool,
+        tokenselected: {
+          first: tokens?.[pool.tokenAId],
+          second: tokens?.[pool.tokenBId],
+        },
+        tvl: BigNumber(pool.tokenAAmount || 0)
+          .times(tokenAPrice)
+          .plus(BigNumber(pool.tokenBAmount || 0).times(tokenBPrice))
+          .div(10 ** precision)
+          .toNumber()
+      }
+    });
+
+    if (!valueSearch) return dataPools;
 
     const lowerValueSearch = valueSearch.toLowerCase();
-    return poolBalances.filter((item: any) => {
+
+    // Filter by valueSearch
+    return dataPools.filter((item: any) => {
       const tokenFirstSymbol =
         item?.tokenselected?.first?.ticker?.toLowerCase();
       const tokenSecondSymbol =
@@ -184,11 +207,14 @@ const PoolPanelComponent = ({ balances, valueSearch }: PoolPanelProps) => {
         tokenSecondSymbol?.includes(lowerValueSearch)
       );
     });
-  }, [poolBalances, valueSearch]);
+  }, [JSON.stringify(poolBalances), valueSearch, JSON.stringify(tokens), JSON.stringify(tokenPrice)]);
 
   useEffect(() => {
-    loadPools()
-  },[])
+    loadPools();
+    if (!tokenPrice || tokenPrice.length === 0) loadTokens();
+  }, []);
+
+
   return (
     <>
       <Table
@@ -196,6 +222,7 @@ const PoolPanelComponent = ({ balances, valueSearch }: PoolPanelProps) => {
         column={columTablePool}
         onClickTr={(dataPool) => {
           router.push(`/info/pools/${dataPool.poolKey}`);
+          router.prefetch(`/info/pools/${dataPool.poolKey}`);
         }}
         loading={loading}
       />

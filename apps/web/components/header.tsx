@@ -11,7 +11,6 @@ import stylesHeader from "./css/header.module.css";
 // import { Wallet } from "./wallet/wallet";
 // import { useBalancesStore, useObserveBalances } from "@/lib/stores/balances";
 // import { useChainStore, usePollBlockHeight } from "@/lib/stores/chain";
-// import { tokens } from "@/tokens";
 // import { useClientStore } from "@/lib/stores/client";
 export default function Header({ type }: { type?: string }) {
   // const {

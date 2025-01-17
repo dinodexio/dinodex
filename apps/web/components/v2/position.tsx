@@ -1,7 +1,5 @@
 "use client";
-import Image from "next/image";
 import styles from "../css/pool.module.css";
-import { tokens } from "@/tokens";
 import { useObservePooled } from "@/lib/stores/balances";
 import { LPTokenId, TokenPair } from "chain";
 import { TokenId } from "@proto-kit/library";
@@ -9,6 +7,8 @@ import { Balances } from "../wallet/wallet";
 import { Balance } from "../ui/balance";
 import { useFormContext } from "react-hook-form";
 import { validateValue } from "@/lib/utils";
+import { ImageCommon } from "../common/ImageCommon";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface PoolPositionProps {
   dataPool?: any;
@@ -23,6 +23,7 @@ export function PoolPosition({
   tokenParams,
   balances,
 }: PoolPositionProps) {
+  const { data: tokens } = useTokenStore();
   const form = useFormContext();
   const fields = form?.getValues();
   // Extract token data
@@ -64,7 +65,7 @@ export function PoolPosition({
 
   return (
     <div
-      className={`flex w-full max-w-[605px] flex-col items-start justify-center gap-[10px] rounded-[12px] border-none shadow-content px-[25px] py-[15px] sm:gap-[10px] lg:gap-[12px] xl:gap-[12px] ${styles["pool-container"]}`}
+      className={`flex w-full max-w-[605px] flex-col items-start justify-center gap-[10px] rounded-[12px] border-none px-[25px] py-[15px] shadow-content sm:gap-[10px] lg:gap-[12px] xl:gap-[12px] ${styles["pool-container"]}`}
     >
       <span className="text-[18px] font-[600] text-textBlack sm:text-[18px] lg:text-[22px] xl:text-[22px]">
         Your position
@@ -72,19 +73,19 @@ export function PoolPosition({
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center gap-[6px]">
           <div className="flex items-center">
-            <Image
+            <ImageCommon 
               src={tokens[firstTokenValue]?.logo || ""}
               width={28}
               height={28}
               alt={firstTokenLabel}
-              className="h-5 w-5 sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
+              className="h-5 w-5 rounded-[50%] sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
             />
-            <Image
+            <ImageCommon 
               src={tokens[secondTokenValue]?.logo || ""}
               width={28}
               height={28}
               alt={secondTokenLabel}
-              className="h-5 w-5 sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
+              className="h-5 w-5 rounded-[50%] sm:h-5 sm:w-5 lg:h-[28px] lg:w-[28px] xl:h-[28px] xl:w-[28px]"
               style={{ marginLeft: "-11px" }}
             />
           </div>
@@ -109,7 +110,7 @@ export function PoolPosition({
           {firstTokenLabel}:
         </span>
         <span className="text-[14px] font-[500] text-textBlack sm:text-[14px] lg:text-[18px] xl:text-[18px]">
-        <Balance balance={(dataPooled?.first ?? "0").toString()} />
+          <Balance balance={(dataPooled?.first ?? "0").toString()} />
         </span>
       </div>
       <div className="flex w-full items-center justify-between">

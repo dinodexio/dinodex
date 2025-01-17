@@ -15,7 +15,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ModalListToken } from "../modalListToken/modalListToken";
-import { tokens } from "@/tokens";
 import { Button } from "../ui/button";
 import {
   useAddLiquidity,
@@ -48,6 +47,7 @@ import dynamic from "next/dynamic";
 import { formatPercentage } from "@/lib/utils";
 import { EMPTY_DATA } from "@/constants";
 import { dataSubmitProps } from "@/types";
+import { useTokenStore } from "@/lib/stores/token";
 const Header = dynamic(() => import("@/components/headerv2"), {
   ssr: false,
 });
@@ -78,6 +78,7 @@ const initDataPoolCreate = {
 };
 
 export function PoolAdd({ tokenParams, balances }: PoolAddProps) {
+  const { data: tokens } = useTokenStore();
   const [loading, setLoading] = useState(false);
   const { wallet } = useWalletStore();
   const createPool = useCreatePool();
@@ -527,7 +528,7 @@ export function PoolAdd({ tokenParams, balances }: PoolAddProps) {
                         >
                           {dataPoolCreate.tokenPool?.first ? (
                             <div className="flex items-center gap-[8px]">
-                              <Image
+                              <img
                                 src={
                                   tokens[dataPoolCreate.tokenPool.first.value]
                                     ?.logo ?? ""
@@ -603,7 +604,7 @@ export function PoolAdd({ tokenParams, balances }: PoolAddProps) {
                         >
                           {dataPoolCreate.tokenPool?.second ? (
                             <div className="flex items-center gap-[8px]">
-                              <Image
+                              <img
                                 src={
                                   tokens[dataPoolCreate.tokenPool.second.value]
                                     ?.logo ?? ""

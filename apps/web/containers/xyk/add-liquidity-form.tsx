@@ -8,7 +8,6 @@ import {
   useAddLiquidity,
   useCreatePool,
   useObservePool,
-  usePool,
 } from "@/lib/stores/xyk";
 import BigNumber from "bignumber.js";
 import { LPTokenId, PoolKey, TokenPair } from "chain";
@@ -23,7 +22,7 @@ import { useWalletStore } from "@/lib/stores/wallet";
 import { usePoolKey } from "@/lib/xyk/usePoolKey";
 import { useSpotPrice } from "@/lib/xyk/useSpotPrice";
 import { dataSubmitProps } from "@/types";
-import { tokens } from "@/tokens";
+import { useTokenStore } from "@/lib/stores/token";
 
 export function addPrecision(value: string) {
   // return new BigNumber(value).times(10 ** precision).toFixed(0);
@@ -44,6 +43,7 @@ export function removePrecision(value: string, decimalPlaces: number = 5) {
 }
 
 export function AddLiquidityForm() {
+  const { data: tokens } = useTokenStore();
   const [loading, setLoading] = useState(false);
   const createPool = useCreatePool();
   const addLiquidity = useAddLiquidity();

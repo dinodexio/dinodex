@@ -1,12 +1,11 @@
-import Image from "next/image";
 import React from "react";
-import { Dialog, DialogClose } from "@/components/ui/dialog";
+import { DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { tokens } from "@/tokens";
 import stylesButton from "../../css/button.module.css";
 import { precision } from "@/components/ui/balance";
 import BigNumber from "bignumber.js";
 import { formatBigNumber } from "@/lib/utils";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface layoutConfirmProps {
   onClickConFirm: () => void;
@@ -23,6 +22,7 @@ export function LayoutConfirm({
   valueTokenPool,
   handleClosePool,
 }: layoutConfirmProps) {
+  const { data: tokens } = useTokenStore();
   const firstTokenValue = tokenParams?.tokenA?.value || 0;
   const secondTokenValue = tokenParams?.tokenB?.value || 0;
   const firstTokenLabel = tokenParams?.tokenA?.label || "";
@@ -68,7 +68,7 @@ export function LayoutConfirm({
                 )}
               </span>
               <div className="flex items-center gap-[10px]">
-                <Image
+                <img
                   src={tokens[firstTokenValue]?.logo || ""}
                   width={28}
                   height={28}
@@ -94,7 +94,7 @@ export function LayoutConfirm({
                 )}
               </span>
               <div className="flex items-center gap-[10px]">
-                <Image
+                <img
                   src={tokens[secondTokenValue]?.logo || ""}
                   width={28}
                   height={28}

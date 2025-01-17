@@ -327,7 +327,7 @@ class BarsChart {
     this.marginBottomChart = marginBottomChart;
     this.marginRightChart = marginRightChart;
     this.marginTopChart = marginTopChart;
-    this.data = data;
+    this.data = data.reverse();
     this.color = color;
     this.axis = axis;
     const columns = this.initColumn();
@@ -372,6 +372,9 @@ class BarsChart {
   }
 
   initColumn() {
+    const columnWidth = 30; // Width of each column
+    const columnSpacing = 10; // Space between columns
+
     this.positionX = d3
       .scaleBand()
       .domain(this.data.map((d) => d.letter))
@@ -386,13 +389,29 @@ class BarsChart {
         this.canvas.height - this.marginBottomChart - this.marginTopChart,
       ]);
 
-    return this.data.map((d) => ({
+    const columns = this.data.map((d) => ({
       label: d.letter,
-      x: this.positionX(d.letter),
       y: this.canvas.height - this.positionY(d.value) - this.marginBottomChart,
-      width: this.positionX.bandwidth(),
+      width: this.data.length < 10 ? columnWidth : this.positionX.bandwidth(),
       height: this.positionY(d.value) - this.positionY(0),
     }));
+
+    // Center columns if there are less than 10
+    if (this.data.length < 10) {
+      const totalWidth = columns.length * columnWidth; // Width of each column
+      const totalPadding = (columns.length - 1) * columnSpacing; // Total padding between columns
+      const startX = (this.canvas.width - totalWidth - totalPadding) / 2; // Calculate starting x position to center
+
+      columns.forEach((col, index) => {
+        col.x = startX + index * (columnWidth + columnSpacing); // Update x position with spacing
+      });
+    } else {
+      columns.forEach((col, index) => {
+        col.x = this.positionX(d.letter); // Use the original position for 10 or more columns
+      });
+    }
+
+    return columns;
   }
 
   draw() {
@@ -941,6 +960,15 @@ class SingleAreaChart {
 
     this.initScales();
     this.draw();
+    this.popup = document.createElement('div');
+    this.popup.style.position = 'absolute';
+    this.popup.style.backgroundColor = '#383d45';
+    this.popup.style.color="white"
+    this.popup.style.fontSize = 12
+    this.popup.style.borderRadius="5px"
+    this.popup.style.padding = '5px';
+    this.popup.style.display = 'none';
+    document.body.appendChild(this.popup);
   }
 
   setupEventListeners() {
@@ -971,6 +999,12 @@ class SingleAreaChart {
 
     this.onHover(x + this.margin.left, this.hoverData);
     this.draw();
+    this.popup.innerHTML = `${d3.timeFormat("%d/%m/%y %H:%M")(d.date)}`;
+    this.popup.style.left = `${event.clientX + 10}px`;
+    this.popup.style.position = 'absolute'
+    this.popup.style.bottom = `${this.canvas.height - 90}px`; // Set to bottom of the chart
+    this.popup.style.display = 'block';
+    this.popup.style.zIndex = 100;
   }
 
   handleMouseOut() {
@@ -978,6 +1012,7 @@ class SingleAreaChart {
     this.hoverData = null;
     this.canvas.style.cursor = "default";
     this.draw();
+    this.popup.style.display = 'none';
   }
 
   drawHoverEffects() {

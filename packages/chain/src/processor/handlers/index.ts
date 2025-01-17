@@ -8,6 +8,10 @@ import {
   handleXYKRemoveLiquidity,
   handleXYKSwap
 } from "./transactions/xyk";
+import {
+  handleFaucetDripBundleTo,
+  handleFaucetDripSignedTo
+} from "./transactions/faucet";
 
 const handleTransactions: BlockHandler<PrismaClient> = async (
   client,
@@ -55,7 +59,16 @@ const handleTransactions: BlockHandler<PrismaClient> = async (
             await handleXYKSwap(client, block, tx);
             break;
         }
-
+        break;
+      case "Faucet":
+        switch (methodName) {
+          case "dripSignedTo":
+            await handleFaucetDripSignedTo(client, block, tx);
+            break;
+          case "dripBundleTo":
+            await handleFaucetDripBundleTo(client, block, tx);
+            break;
+        }
         break;
     }
   }

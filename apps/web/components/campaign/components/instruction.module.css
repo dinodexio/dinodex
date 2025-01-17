@@ -223,6 +223,20 @@
     background-color: var(--or-2-color);
 }
 
+.btn-quest-campaign-checking,.btn-quest-campaign-checking:hover{
+    background-color: var(--or-2-color);
+}
+
+.btn-quest-campaign-success,.btn-quest-campaign-success:hover{
+    background: #FF603B;
+    color: #FFF;
+}
+
+.btn-quest-campaign-fail,.btn-quest-campaign-fail:hover{
+    background: #FF603B;
+    color: #5C1100;
+    font-size: 14px;
+}
 .lock-quest-campaign .content-quest {
     flex: 1;
 }
@@ -244,6 +258,15 @@
 
 .index-quest-campaign {
     z-index: 10;
+}
+
+.checking-quest{
+    animation: loading 1s infinite linear;
+}
+
+@keyframes loading {
+    0% {    transform: rotate(0deg); }
+    100% {  transform: rotate(360deg); }
 }
 
 @media screen and (max-width: 1435px) {

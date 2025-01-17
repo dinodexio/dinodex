@@ -1,13 +1,14 @@
 import Image from "next/image";
 import React from "react";
-import { Dialog, DialogClose } from "@/components/ui/dialog";
+import { DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import styles from "../../css/pool.module.css";
 import stylesButton from "../../css/button.module.css";
-import { tokens } from "@/tokens";
 import { precision } from "@/components/ui/balance";
 import BigNumber from "bignumber.js";
 import { formatBigNumber } from "@/lib/utils";
+import { ImageCommon } from "@/components/common/ImageCommon";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface layoutWaitingAndSuccessProps {
   statusLayout: any;
@@ -35,6 +36,7 @@ export function LayoutWaitingAndSuccess({
   tokenInAmount,
   tokenOutAmount,
 }: layoutWaitingAndSuccessProps) {
+  const { data: tokens } = useTokenStore();
   const tokenA_amount =
     type === "remove"
       ? formatBigNumber(
@@ -87,7 +89,7 @@ export function LayoutWaitingAndSuccess({
             >
               <div className={styles["token-pool-logo"]}>
                 <div className={styles["token-pool-logo-item-first"]}>
-                  <Image
+                  <ImageCommon
                     src={(tokens[tokenIn_token ?? ""]?.logo as string) || ""}
                     width={76}
                     height={76}
@@ -96,7 +98,7 @@ export function LayoutWaitingAndSuccess({
                   />
                 </div>
                 <div className={styles["token-pool-logo-item-second"]}>
-                  <Image
+                  <ImageCommon
                     src={(tokens[tokenOut_token ?? ""]?.logo as string) || ""}
                     width={76}
                     height={76}

@@ -3,12 +3,19 @@ import styles from './css/home.module.css'
 import stylesButton from './css/button.module.css'
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { GetServerSideProps } from 'next';
 
 export interface HomeProps {
 }
 
 export function Home({ }: HomeProps) {
-  // const router = useRouter();
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/swap');
+  }, [router]);
   return (
     <>
       <div className={styles["home-a"]} >

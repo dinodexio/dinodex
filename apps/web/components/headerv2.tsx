@@ -1,7 +1,7 @@
 "use client";
 import styleHeader from "./css/headerV2.module.css";
-import { useEffect, useState, } from "react";
-import { usePathname } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import useClickOutside from "@/hook/useClickOutside";
 import { useNotifyTransactions, useWalletStore } from "@/lib/stores/wallet";
@@ -12,12 +12,13 @@ import { Wallet } from "./wallet/wallet";
 import { cn, truncateAddress } from "@/lib/utils";
 import Image from "next/image";
 import { useToast } from "./ui/use-toast";
+import { usePoolTokens } from "@/lib/stores/token";
 
 const listNav = [
-  {
-    label: "Home",
-    link: "/",
-  },
+  // {
+  //   label: "Home",
+  //   link: "/",
+  // },
   {
     label: "Trade",
     link: "/swap",
@@ -36,6 +37,8 @@ const listNav = [
   },
 ];
 export default function HeaderV2({ type }: { type?: string }) {
+  const pathName = usePathname();
+  const { isLoadBalances, setLoadBalances } = useBalancesStore();
   const [isShowMenu, setIsShowMenu] = useState(false);
   const refNetWork = useClickOutside<HTMLDivElement>(() => {
     setIsShowMenu(false);
@@ -54,15 +57,39 @@ export default function HeaderV2({ type }: { type?: string }) {
     loading: balancesLoading,
     clearBalances,
   } = useBalancesStore();
-
-  usePollBlockHeight();
+  const name = pathName.startsWith("/") ? pathName.slice(1) : pathName;
+  usePoolTokens();
   const { block } = useChainStore();
   useNotifyTransactions();
+
+  usePollBlockHeight(
+    name !== "campaign" &&
+      // !name.includes("info/tokens") &&
+      !name.includes("info/pools") &&
+      !name.includes("info/transactions") &&
+      name !== "pool" &&
+      isLoadBalances,
+  );
+  useObserveBalances(
+    wallet,
+    name,
+    name !== "campaign" &&
+      // !name.includes("info/tokens") &&
+      !name.includes("info/pools") &&
+      !name.includes("info/transactions") &&
+      name !== "pool" &&
+      isLoadBalances,
+  );
 
   useEffect(() => {
     wallet && clearBalances(wallet);
   }, [wallet]);
-  useObserveBalances(wallet, type);
+
+  useEffect(() => {
+    if (name.includes("add") || name.includes("remove")) {
+      setLoadBalances(true);
+    }
+  }, [name]);
 
   useEffect(() => {
     !client && start();
@@ -70,9 +97,21 @@ export default function HeaderV2({ type }: { type?: string }) {
       observeWalletChange();
       initializeWallet();
     } catch (error: any) {
-      console.log(error?.message || '')
+      console.log(error?.message || "");
     }
+  }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 655) {
+        setIsShowMenu(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const ownBalances = wallet ? balances[wallet] : {};
@@ -80,8 +119,7 @@ export default function HeaderV2({ type }: { type?: string }) {
   const loading =
     balancesLoading && !!(wallet && balances[wallet]?.["0"] === undefined);
 
-  const pathName = usePathname()
-  const {toast} = useToast()
+  const { toast } = useToast();
 
   return (
     <>
@@ -89,48 +127,62 @@ export default function HeaderV2({ type }: { type?: string }) {
         <div className={styleHeader["contentLeftNavbar"]}>
           <div className={styleHeader["containerTitleNavbar"]}>
             <div className={styleHeader["boxTitleNavbar"]}>
-              <img src="/images/navbar_footer/dino_image.svg" alt="DinoDEX" />
+              <img src="/images/navbar_footer/dino_image.svg" alt="DinoDex" />
               <Link
                 href="/"
                 className={styleHeader["titleNavbar"]}
                 style={{ fontFamily: "PPMondwest" }}
               >
-                DinoDEX
+                DinoDex
               </Link>
             </div>
-            <img
-              id="btnMenu"
-              className={styleHeader["iconDropDownHeader"]}
-              src="/images/navbar_footer/icon_drop_down.svg"
-              alt="icon drop down"
-              onClick={() => setIsShowMenu(true)}
-            />
-          </div>
-          <div
-            id="popupMenu"
-            className={`${styleHeader["containerMenuNav_mobile"]} ${isShowMenu ? styleHeader["showMenu"] : ""}`}
-            ref={refNetWork}
-          >
-            <div className={styleHeader["boxMenuNav_mobile"]}>
-              {listNav.map((item, index) => (
-                <Link
-                  href={item.link}
-                  key={index}
-                  className={styleHeader["tabNavbar"]}
-                  prefetch
-                >
-                  {item.label}
-                </Link>
-              ))}
+
+            <div ref={refNetWork}>
+              <div
+                id="btnMenu"
+                className={styleHeader["iconDropDownHeader"]}
+                onClick={() => setIsShowMenu(!isShowMenu)}
+                style={{ padding: "10px 20px 10px 12px", cursor: "pointer" }}
+              >
+                <img
+                  src="/images/navbar_footer/icon_drop_down.svg"
+                  alt="icon drop down"
+                />
+              </div>
+
+              <div
+                id="popupMenu"
+                className={`${styleHeader["containerMenuNav_mobile"]} ${isShowMenu ? styleHeader["showMenu"] : ""}`}
+                ref={refNetWork}
+              >
+                <div className={styleHeader["boxMenuNav_mobile"]}>
+                  {listNav.map((item, index) => (
+                    <Link
+                      href={item.link}
+                      key={index}
+                      className={styleHeader["tabNavbar"]}
+                      prefetch
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
+
           <div className={styleHeader["boxMenuNav"]}>
             {listNav.map((item, index) => (
               <Link
                 href={item.link}
                 key={index}
-                className={cn(styleHeader["tabNavbar"],
-                  pathName === item.link || item.label==='Info' && pathName.includes(`/info`)  ? styleHeader["tabNavbarActive"] : "")}
+                className={cn(
+                  styleHeader["tabNavbar"],
+                  pathName === item.link ||
+                    (item.label === "Info" && pathName.includes(`/info`))
+                    ? styleHeader["tabNavbarActive"]
+                    : "",
+                )}
               >
                 {item.label}
               </Link>
@@ -142,16 +194,20 @@ export default function HeaderV2({ type }: { type?: string }) {
             wallet ? styleHeader["btnWalletAcount"] : styleHeader["btnConnect"]
           }
           onClick={async () =>
-            !wallet ? await connectWallet().catch((error) => {
-              if(error?.message === "Auro wallet not installed"){
-                toast({
-                  title: "Auro wallet not installed",
-                  description: "Please install auro wallet to use this feature",
-                  variant: "destructive",
-                  className: "text-textBlack bg-white box-shadow border-0 p-4",
+            !wallet
+              ? await connectWallet().catch((error) => {
+                  if (error?.message === "Auro wallet not installed") {
+                    toast({
+                      title: "Auro wallet not installed",
+                      description:
+                        "Please install auro wallet to use this feature",
+                      variant: "destructive",
+                      className:
+                        "text-textBlack bg-white box-shadow border-0 p-4",
+                    });
+                  }
                 })
-              }
-            }) : setIsWalletOpen(true)
+              : setIsWalletOpen(true)
           }
         >
           <span className={styleHeader["textBtnConnect"]}>
@@ -164,7 +220,14 @@ export default function HeaderV2({ type }: { type?: string }) {
                     height={29}
                     alt=""
                   />
-                  <span className="text-black text-[19px]">{truncateAddress(wallet)}</span>
+                  <span
+                    className={cn(
+                      "text-[19px] text-black",
+                      styleHeader.addressText,
+                    )}
+                  >
+                    {truncateAddress(wallet)}
+                  </span>
                 </div>
 
                 <svg

@@ -1,4 +1,4 @@
-.table-container {
+/* .table-container {
     width:min(100%, 1150px);
     overflow-x: scroll;
     margin-bottom: 20px;
@@ -6,8 +6,18 @@
     max-height: 393px;
     box-shadow: 0px 2px 4px 0px var(--shadow-popup-color);
     border-radius: 12px;
-}
+} */
 
+.table-container {
+    width: min(100%, 1150px);
+    overflow-x: scroll;
+    margin-bottom: 20px;
+    background-color: #FFF;
+    box-shadow: 0px 2px 4px 0px var(--shadow-popup-color);
+    border-radius: 12px;
+  }
+
+  
 .table-layout{
     width: min(100%,734px)
 }
@@ -87,7 +97,7 @@
     height: 56px;
     color: var(--black-text-color);
     text-align: center;
-    font-size: 20px;
+    font-size: 18px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -161,12 +171,11 @@
     gap: 4px;
 }
 
-.token-name-text {
-    text-transform: capitalize;
+.token-info > span {
+    white-space: nowrap;
 }
 
 .token-symbol-text {
-    text-transform: uppercase;
     font-weight: 500;
     opacity: 0.5;
 }
@@ -354,7 +363,7 @@
 .text-header-wallet,
 .text-header-token-amount,.table-td-token-amount{
     text-align: end;
-    padding-right: 43px;
+    padding-right: 30px;
 }
 
 .table-td-wallet,.text-header-wallet{

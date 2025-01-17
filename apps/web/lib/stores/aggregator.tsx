@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { Token, tokens } from "@/tokens";
+import { Token } from "@/tokens";
 import { generatePriceData, removePrecision } from "../utils";
 import { ComputedTransactionJSON, LeaderboardData } from "@/types";
 import BigNumber from "bignumber.js";
 import { precision } from "@/components/ui/balance";
+import { set } from "lodash";
 
 export interface ComputedPoolTransactionJSON {
   hash?: string | number;
@@ -98,6 +99,7 @@ export interface ComputedTokenJSON {
   id?: string | number;
   ticker?: string | number;
   name?: string;
+  logo?: string;
   price?: { usd?: string };
   volume?: { usd?: string };
   tvl?: { usd?: string };
@@ -164,8 +166,8 @@ export interface PoolsInfoJSON {
   type: string;
 
   //before update
-  tokenAPrice?: string | number
-  tokenBPrice?: string | number
+  tokenAPrice?: string | number;
+  tokenBPrice?: string | number;
   tvl?: string | number;
   apr?: string | number;
   volume_1d?: string | number;
@@ -266,7 +268,8 @@ export const useAggregatorStore = create<
           }),
         },
       );
-      const data: { data: { balances: BalanceDataJSON[] } } = await response.json();
+      const data: { data: { balances: BalanceDataJSON[] } } =
+        await response.json();
       set((state) => {
         state.balances = data.data.balances;
       });
@@ -298,22 +301,21 @@ export const useAggregatorStore = create<
 
       const data = (await response.json()) as tokensQueryResponse;
 
-      const newData: any = data.data.tokens.map(
-        (token: ComputedTokenInfoJSON, index): TokenDataJSON => {
+      const newData: any = data.data.tokens
+        .map((token: ComputedTokenInfoJSON, index): TokenDataJSON => {
           const basePrice = Number(token.price) || 100;
 
           const priceData = generatePriceData(basePrice);
           return {
             index: index + 1,
             id: token.tokenId,
-            ticker: tokens[token.tokenId || 0]?.ticker,
-            name: tokens[token.tokenId || 0]?.name,
+            // ticker: tokens[token.tokenId || 0]?.ticker,
+            // name: tokens[token.tokenId || 0]?.name,
+            // logo: token.tokenId ? tokens[token.tokenId]?.logo : "",
             price: token.price,
-            logo: token.tokenId ? tokens[token.tokenId]?.logo : "",
             prices: priceData,
           };
-        },
-      );
+        });
 
       set((state) => {
         state.loading = false;
@@ -337,15 +339,12 @@ export const useAggregatorStore = create<
             query: `
               query loadPools {
                 pools(skip: 0, take: 50, orderBy: {blockHeight: desc}) {
-                  blockHeight
                   createAt
-                  path
                   poolKey
                   tokenAAmount
                   tokenAId
                   tokenBAmount
                   tokenBId
-                  updateBlockHeight
                   updatedAt
                 }
               }
@@ -356,15 +355,15 @@ export const useAggregatorStore = create<
 
       const data = (await response.json()) as PoolsInfoQueryResponse;
       const newData: any = data?.data?.pools?.map?.((pool: any, index) => {
-        const firstToken = tokens[pool.tokenAId];
-        const secondToken = tokens[pool.tokenBId];
+        // const firstToken = tokens[pool.tokenAId];
+        // const secondToken = tokens[pool.tokenBId];
         return {
           ...pool,
           id: index + 1, // TODO update id token
-          tokenselected: {
-            first: firstToken,
-            second: secondToken,
-          },
+          // tokenselected: {
+          //   first: firstToken,
+          //   second: secondToken,
+          // },
           feeTier: null,
           tvl: null,
           volume1d: null,
@@ -392,7 +391,9 @@ export const useAggregatorStore = create<
           body: JSON.stringify({
             query: `
               query loadTransactions {
-                poolActions(orderBy: {blockHeight: desc}, skip: 0, take: 50) {
+                poolActions(
+                where: {status: {equals: true}}
+                orderBy: {blockHeight: desc}, skip: 0, take: 50) {
                   blockHeight
                   createAt
                   creator
@@ -436,7 +437,7 @@ export const useAggregatorStore = create<
           },
           body: JSON.stringify({
             query: `
-              query loadTokensInfo {
+              query loadCalculationTVL {
                 tokens {
                   price
                   tokenId
@@ -592,9 +593,12 @@ export const usePoolTxs = (poolKey: string) => {
           },
           body: JSON.stringify({
             query: `
-              query loadPoolInfo {
+              query usePoolTxs {
                 poolActions(
-                  where: {poolKey: {contains: "${poolKey}"}}
+                  where: {
+                    poolKey: {contains: "${poolKey}"}, 
+                    status: {equals: true}
+                  }
                   orderBy: {blockHeight: desc}
                   skip: 0
                   take: 50
@@ -634,11 +638,13 @@ export const usePoolTxs = (poolKey: string) => {
 
 export const useTokenInfo = (tokenId: string) => {
   const [data, setData] = useState<any>({});
-  const [dataHistoryToken, setDataHistoryToken] = useState<Array<{
-    createAt: string,
-    price: string | number,
-    id: string | number
-  }>>([]);
+  const [dataHistoryToken, setDataHistoryToken] = useState<
+    Array<{
+      createAt: string;
+      price: string | number;
+      id: string | number;
+    }>
+  >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const getTokenInfo = async () => {
@@ -660,7 +666,7 @@ export const useTokenInfo = (tokenId: string) => {
                 }
               }
 
-            `
+            `,
           }),
         },
       );
@@ -671,18 +677,18 @@ export const useTokenInfo = (tokenId: string) => {
       const priceData = generatePriceData(basePrice);
       const newData: any = {
         id: dataRes.tokenId,
-        ticker: tokens[dataRes.tokenId || 0]?.ticker,
-        name: tokens[dataRes.tokenId || 0]?.name,
+        // ticker: tokens[dataRes.tokenId || 0]?.ticker,
+        // name: tokens[dataRes.tokenId || 0]?.name,
+        // logo: dataRes.tokenId ? tokens[dataRes.tokenId]?.logo : "",
         price: dataRes.price,
         volume: dataRes.volume || 0,
         fdv: dataRes.fdv || 0,
         tvl: dataRes.tvl || 0,
-        logo: dataRes.tokenId ? tokens[dataRes.tokenId]?.logo : "",
         prices: priceData,
       };
       setLoading(false);
       setData(newData || {});
-      setDataHistoryToken(data?.data?.historyTokens || [])
+      setDataHistoryToken(data?.data?.historyTokens || []);
       setError(data?.error);
     } catch {
       setData({});
@@ -713,7 +719,8 @@ export const useTokenTxs = (tokenId: string) => {
                     [
                       {tokenBId: {contains: "${tokenId}"}}, 
                       {tokenAId: {contains: "${tokenId}"}}
-                    ]
+                    ],
+                    status: {equals: true}
                   }
                   orderBy: {blockHeight: desc}
                   skip: 0
@@ -801,15 +808,15 @@ export const useTokenPools = (tokenId: string) => {
 
       const dataRes = (await response.json()) as PoolsInfoQueryResponse;
       const newData: any = dataRes.data.pools.map((pool: any, index) => {
-        const firstToken = tokens[pool.tokenAId];
-        const secondToken = tokens[pool.tokenBId];
+        // const firstToken = tokens[pool.tokenAId];
+        // const secondToken = tokens[pool.tokenBId];
         return {
           ...pool,
           id: index + 1, // TODO update id token
-          tokenselected: {
-            first: firstToken,
-            second: secondToken,
-          },
+          // tokenselected: {
+          //   first: firstToken,
+          //   second: secondToken,
+          // },
           feeTier: pool?.feeTier || null,
           tvl: pool?.tvl?.usd || null,
           apr: pool?.apr || null,
@@ -825,15 +832,23 @@ export const useTokenPools = (tokenId: string) => {
     }
   };
   return { data, loading, error, getTokenPools };
-}
+};
 
-export const useHistoryToken = (tokenId: string, filterTime: string | null, skip?: number, take?: number) => {
-  const [data, setData] = useState<Array<{
-    createAt: string,
-    price: string | number,
-    id: string | number
-  }>>([]);
-  const [loading, setLoading] = useState<Boolean>(false)
+export const useHistoryToken = (
+  tokenId: string,
+  filterTime: string | null,
+  skip?: number,
+  take?: number,
+) => {
+  const [data, setData] = useState<
+    Array<{
+      createAt: string;
+      price: string | number;
+      id: string | number;
+      type?: string;
+    }>
+  >([]);
+  const [loading, setLoading] = useState<Boolean>(false);
   const [error, setError] = useState(false);
 
   const getHistoryToken = async () => {
@@ -852,7 +867,7 @@ export const useHistoryToken = (tokenId: string, filterTime: string | null, skip
                 historyTokens(where: {
                 tokenId: {contains: "${tokenId}"}, 
                 createAt: ${filterTime ? `{gt: "${filterTime}"}` : `{}`}},
-                orderBy: {createAt: desc}
+                orderBy: {createAt: asc}
                 ${skip ? `skip: ${skip}` : ``}
                 take: ${take || 1}
                 ) {
@@ -861,7 +876,7 @@ export const useHistoryToken = (tokenId: string, filterTime: string | null, skip
                   id
                 }
               }
-            `
+            `,
           }),
         },
       );
@@ -870,49 +885,51 @@ export const useHistoryToken = (tokenId: string, filterTime: string | null, skip
       setLoading(false);
       setData(data?.data?.historyTokens || []);
       setError(data?.error);
-
     } catch {
       setData([]);
     }
   };
   return { data, loading, error, getHistoryToken };
-}
+};
 
 export const useLeaderBoard = () => {
   const [data, setData] = useState<Array<LeaderboardData>>([]);
-  const [loading, setLoading] = useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState(false);
 
-  const asyncLeaderBoard = async (sortType: "total_vol" | 'pnl') => {
+  const asyncLeaderBoard = async (sortType: "total_vol" | "pnl") => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/leaderboard/?${new URLSearchParams({ sortType })}`
+      `${process.env.NEXT_PUBLIC_SERVER_APP_HOST}/leaderboard/?${new URLSearchParams({ sortType })}`,
     );
-    const dataRes = await response.json()
-    return dataRes
-  }
-  const getLeaderBoard = async (sortType: "total_vol" | 'pnl' = 'total_vol') => {
+    const dataRes = await response.json();
+    return dataRes;
+  };
+  const getLeaderBoard = async (
+    sortType: "total_vol" | "pnl" = "total_vol",
+  ) => {
     try {
       setLoading(true);
       const data = await asyncLeaderBoard(sortType);
       setLoading(false);
       setData(data);
-
     } catch {
       setData([]);
     }
   };
   return { data, loading, error, getLeaderBoard };
-}
+};
 
-export const useHistoryPools = (poolKey: string, filterTime?:string) => {
-  const [data, setData] = useState<Array<{
-    createAt: string,
-    tokenAPrice: string | number,
-    tokenBPrice: string | number,
-    tokenAAmount: string | number,
-    tokenBAmount: string | number,
-  }>>([]);
-  const [loading, setLoading] = useState<Boolean>(false)
+export const useHistoryPools = (poolKey: string, filterTime?: string) => {
+  const [data, setData] = useState<
+    Array<{
+      createAt: string;
+      tokenAPrice: string | number;
+      tokenBPrice: string | number;
+      tokenAAmount: string | number;
+      tokenBAmount: string | number;
+    }>
+  >([]);
+  const [loading, setLoading] = useState<Boolean>(false);
   const [error, setError] = useState(false);
 
   const getHistoryPools = async () => {
@@ -932,7 +949,7 @@ export const useHistoryPools = (poolKey: string, filterTime?:string) => {
                   orderBy: {createAt: desc}
                   where: {
                     poolKey: {contains: "${poolKey}"},
-                    createAt: ${filterTime ? `{gt: "${filterTime}"}` : `{gt: "${'2024-12-18T09:09:09.884Z'}"}`}
+                    createAt: ${filterTime ? `{gt: "${filterTime}"}` : `{}`}
                   }
                 ) {
                   createAt
@@ -942,7 +959,7 @@ export const useHistoryPools = (poolKey: string, filterTime?:string) => {
                   tokenAAmount
                 }
               }
-            `
+            `,
           }),
         },
       );
@@ -951,10 +968,117 @@ export const useHistoryPools = (poolKey: string, filterTime?:string) => {
       setLoading(false);
       setData(data?.data?.historyPools || []);
       setError(data?.error);
-
     } catch {
       setData([]);
     }
   };
   return { data, loading, error, getHistoryPools };
-}
+};
+
+export const useGetTvlVolPool = (poolKey: string) => {
+  const [data, setData] = useState<{
+    tvl: number;
+    changeTvl: number | null;
+    vol: number;
+    changeVol: number | null;
+    fees: number | null;
+  }>({
+    tvl: 0,
+    changeTvl: null,
+    vol: 0,
+    changeVol: null,
+    fees: null,
+  });
+  const [loading, setLoading] = useState<Boolean>(false);
+  const [error, setError] = useState(false);
+
+  const getTVLandVolPools = async () => {
+    let currentTime = new Date();
+
+    let filterTime = new Date(
+      currentTime.getTime() - 60 * 60 * 24 * 1000,
+    ).toISOString();
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PROTOKIT_PROCESSOR_GRAPHQL_URL}`,
+        {
+          method: "Post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: `
+              query loadGetTvlVolPool {
+                pool(
+                  where: {poolKey: "${poolKey}"}
+                ) {
+                  tokenAAmount
+                  tokenAId
+                  tokenBAmount
+                  tokenBId
+                }
+                tokens {
+                  tokenId
+                  price
+                }
+              }
+            `,
+          }),
+        },
+      );
+      // historyPools(
+      //   orderBy: {createAt: desc}
+      //   where: {
+      //     poolKey: {contains: "${poolKey}"},
+      //     createAt: {gt: "${filterTime}"}
+      //   }
+      // ) {
+      //   tokenAPrice
+      //   tokenBAmount
+      //   tokenBPrice
+      //   tokenAAmount
+      // }
+      const dataRes = await response.json();
+      let dataTokens = dataRes?.data?.tokens || [];
+      let dataPool = dataRes?.data?.pool || {};
+      // let dataHistoryPools = dataRes?.data?.historyPools || [];
+      let tvl = 0;
+      let vol = 0;
+      let tokenAPrice =
+        dataTokens.filter((item: any) => item.tokenId === dataPool.tokenAId)[0]
+          ?.price || 0;
+      let tokenBPrice =
+        dataTokens.filter((item: any) => item.tokenId === dataPool.tokenBId)[0]
+          ?.price || 0;
+      tvl = BigNumber(dataPool.tokenAAmount || 0)
+        .times(tokenAPrice)
+        .plus(BigNumber(dataPool.tokenBAmount || 0).times(tokenBPrice))
+        .div(10 ** precision)
+        .toNumber();
+      // vol = dataHistoryPools.reduce((acc: number, item: any) => {
+      //   const tokenAPriceVolume =
+      //     item?.tokenAPrice * parseFloat(item?.tokenAAmount);
+      //   const tokenBPriceVolume =
+      //     item?.tokenBPrice * parseFloat(item?.tokenBAmount);
+      //   return acc + tokenAPriceVolume + tokenBPriceVolume;
+      // }, 0)
+      setLoading(false);
+      setData({
+        ...data,
+        tvl: tvl,
+        vol: vol,
+      });
+      setError(dataRes?.error);
+    } catch {
+      setData({
+        tvl: 0,
+        changeTvl: null,
+        vol: 0,
+        changeVol: null,
+        fees: null,
+      });
+    }
+  };
+  return { data, loading, error, getTVLandVolPools };
+};

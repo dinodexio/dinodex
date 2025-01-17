@@ -5,10 +5,10 @@ export function Footer() {
 
   return (
     <>
-      <div className="fixed bottom-[41px] left-[50px] hidden xl:block lg:block sm:hidden" style={{ zIndex: 100 }}>
+      <div className="fixed bottom-[41px] left-[50px] hidden xl:block lg:block sm:hidden" style={{ zIndex: 30 }}>
         <Image src={'/images/home/dex.svg'} width={84} height={84} alt="dex" />
       </div>
-      <div className="fixed bottom-[41px] right-[50px] hidden xl:block lg:block sm:hidden" style={{ zIndex: 100 }}>
+      <div className="fixed bottom-[41px] right-[50px] hidden xl:block lg:block sm:hidden" style={{ zIndex: 30 }}>
         <div className="flex items-center gap-[17px]">
           <Link href="https://github.com/dinodexio" target="_blank">
             <Image

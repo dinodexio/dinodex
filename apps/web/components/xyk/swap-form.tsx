@@ -11,7 +11,7 @@ import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { USDBalance } from "../ui/usd-balance";
 import { useFormContext } from "react-hook-form";
-import { tokens } from "@/tokens";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface SwapFormProps {
   loading: boolean;
@@ -20,6 +20,7 @@ export interface SwapFormProps {
 }
 
 export function SwapForm({ loading, route, unitPrice }: SwapFormProps) {
+   const { data: tokens } = useTokenStore();
   const [detailsOpen, setDetailsOpen] = useState(false);
   const form = useFormContext();
   const error = Object.values(form.formState.errors)[0]?.message?.toString();

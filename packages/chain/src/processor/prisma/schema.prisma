@@ -24,11 +24,12 @@ model Block {
 }
 
 model Balance {
-  height  Int
-  address String
-  amount  String
+  address       String
+  tokenId       String
+  amount        String
+  waitForUpdate Boolean
 
-  @@id([height, address])
+  @@id([address, tokenId])
 }
 
 model Pool {
@@ -62,6 +63,20 @@ model PoolAction {
   createAt      DateTime @default(now())
 
   @@id([hash, eventIndex])
+}
+
+model HistoryPool {
+  id            Int @id @default(autoincrement())
+  hash          String
+  blockHeight   Int
+  poolKey       String
+  tokenAId      String
+  tokenBId      String
+  tokenAAmount  String
+  tokenBAmount  String
+  tokenAPrice   Float
+  tokenBPrice   Float
+  createAt      DateTime @default(now())
 }
 
 model RouteStable {

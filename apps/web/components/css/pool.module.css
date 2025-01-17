@@ -485,6 +485,11 @@
     transition: all 0.3s ease;
 }
 
+.pool-item:last-child .content-pool-item,
+.pool-item:nth-last-child(2) .content-pool-item{
+    display: none;
+}
+
 .content-pool-item-show {
     margin-top: 15px;
     opacity: 1;
@@ -494,6 +499,7 @@
     flex-direction: column;
     gap: 15px;
     height: 227px;
+    display: block !important;
 }
 
 .info-item {
@@ -538,6 +544,7 @@
     justify-content: space-around;
     align-items: center;
     width: 100%;
+    margin-top: 15px;
 }
 
 .slider {
@@ -560,10 +567,14 @@
 }
 
 .slider::-moz-range-thumb {
-    width: 25px;
-    height: 25px;
-    background: #04AA6D;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 31px;
+    height: 31px;
+    background: #FF603B;
+    border-radius: 31px;
     cursor: pointer;
+    border-color: #FF603B !important;
 }
 
 .modal-pool {
@@ -609,6 +620,7 @@
 .pool-logo-item {
     max-width: 76px !important;
     height: 76px !important;
+    border-radius: 50%;
 }
 
 .pool-container {
@@ -662,6 +674,8 @@
     opacity: 1;
     visibility: visible;
 }
+
+
 
 @media (min-width: 800px) and (max-width: 1367px) {
     .pool-container {
@@ -771,6 +785,16 @@
     }
 }
 
+@media (max-width: 375px) {
+    .addLiquidityButton {
+        padding: 6px 10px;
+    }
+
+    .inputAddLiquidity {
+        width: 35%;
+    }
+}
+
 @keyframes spin {
     0% {
         transform: rotate(0deg);
@@ -778,5 +802,16 @@
 
     100% {
         transform: rotate(360deg);
+    }
+}
+
+
+@media (max-width: 375px) {
+    .addLiquidityButton {
+        padding: 6px 10px;
+    }
+
+    .inputAddLiquidity {
+        width: 40%;
     }
 }

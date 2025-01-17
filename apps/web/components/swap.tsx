@@ -20,7 +20,7 @@ export function SwapForm({ swapForm, isDetail = false }: SwapProps) {
     <div className="flex items-center justify-center flex-col">
       <Toaster />
       <Header type="swap" />
-      <div className="flex w-full flex-col px-[16px] pt-8 sm:px-[16px] lg:px-[32px] xl:px-[41px] xl:pt-8">
+      <div className="flex w-full flex-col px-[16px] pt-0 sm:pt-0 lg:pt-8 xl:pt-8">
         {swapForm}
         <Footer />
       </div>

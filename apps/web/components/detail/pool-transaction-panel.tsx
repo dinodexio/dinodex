@@ -1,8 +1,6 @@
 import {
   capitalizeFirstLetter,
-  formatNumber,
   formatNumberWithPrice,
-  formatterInteger,
   formatTimeAgo,
   truncateString,
 } from "@/lib/utils";
@@ -11,29 +9,13 @@ import styles from "../css/table.module.css";
 import { precision } from "../ui/balance";
 import { DataTransactionPanel, TransactionPanelProps } from "@/types";
 import { SkeletonLoading } from "./SkeletonLoading";
-import { EMPTY_DATA } from "@/constants";
-import BigNumber from "bignumber.js";
-
-function formatNumberPrecisionVol(value: string | number, isPrice: boolean = false) {
-  if (!value) return EMPTY_DATA;
-
-  const priceResult = formatNumber(BigNumber(value).toNumber());
-  return `${
-    priceResult == "<0.01"
-      ? isPrice
-        ? "< $0.01"
-        : priceResult
-      : isPrice
-        ? `$${priceResult}`
-        : priceResult
-  }`;
-}
+import BaseTokenTag from "../common/BaseTokenTag";
 
 export function PoolTransactionPanel({
   data = [],
   titleA = "TokenA",
   titleB = "TokenB",
-  loading
+  loading,
 }: TransactionPanelProps) {
   let columnTableTransactionTokenInfo = [
     {
@@ -43,9 +25,7 @@ export function PoolTransactionPanel({
       width: 120,
       render: (data: DataTransactionPanel) => {
         return (
-          <span className="text-[18px]">
-            {formatTimeAgo(data?.timestamp)}
-          </span>
+          <span className="text-[17px]">{formatTimeAgo(data?.timestamp)}</span>
         );
       },
     },
@@ -53,11 +33,11 @@ export function PoolTransactionPanel({
       id: 2,
       title: "Type",
       key: "Type-transaction",
-      width: 120,
+      width: 130,
       render: (data: DataTransactionPanel) => {
         return (
           <span
-            className={`${data?.action === "sell" || data?.action === "remove" ? styles["text-red"] : styles["text-green"]} ${styles["text-action"]} text-[18px]`}
+            className={`${data?.action === "sell" || data?.action === "remove" ? styles["text-red"] : styles["text-green"]} ${styles["text-action"]} text-[17px]`}
           >
             {capitalizeFirstLetter(data?.typeText || "")}
           </span>
@@ -66,23 +46,25 @@ export function PoolTransactionPanel({
     },
     {
       id: 3,
-      title: "$USDT",
+      title: "Volume",
       key: "usdt-transaction",
-      width: 100,
+      width: 150,
       render: (data: DataTransactionPanel) => {
         return (
           <span>
-            $
-            {Number(data?.priceusd) > 1000000
-              ? formatNumberPrecisionVol(Number(Number(data?.priceusd).toFixed(4)), true)
-              : formatterInteger(Number(Number(data?.priceusd).toFixed(4)))}
+            {formatNumberWithPrice(data?.priceusd || "", true, 0, true)}
+            <BaseTokenTag fontSize="0.8em" />
           </span>
         );
       },
     },
     {
       id: 4,
-      title: loading ? <SkeletonLoading loading={loading} className="w-[98%] h-[20px]" /> : <>{titleA || 'titleA'}</>,
+      title: loading ? (
+        <SkeletonLoading loading={loading} className="h-[20px] w-[98%]" />
+      ) : (
+        <>{titleA || "titleA"}</>
+      ),
       key: "for-transaction",
       width: 100,
       render: (data: DataTransactionPanel) => {
@@ -106,7 +88,11 @@ export function PoolTransactionPanel({
     },
     {
       id: 5,
-      title: loading ? <SkeletonLoading loading={loading} className="w-[98%] h-[20px]" /> : <>{titleB || 'titleB'}</>,
+      title: loading ? (
+        <SkeletonLoading loading={loading} className="h-[20px] w-[98%]" />
+      ) : (
+        <>{titleB || "titleB"}</>
+      ),
       key: "usd-transaction",
       width: 100,
       render: (data: DataTransactionPanel) => {
@@ -148,9 +134,10 @@ export function PoolTransactionPanel({
       <Table
         data={data}
         column={columnTableTransactionTokenInfo}
-        onClickTr={() => { }}
+        onClickTr={() => {}}
         classTable="table-layout"
         loading={loading}
+        isHeightFull={false}
       />
     </>
   );

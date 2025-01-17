@@ -139,7 +139,7 @@ export const useChainStore = create<ChainState, [["zustand/immer", never]]>(
 );
 
 export const tickInterval = 3000;
-export const usePollBlockHeight = () => {
+export const usePollBlockHeight = (isLoadBlock: boolean = true) => {
   const [tick, setTick] = useState(0);
   const chain = useChainStore();
   const { wallet } = useWalletStore();
@@ -149,13 +149,15 @@ export const usePollBlockHeight = () => {
   }, [tick, wallet]);
 
   useEffect(() => {
-    const intervalId = setInterval(
-      () => setTick((tick) => tick + 1),
-      tickInterval,
-    );
+    if (isLoadBlock) {
+      const intervalId = setInterval(
+        () => setTick((tick) => tick + 1),
+        tickInterval,
+      );
 
-    setTick((tick) => tick + 1);
+      setTick((tick) => tick + 1);
 
-    return () => clearInterval(intervalId);
-  }, []);
+      return () => clearInterval(intervalId);
+    }
+  }, [isLoadBlock]);
 };

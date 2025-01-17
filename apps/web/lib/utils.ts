@@ -1,5 +1,6 @@
 import {
   ADDLIQUIDITY,
+  BASE_TOKEN,
   CREATEPOOL,
   DRIPBUNDLE,
   EMPTY_DATA,
@@ -8,6 +9,7 @@ import {
   TOKEN_PRICES,
   TRANSFER,
 } from "@/constants";
+import { Tokens } from "@/tokens";
 import BigNumber from "bignumber.js";
 import { type ClassValue, clsx } from "clsx";
 import moment from "moment";
@@ -45,7 +47,19 @@ export function formatterInteger(number: number) {
   return parts.join(".");
 }
 
-export function formatNumber(num: number | string): string {
+export function getTokenId(tokens: Tokens, ticker: string) {
+  for (const [id, token] of Object.entries(tokens)) {
+    if (token?.ticker === ticker) {
+      return id;
+    }
+  }
+  return null; // Return null if not found
+}
+
+export function formatNumber(
+  num: number | string,
+  toFixed: number = 2,
+): string {
   const EMPTY_DATA = "--"; // Define EMPTY_DATA if not already defined
   const value = typeof num === "string" ? parseFloat(num) : num;
 
@@ -62,7 +76,7 @@ export function formatNumber(num: number | string): string {
 
   for (const { limit, suffix } of thresholds) {
     if (value >= limit) {
-      return (value / limit).toFixed(2) + suffix;
+      return (value / limit).toFixed(toFixed) + suffix;
     }
   }
 
@@ -70,7 +84,7 @@ export function formatNumber(num: number | string): string {
     return "<0.01";
   }
 
-  return value.toFixed(2).toString();
+  return value.toFixed(toFixed).toString();
 }
 
 export function formatBigNumber(value: BigNumber): string {
@@ -188,7 +202,7 @@ export const dataTokenDefault = {
 export function formatPriceUSD(
   amount: number | string,
   ticker: string,
-  tokenPrice?: number | string
+  tokenPrice?: number | string,
 ): string {
   // Convert the amount to a number
   const parsedAmount = typeof amount === "number" ? amount : Number(amount);
@@ -289,9 +303,10 @@ export function formatNumberWithPrice(
   value: string | number,
   isPrice: boolean = false,
   precision: number = 0,
+  isHideBaseToken: boolean = false,
 ) {
   if (!value || value === Infinity || value === -Infinity) {
-    return isPrice ? `$0` : 0;
+    return isPrice ? `0 ${isHideBaseToken ? "" : BASE_TOKEN}` : 0;
   }
   const numericValue = new BigNumber(value);
   const priceResult = formatNumber(
@@ -304,10 +319,12 @@ export function formatNumberWithPrice(
 
   // Format output based on isPrice and threshold comparison
   if (isLessThanThreshold) {
-    return isPrice ? "<$0.01" : "<0.01";
+    return isPrice ? `<0.01 ${isHideBaseToken ? "" : BASE_TOKEN}` : "<0.01";
   }
 
-  return isPrice ? `$${priceResult}` : priceResult;
+  return isPrice
+    ? `${priceResult} ${isHideBaseToken ? "" : BASE_TOKEN}`
+    : priceResult;
 }
 
 export const formatTimeAgo = (
@@ -327,7 +344,7 @@ export const formatTimeAgo = (
     .replace("an hour", "1h")
     .replace("a day", "1d")
     .replace("a month", "1mo")
-    .replace("a year", "1y")
+    .replace("a year", "1y");
   return /\d/.test(timeAgo) ? `${timeAgo} ago` : "a few sec";
 };
 
@@ -348,9 +365,9 @@ export const generatePriceData = (basePrice: number) => {
 };
 
 export function formatNumberWithCommas(number: string | number, decimals = 2) {
-  let formattedNumber = Number(number).toLocaleString('en-US',{
-    minimumFractionDigits: 0, 
-    maximumFractionDigits: decimals, 
+  let formattedNumber = Number(number).toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: decimals,
   });
 
   return formattedNumber;

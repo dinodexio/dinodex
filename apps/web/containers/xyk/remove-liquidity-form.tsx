@@ -23,8 +23,8 @@ import { precision, removeTrailingZeroes } from "@/components/ui/balance";
 import { useWalletStore } from "@/lib/stores/wallet";
 import { usePoolKey } from "@/lib/xyk/usePoolKey";
 import { useSpotPrice } from "@/lib/xyk/useSpotPrice";
-import { tokens } from "@/tokens";
 import { dataSubmitProps } from "@/types";
+import { useTokenStore } from "@/lib/stores/token";
 
 export function addPrecision(value: string) {
   return new BigNumber(value).times(10 ** precision).toString();
@@ -35,6 +35,7 @@ export function removePrecision(value: string) {
 }
 
 export function RemoveLiquidityForm() {
+  const { data: tokens } = useTokenStore();
   const [loading, setLoading] = useState(false);
   const removeLiquidity = useRemoveLiquidity();
   const { wallet } = useWalletStore();

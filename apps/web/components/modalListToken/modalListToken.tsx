@@ -2,7 +2,7 @@ import Image from "next/image";
 import React, { useEffect, useMemo } from "react";
 import "../style.css";
 import { Dialog, DialogClose } from "../ui/dialog";
-import { LIST_TOKENS } from "@/tokens";
+import { Tokens } from "@/tokens";
 import styles from "../css/modalListToken.module.css";
 import { formatPriceUSD } from "@/lib/utils";
 import { useWalletStore } from "@/lib/stores/wallet";
@@ -11,6 +11,8 @@ import { Balance, precision } from "../ui/balance";
 import { USDBalance } from "../ui/usd-balance";
 import { useAggregatorStore } from "@/lib/stores/aggregator";
 import BigNumber from "bignumber.js";
+import { ImageCommon } from "../common/ImageCommon";
+import { useTokenStore } from "@/lib/stores/token";
 // import { cn } from "@/lib/utils";
 // import { Input } from "../ui/input";
 
@@ -18,26 +20,31 @@ export interface modalListTokenProps {
   tokenSelected?: any;
   onClickToken: (token: any) => void;
   dialogClose: boolean;
+  listTokens?: Tokens;
 }
 
 export const ModalListToken = ({
   tokenSelected,
   onClickToken,
   dialogClose,
+  listTokens,
 }: modalListTokenProps) => {
+  const { base: LIST_TOKENS } = useTokenStore();
   const { wallet } = useWalletStore();
   const { balances } = useBalancesStore();
   const { tokens, loadTokens } = useAggregatorStore();
   const ownBalances = wallet ? balances[wallet] : {};
 
   const tokenOptions = useMemo(() => {
-    let list_token = Object.entries(LIST_TOKENS).map(([tokenId, token]) => ({
-      label: token?.name,
-      ticker: token?.ticker,
-      value: tokenId,
-      price: tokens ? tokens.find((t) => t.id === tokenId)?.price : '--',
-      balance: ownBalances ? ownBalances[tokenId] : 0,
-    }));
+    let list_token = Object.entries(listTokens ? listTokens : LIST_TOKENS).map(
+      ([tokenId, token]) => ({
+        label: token?.name,
+        ticker: token?.ticker,
+        value: tokenId,
+        price: tokens ? tokens.find((t) => t.id === tokenId)?.price : "--",
+        balance: ownBalances ? ownBalances[tokenId] : 0,
+      }),
+    );
     return list_token;
   }, [LIST_TOKENS, ownBalances, tokens]);
   const [valueSearch, setValueSearch] = React.useState<string>("");
@@ -46,7 +53,7 @@ export const ModalListToken = ({
     if (!tokens || tokens.length === 0) {
       loadTokens();
     }
-  }, [JSON.stringify(tokens)])
+  }, [JSON.stringify(tokens)]);
   return (
     <div className="h-max">
       <div className={styles["header-content-modal"]}>
@@ -93,22 +100,23 @@ export const ModalListToken = ({
                 {dialogClose ? (
                   <DialogClose>
                     <div
-                      className={`${styles["list-token-item"]} ${tokenSelected?.symbol === token.label ||
+                      className={`${styles["list-token-item"]} ${
+                        tokenSelected?.symbol === token.label ||
                         tokenSelected?.ticker === token.label ||
                         tokenSelected?.label === token.label ||
                         tokenSelected?.name === token.label
-                        ? styles["list-token-item-active"]
-                        : ""
-                        }`}
+                          ? styles["list-token-item-active"]
+                          : ""
+                      }`}
                       onClick={() => onClickToken(token)}
                     >
                       <div className={styles["list-token-item-content"]}>
                         <div className="relative">
-                          <Image
+                          <ImageCommon
                             src={LIST_TOKENS[token.value]?.logo || ""}
-                            alt="token-1"
                             width={50}
                             height={50}
+                            style={{ borderRadius: 50 / 2 }}
                           />
                           <Image
                             src="/icon/logo-dino.svg"
@@ -136,14 +144,15 @@ export const ModalListToken = ({
                           balance={formatPriceUSD(
                             BigNumber(token?.balance || "~")
                               .div(10 ** precision)
-                              .toFixed(2).toString(),
+                              .toFixed(2)
+                              .toString(),
                             token?.ticker || "",
-                            token?.price || "~"
+                            token?.price || "~",
                           )}
                           type="USD"
                         />
                         <span className={styles["list-token-item-symbol"]}>
-                          <Balance balance={String(token?.balance)} />
+                          <Balance balance={String(token?.balance)} formatInteger={true}/>
                         </span>
                       </div>
                     </div>
@@ -155,7 +164,7 @@ export const ModalListToken = ({
                   >
                     <div className={styles["list-token-item-content"]}>
                       <div>
-                        <Image
+                        <img
                           src={LIST_TOKENS[token.value]?.logo || ""}
                           alt="token-1"
                           width={50}

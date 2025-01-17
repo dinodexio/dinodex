@@ -1,10 +1,11 @@
 import { useObserveBalancePool } from '@/lib/stores/balances';
-import { getTokenID } from '@/tokens';
+import { useTokenStore } from '@/lib/stores/token';
 import { TokenId } from '@proto-kit/library';
 import { PoolKey, TokenPair } from 'chain';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 
 export const useToggleActiveItem = (item: any) => {
+  const { getTokenID } = useTokenStore()
   const [pooledBalances, setPooledBalances] = useState<any>(null);
   const [activeItems, setActiveItems] = useState<any[]>([]);
 

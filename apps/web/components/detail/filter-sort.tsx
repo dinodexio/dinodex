@@ -5,7 +5,8 @@ import useClickOutside from "@/hook/useClickOutside";
 import styles from "../css/tokens.module.css";
 export interface FilterSortProps {
   onChangeTime?: (value: string) => void;
-
+  handleUpdateFilterChart?: (value: string) => void;
+  dataFiltersChart?: string;
 }
 let dataFilterTime = [
   {
@@ -30,36 +31,44 @@ let dataFilterTime = [
   },
 ];
 
-let FilterChart = [
-  {
-    value: "price",
-    label: "Price",
-  },
+interface ChartFilter {
+  value: string;
+  label: string;
+}
+
+const FilterChart: ChartFilter[] = [
   {
     value: "volume",
     label: "Volume",
+  },
+  {
+    value: "price",
+    label: "Price",
   },
   {
     value: "tvl",
     label: "TVL",
   },
 ];
-export function FilterSort({onChangeTime}: FilterSortProps) {
+export function FilterSort({
+  onChangeTime,
+  dataFiltersChart = "volume",
+  handleUpdateFilterChart,
+}: FilterSortProps) {
   const [openFiltersChart, setOpenFiltersChart] = useState<boolean>(false);
-  const [dataFiltersChart, setDataFiltersChart] = useState<string>("price");
-  const [dataTime, setDataTime] = useState<any>("1h");
+  const [dataTime, setDataTime] = useState<any>("1d");
   const refFiltersChart = useClickOutside<HTMLDivElement>(() => {
     setOpenFiltersChart(false);
   });
-
+  const dataFilter = FilterChart.filter((item) => item.value === dataFiltersChart);
   return (
     <div className={styles["filter-container"]}>
       <div className={styles["filter-time-container"]}>
         {dataFilterTime.map((item, index) => (
           <div
             onClick={() => {
-              setDataTime(item.value)
-              onChangeTime && onChangeTime(item.value)
+              setDataTime(item.value);
+              onChangeTime && onChangeTime(item.value);
             }}
             className={`${styles["filter-time-item"]} ${item.value === dataTime ? styles["filter-time-item-active"] : ""}`}
             key={index}
@@ -99,7 +108,7 @@ export function FilterSort({onChangeTime}: FilterSortProps) {
             className={styles["network-content-menu-item-text"]}
             style={{ textTransform: "capitalize" }}
           >
-            {dataFiltersChart}
+            {dataFiltersChart || "Volume"}
           </span>
           <Image
             width={20}
@@ -110,12 +119,13 @@ export function FilterSort({onChangeTime}: FilterSortProps) {
           <div
             className={`${styles["network-content-menu"]} ${openFiltersChart ? styles["network-content-menu-show"] : ""}`}
           >
-            {FilterChart.map((item, index) => (
+            {dataFilter && dataFilter?.map((item, index) => (
               <div
                 className={styles["network-content-menu-item"]}
                 key={index}
                 onClick={() => {
-                  setDataFiltersChart(item.value);
+                  handleUpdateFilterChart &&
+                    handleUpdateFilterChart(item.value);
                   setOpenFiltersChart(false);
                 }}
                 data-network={item.value}

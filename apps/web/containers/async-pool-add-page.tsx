@@ -8,9 +8,8 @@ import {
   useObserveTotalSupply,
 } from "@/lib/stores/balances";
 import { useWalletStore } from "@/lib/stores/wallet";
-import { findTokenByParams, tokens } from "@/tokens";
 import BigNumber from "bignumber.js";
-import {  useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,6 +26,7 @@ import { precision, removeTrailingZeroes } from "@/components/ui/balance";
 import { Form } from "@/components/ui/form";
 import { UInt64 } from "o1js";
 import { dataSubmitProps } from "@/types";
+import { useTokenStore } from "@/lib/stores/token";
 
 export const initCheckForm = {
   isComfirmed: false,
@@ -39,6 +39,7 @@ export const initCheckForm = {
 const INIT_SLIPPAGE = 0.2;
 
 export default function Pool({ params }: { params?: any }) {
+  const { data: tokens, findTokenByParams } = useTokenStore();
   const [loading, setLoading] = useState(false);
   const createPool = useCreatePool();
   const addLiquidity = useAddLiquidity();
@@ -98,18 +99,21 @@ export default function Pool({ params }: { params?: any }) {
       slippage_custom: z.any().optional(),
       transactionDeadline: z.any().optional(),
     })
-    .refine((data) => {
-      if (data.tokenA_token === "1") {
-        return data.tokenB_token !== "2";
-      }
-      if (data.tokenA_token === "2") {
-        return data.tokenB_token !== "1";
-      }
-      return true;
-    }, {
-      message: "Invalid token pair",
-      path: ["tokenA_token"],
-    })
+    .refine(
+      (data) => {
+        if (data.tokenA_token === "1") {
+          return data.tokenB_token !== "2";
+        }
+        if (data.tokenA_token === "2") {
+          return data.tokenB_token !== "1";
+        }
+        return true;
+      },
+      {
+        message: "Invalid token pair",
+        path: ["tokenA_token"],
+      },
+    )
     .refine((data) => data.tokenA_token !== data.tokenB_token, {
       message: "Tokens must be different",
       path: ["tokenA_token"],
@@ -212,10 +216,6 @@ export default function Pool({ params }: { params?: any }) {
       .div(tokenAReserve)
       .toString();
 
-    console.log(
-      "calculated lp tokens",
-      removePrecision(lpTokensToMint, precision),
-    );
     if (pool?.exists && tokenAReserve === "0" && tokenBReserve === "0") {
       if (Number(fields.tokenA_token) > Number(fields.tokenB_token)) {
         return form.setValue("tokenLP_amount", fields.tokenA_amount);
@@ -236,7 +236,10 @@ export default function Pool({ params }: { params?: any }) {
   // calculate amount B
   useEffect(() => {
     if (pool?.exists && tokenAReserve === "0" && tokenBReserve === "0") return;
-    if (fields.tokenA_amount === "" || BigNumber(fields.tokenA_amount).lte(0)) {
+    if (
+      pool?.exists &&
+      (fields.tokenA_amount === "" || BigNumber(fields.tokenA_amount).lte(0))
+    ) {
       form.setValue("tokenB_amount", "");
       return;
     }

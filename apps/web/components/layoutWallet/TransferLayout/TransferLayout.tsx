@@ -15,7 +15,7 @@ import { Form } from "@/components/ui/form";
 import { TransferConfirm } from "./transfer-confirm";
 import { TransferWaiting } from "./transfer-waiting";
 import { dataSubmitProps } from "@/types";
-import { tokens } from "@/tokens";
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface transferLayoutProps {
   onClose: () => void;
@@ -29,6 +29,7 @@ export function TransferLayout({ onClose }: transferLayoutProps) {
     confirm: false,
     waiting: false,
   });
+  const { data: tokens } = useTokenStore();
 
   const formSchema = z.object({
     toRecipientAddress: z

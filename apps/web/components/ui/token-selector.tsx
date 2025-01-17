@@ -1,10 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import styles from "../css/wallet.module.css";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -15,14 +14,9 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
-import { tokens } from "@/tokens";
 import { FormField } from "./form";
 import { useFormContext } from "react-hook-form";
-
-const tokenOptions = Object.entries(tokens).map(([tokenId, token]) => ({
-  label: token?.ticker,
-  value: tokenId,
-}));
+import { useTokenStore } from "@/lib/stores/token";
 
 export interface TokenSelectorProps {
   handleResetValue?: () => void;
@@ -30,17 +24,29 @@ export interface TokenSelectorProps {
   name: string;
 }
 
-export function TokenSelector({ disabled, name, handleResetValue }: TokenSelectorProps) {
+export function TokenSelector({
+  disabled,
+  name,
+  handleResetValue,
+}: TokenSelectorProps) {
+  const { data: tokens } = useTokenStore();
   const [open, setOpen] = React.useState(false);
 
   const form = useFormContext();
   const inputName = `${name}_token`;
+
+  const tokenOptions = tokens
+    ? Object.entries(tokens).map(([tokenId, token]) => ({
+        label: token?.ticker || "Unknown Token",
+        value: tokenId,
+      }))
+    : [];
   return (
     <FormField
       control={form.control}
       name={inputName}
       render={({ field }) => {
-        return(
+        return (
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -49,8 +55,8 @@ export function TokenSelector({ disabled, name, handleResetValue }: TokenSelecto
                 role="combobox"
                 aria-expanded={open}
                 className={`flex h-[38px] flex-row items-center justify-between gap-[8px] 
-                  rounded-[8px] py-[8px] pl-[12px] border-none pr-[8px] text-textBlack hover:text-textBlack hover:bg-[#D1D1D1] 
-                  ${field.value ? "bg-bgWhiteColor" : "bg-[#D1D1D1] hover:opacity-70"} ${styles['select-token']}`}
+                  rounded-[8px] border-none py-[8px] pl-[12px] pr-[8px] text-textBlack hover:bg-[#D1D1D1] hover:text-textBlack 
+                  ${field.value ? "bg-bgWhiteColor" : "bg-[#D1D1D1] hover:opacity-70"} ${styles["select-token"]}`}
                 style={{ width: "max-content" }}
               >
                 <div className="flex items-center justify-start">
@@ -78,7 +84,7 @@ export function TokenSelector({ disabled, name, handleResetValue }: TokenSelecto
               </Button>
             </PopoverTrigger>
             <PopoverContent
-              className={`w-[225px] border-none bg-white p-0 ${styles["popover-content"]} ${styles['box-shadow-content-wallet']}`}
+              className={`w-[225px] border-none bg-white p-0 ${styles["popover-content"]} ${styles["box-shadow-content-wallet"]}`}
             >
               <Command
                 className="bg-white"
@@ -114,7 +120,7 @@ export function TokenSelector({ disabled, name, handleResetValue }: TokenSelecto
                           form.trigger(inputName);
                           setOpen(false);
                         }}
-                        className={`flex items-center justify-between rounded-[3px] ${field.value === token.value ? styles["command-item-active"] : ''} ${styles["command-item"]}`}
+                        className={`flex items-center justify-between rounded-[3px] ${field.value === token.value ? styles["command-item-active"] : ""} ${styles["command-item"]}`}
                       >
                         <div className="flex items-center">
                           <img
@@ -141,7 +147,7 @@ export function TokenSelector({ disabled, name, handleResetValue }: TokenSelecto
               </Command>
             </PopoverContent>
           </Popover>
-        )
+        );
       }}
     ></FormField>
   );

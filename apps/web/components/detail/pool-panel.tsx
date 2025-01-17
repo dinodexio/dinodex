@@ -5,6 +5,8 @@ import { DATA_POOL, EMPTY_DATA } from "@/constants";
 import styles from "../css/table.module.css";
 import { useRouter } from "next/navigation";
 import { DataPoolsPanel } from "@/types";
+import { ImageCommon } from "../common/ImageCommon";
+import BaseTokenTag from "../common/BaseTokenTag";
 
 export interface PoolPanelProps {
   data?: any
@@ -32,8 +34,8 @@ export function PoolPanel({data,loading}: PoolPanelProps) {
           <div className={styles["token-info"]}>
           <div className={styles["token-info-logo"]}>
             <div className="relative h-6 w-6 overflow-hidden">
-              <Image
-                className="absolute left-1/2"
+              <ImageCommon
+                className="absolute left-1/2 rounded-full"
                 src={data?.tokenselected?.first?.logo}
                 alt={data?.tokenselected?.first?.name}
                 width={24}
@@ -41,7 +43,7 @@ export function PoolPanel({data,loading}: PoolPanelProps) {
               />
             </div>
             <div className="relative h-6 w-6 overflow-hidden">
-              <Image
+              <ImageCommon
                 className="absolute right-1/2"
                 src={data?.tokenselected?.second?.logo}
                 alt={data?.tokenselected?.second?.name}
@@ -67,7 +69,7 @@ export function PoolPanel({data,loading}: PoolPanelProps) {
       width: 123,
       render: (data: DataPoolsPanel) => {
         return (
-          <span className={styles["price-text"]}>${formatLargeNumber(data?.tvl)}</span>
+          <span className={styles["price-text"]}>{formatLargeNumber(data?.tvl)} {' '} <BaseTokenTag fontSize="0.8em" /></span>
         );
       },
     },
@@ -88,7 +90,7 @@ export function PoolPanel({data,loading}: PoolPanelProps) {
       render: (data: DataPoolsPanel) => {
         return (
           <span className={styles["price-text"]}>
-            ${formatLargeNumber(data?.volume1d)}
+            {formatLargeNumber(data?.volume1d)} {' '} <BaseTokenTag fontSize="0.8em" />
           </span>
         );
       },
@@ -101,7 +103,7 @@ export function PoolPanel({data,loading}: PoolPanelProps) {
       render: (data: DataPoolsPanel) => {
         return (
           <span className={styles["price-text"]}>
-            ${formatLargeNumber(data?.volume7d)}
+            {formatLargeNumber(data?.volume7d)} {' '} <BaseTokenTag fontSize="0.8em" />
           </span>
         );
       },
@@ -117,6 +119,7 @@ export function PoolPanel({data,loading}: PoolPanelProps) {
         }}
         classTable="table-layout"
         loading={loading}
+        isHeightFull={false}
       />
     </>
   );
